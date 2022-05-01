@@ -21,7 +21,10 @@ if not SECRET_KEY_FILE.exists():
 SECRET_KEY = open(SECRET_KEY_FILE).read()
 
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+]
 
 CORS_ORIGIN_WHITELIST = (
     'http://localhost:8080',
