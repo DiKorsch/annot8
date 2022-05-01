@@ -36,3 +36,9 @@ chmod 600 mysql.cnf
 python manage.py migrate
 python manage.py runserver
 ```
+
+5. (Optional) Create a superuser:
+
+```bash
+python manage.py createsuperuser
+```
