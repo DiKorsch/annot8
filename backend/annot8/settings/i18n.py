@@ -1,7 +1,7 @@
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
 
-LANGUAGE_CODE = 'de-de'
+LANGUAGE_CODE = 'de'
 
 TIME_ZONE = 'UTC'
 
