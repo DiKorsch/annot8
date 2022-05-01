@@ -15,6 +15,7 @@ def new_root_folder():
 
 class Project(base.BaseModel):
 
+    name = models.CharField(max_length=255)
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -28,7 +29,10 @@ class Project(base.BaseModel):
         default=new_root_folder,
         unique=True)
 
+    data_folder = models.CharField(max_length=255)
+
     serializer_fields = base.BaseModel.serializer_fields + [
+        "name",
         "description",
         "data_folder",
         "root_folder",

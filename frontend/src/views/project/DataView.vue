@@ -34,7 +34,7 @@
             class="d-flex child-flex"
           >
             <v-img
-              :src="`${getAPIUrl}${file.url}`"
+              :src="`${getMediaUrl}${file.url}`"
               :lazy-src="`https://via.placeholder.com/150x100/?text=Image`"
               aspect-ratio="4/3"
               class="grey lighten-2"
@@ -89,7 +89,7 @@
 
     computed: {
 
-      ...mapGetters(['getAPIUrl']),
+      ...mapGetters(['getMediaUrl']),
       projectId() {
         return this.$route.params.id;
       },

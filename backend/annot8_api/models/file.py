@@ -1,6 +1,7 @@
 import enum
 import uuid
 
+from django.conf import settings
 from django.core.files.uploadedfile import UploadedFile
 from django.db import models
 
@@ -17,7 +18,8 @@ class Extensions(enum.Enum):
 
 
 def project_directory(instance: "File", filename: str):
-    return f"{instance.project.data_folder}/{filename}"
+    data_folder = Path(instance.project.data_folder).relative_to(settings.MEDIA_ROOT)
+    return f"{data_folder}/{filename}"
 
 
 class File(base.BaseModel):

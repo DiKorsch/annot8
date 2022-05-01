@@ -2,20 +2,6 @@ import api from "./api";
 
 class DataService {
 
-  getModels() {
-    return api.get("/model/")
-      .then((response) => {
-        return response.data;
-      });
-  }
-
-  getLabelProviders() {
-    return api.get("/label-provider/")
-      .then((response) => {
-        return response.data;
-      });
-  }
-
   getProjects() {
     return api.get("/project/")
       .then((response) => {
@@ -49,8 +35,6 @@ class DataService {
     return api.post("/project/", {
       'name': project.name,
       'description': project.description,
-      'model': project.model.id,
-      'label_provider': project.labelProvider?.id,
     }).then(
       (response) => {
         return response.data;

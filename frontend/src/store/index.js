@@ -9,6 +9,7 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     apiURL: "http://127.0.0.1:5000/api/v1",
+    mediaURL: "http://127.0.0.1:5000",
     currentProject: null,
   },
 
@@ -30,7 +31,11 @@ export default new Vuex.Store({
 
     getAPIUrl: state => {
       return state.apiURL;
-    }
+    },
+
+    getMediaUrl: state => {
+      return state.mediaURL;
+    },
 
   },
 

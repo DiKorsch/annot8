@@ -44,40 +44,7 @@
                 </v-textarea>
               </v-col>
             </v-row>
-            <v-row>
-              <v-col cols=12 sm=12>
-                <v-select
-                  v-model="project.model"
-                  name="model"
-                  label="Model"
-                  :error-messages="modelErrors"
-                  :items="data.models"
-                  :hint="modelHint"
-                  item-text="name"
-                  item-value="id"
-                  persistent-hint
-                  return-object
-                  required>
-                </v-select>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col cols=12 sm=12>
-                <v-select
-                  v-model="project.labelProvider"
-                  name="labelProvider"
-                  label="Label Provider"
-                  :error-messages="labelProviderErrors"
-                  :items="labelProviders"
-                  :hint="labelProviderHint"
-                  item-text="name"
-                  item-value="id"
-                  persistent-hint
-                  return-object
-                  required>
-                </v-select>
-              </v-col>
-            </v-row>
+
             <v-row>
               <v-col cols=12 sm=12 class="d-flex align-end flex-column">
                 <v-btn
@@ -112,8 +79,6 @@
       project: {
         name: { required, minLength: minLength(3) },
         description: { required },
-        model: { required },
-        labelProvider: {  },
       }
     },
 
@@ -152,26 +117,6 @@
         return errors;
       },
 
-      modelHint() {
-        return this.project.model?.description
-      },
-
-      labelProviderHint() {
-        return this.project.labelProvider?.description
-      },
-
-      labelProviders(){
-        let providers = this.data.labelProviders;
-        if (!providers)
-          providers = []
-        providers.unshift({
-          'name': "None",
-          'id': null,
-          "description": "Do not use any label provider"
-        });
-        return providers;
-      },
-
       ...mapState(['data'])
     },
 
@@ -190,8 +135,6 @@
     },
 
     created () {
-      this.$store.dispatch('data/getModels')
-      this.$store.dispatch('data/getLabelProviders')
     },
   }
 </script>
