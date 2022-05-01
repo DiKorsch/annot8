@@ -1,13 +1,14 @@
-import uuid
 import logging
+import uuid
 
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
+from django.dispatch import receiver
 
 from pathlib import Path
 
-from pycs_api.models import base
+from annot8_api.models import base
 
 def new_root_folder():
     return f"{settings.PROJECTS_DIR}/{uuid.uuid4()}"

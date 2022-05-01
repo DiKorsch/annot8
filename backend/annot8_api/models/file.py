@@ -6,8 +6,8 @@ from django.db import models
 
 from pathlib import Path
 
-from pycs_api.models import base
-from pycs_api.models.project import Project
+from annot8_api.models import base
+from annot8_api.models.project import Project
 
 
 class Extensions(enum.Enum):
@@ -33,6 +33,13 @@ class File(base.BaseModel):
             "project",
             "path"
         ]
+
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.CASCADE,
+        related_name="files",
+        related_query_name="file",
+    )
 
     path = models.ImageField(upload_to=project_directory)
 
