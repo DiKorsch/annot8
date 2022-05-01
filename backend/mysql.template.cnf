@@ -1,0 +1,6 @@
+[client]
+host = localhost
+port = 3306
+database = NAME
+user = USER
+password = PWD
