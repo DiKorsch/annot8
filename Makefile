@@ -8,7 +8,7 @@ export GID
 run_backend:
 	@cd backend && python manage.py runserver
 
-run_webui:
+run_frontend:
 	@cd frontend && npm run serve
 
 install:

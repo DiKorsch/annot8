@@ -18,8 +18,11 @@ sudo mysql
 mysql> CREATE DATABASE annot8;
 mysql> CREATE USER 'annot8'@'localhost' IDENTIFIED BY '<password>';
 mysql> GRANT ALL PRIVILEGES ON annot8 . * TO 'annot8'@'localhost';
+mysql> GRANT ALL PRIVILEGES ON annot8_tests . * TO 'annot8'@'localhost';
 mysql> FLUSH PRIVILEGES;
 ```
+*Note: Do not create the database `annot_tests`, django will care about creation and destruction. We just need to grant the privileges to the user.*
+
 3. Set the correct credentials in the `mysql.cnf`
 ```bash
 cp mysql.template.cnf mysql.cnf

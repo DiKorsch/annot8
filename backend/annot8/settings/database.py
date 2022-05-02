@@ -12,7 +12,7 @@ DATABASES = {
 
         },
         'TEST': {
-            "NAME": "test_annot8"
+            "NAME": "annot8_tests"
         }
     }
 }
