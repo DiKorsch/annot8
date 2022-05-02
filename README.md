@@ -27,7 +27,6 @@ mysql> FLUSH PRIVILEGES;
 ```bash
 cp mysql.template.cnf mysql.cnf
 chmod 600 mysql.cnf
-
 <edit mysql.cnf accordingly>
 ```
 
@@ -49,23 +48,23 @@ python manage.py createsuperuser
 ### Frontend
 
 #### Project setup
-```
+```bash
 sudo npm install -g @vue/cli
 npm install
 ```
 
 #### Compiles and hot-reloads for development
-```
+```bash
 npm run serve
 ```
 
 #### Compiles and minifies for production
-```
+```bash
 npm run build
 ```
 
 #### Lints and fixes files
-```
+```bash
 npm run lint
 ```
 
