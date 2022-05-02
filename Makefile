@@ -19,7 +19,9 @@ backend_tests:
 	@echo "BACKEND TESTS MISSING!"
 
 backend_coverage:
-	@echo "BACKEND COVERAGE MISSING!"
+	coverage run backend/manage.py test
+	coverage html
+	coverage report -m
 
 backend_pylint:
 	@echo "BACKEND PYLINT MISSING!"
