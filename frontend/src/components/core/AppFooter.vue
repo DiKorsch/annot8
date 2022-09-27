@@ -10,7 +10,7 @@
     <v-card
       flat
       tile
-      class="indigo lighten-2 text-center flex"
+      class="primary text-center flex"
     >
       <v-card-text class="pa-1">
         <v-btn
