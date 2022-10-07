@@ -32,7 +32,7 @@ chmod 600 mysql.cnf
 
 
 
-4. Apply DB migrations and run the Django App
+4. Apply DB migrations and run the Django app
 
 ```bash
 python manage.py migrate
@@ -40,7 +40,13 @@ python manage.py loaddata fixtures/labels.json
 python manage.py runserver
 ```
 
-5. (Optional, recommended) Create a superuser:
+5. In a separate terminal, start the Django-Q job cluster:
+
+```bash
+python manage.py qcluster
+```
+
+6. (Optional, recommended) Create a superuser:
 
 ```bash
 python manage.py createsuperuser
