@@ -7,7 +7,17 @@
       :class="{ 'grey lighten-2': dragover }"
     >
       <v-card-text>
-        <v-row class="d-flex flex-column" dense align="center" justify="center">
+        <input type="file" ref="file" style="display: none" v-on:change="onClick($event)">
+        <v-row
+          dense
+          class="d-flex flex-column"
+          align="center"
+          justify="center"
+          @click="$refs.file.click()"
+          @mouseover="dragover = true"
+          @mouseleave="dragover = false"
+
+        >
           <v-icon :class="[dragover ? 'mt-2, mb-6' : 'mt-5']" size="60">
             mdi-cloud-upload
           </v-icon>
@@ -88,24 +98,25 @@ export default {
       if (index > -1) this.uploadedFiles.splice(index, 1);
     },
 
-    onDrop(e) {
-      this.dragover = false;
-      // If there are already uploaded files remove them
-      // if (this.uploadedFiles.length > 0)
-      //   this.uploadedFiles = [];
+    onClick(e) {
+      this.handleFiles(e.target.files);
 
-      // If user has uploaded multiple files but the component is not multiple throw error
-      if (!this.multiple && e.dataTransfer.files.length > 1) {
+    },
+
+    onDrop(e) {
+      this.handleFiles(e.dataTransfer.files);
+    },
+
+    handleFiles(files) {
+
+      this.dragover = false;
+
+      if (!this.multiple && files.length > 1){
         let message = "Only one file can be uploaded at a time";
         console.log(message)
-        // this.$store.dispatch("addNotification", {
-        //   message ,
-        //   colour: "error"
-        // });
-      }
-      // Add each file to the array of uploaded files
-      else{
-        for (const file of e.dataTransfer.files) {
+
+      } else {
+        for (const file of files) {
           this.uploadedFiles.push(file)
         }
       }

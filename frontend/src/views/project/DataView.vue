@@ -14,7 +14,7 @@
     <v-card>
       <v-card-title>Data Upload</v-card-title>
       <v-card-text>
-        <Upload
+        <core-ImageUploader
           :multiple="true"
           @upload="upload"
         />
@@ -77,16 +77,11 @@
 </template>
 
 <script>
-  import Upload from "@/components/UploadComponent"
   import DataService from '@/services/data.service';
   import { mapGetters } from 'vuex'
 
 
   export default {
-    components: {
-      Upload
-    },
-
     computed: {
 
       ...mapGetters(['getMediaUrl']),
