@@ -20,6 +20,7 @@
     "vuex": "^3.6.2"
   },
   "devDependencies": {
+    "@mdi/font": "^7.0.96",
     "@vue/cli-plugin-babel": "^5.0.4",
     "@vue/cli-plugin-eslint": "^5.0.4",
     "@vue/cli-service": "^5.0.4",
