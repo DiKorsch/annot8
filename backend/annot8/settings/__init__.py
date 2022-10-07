@@ -25,6 +25,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'django_q',
+
     'corsheaders',
     'labeltree',
     'rest_framework',
@@ -57,3 +59,4 @@ from annot8.settings.database import *
 from annot8.settings.security import *
 from annot8.settings.i18n import *
 from annot8.settings.media import *
+from annot8.settings.qcluster import *
