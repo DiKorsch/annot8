@@ -22,8 +22,8 @@ TEMPLATES = [
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
-MEDIA_URL = '/media/'
-STATIC_URL = '/static/'
+MEDIA_URL = '/annot8/media/'
+STATIC_URL = '/annot8/static/'
 
 
 MEDIA_ROOT = Path(os.environ.get("ANNOT8_MEDIA_ROOT", BASE_DIR / "media"))

@@ -20,8 +20,8 @@ from django.urls import include
 from django.urls import path
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/v1/', include('annot8_api.urls')),
+    path('annot8/admin/', admin.site.urls),
+    path('annot8/api/v1/', include('annot8_api.urls')),
 
 ]
 
