@@ -20,10 +20,10 @@ run_docker: build_docker
 	@echo "DOCKER START MISSING!"
 
 backend_tests:
-	backend/manage.py test
+	@cd backend && python manage.py test
 
 backend_coverage:
-	coverage run backend/manage.py test
+	@cd backend && coverage run manage.py test
 	coverage html
 	coverage report -m
 
