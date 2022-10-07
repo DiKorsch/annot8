@@ -36,10 +36,11 @@ chmod 600 mysql.cnf
 
 ```bash
 python manage.py migrate
+python manage.py loaddata fixtures/labels.json
 python manage.py runserver
 ```
 
-5. (Optional) Create a superuser:
+5. (Optional, recommended) Create a superuser:
 
 ```bash
 python manage.py createsuperuser
