@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'labeltree',
     'rest_framework',
+    'django_filters',
     'rest_framework_simplejwt.token_blacklist',
 ]
 

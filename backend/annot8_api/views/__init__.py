@@ -1,4 +1,5 @@
-from annot8_api.views.project import ProjectViewSet
+from annot8_api.views import project
+from annot8_api.views import label
 
 from rest_framework import routers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
@@ -25,4 +26,6 @@ class TokenRefreshView(BaseTokenRefreshView):
 
 
 router = routers.DefaultRouter()
-router.register(r'project', ProjectViewSet, "project")
+router.register(r'project', project.ProjectViewSet, "project")
+router.register(r'label', label.LabelViewSet, "label")
+router.register(r'label-group', label.LabelGroupViewSet, "label-group")
