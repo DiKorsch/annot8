@@ -5,18 +5,22 @@ GID := $(shell id -g)
 export UID
 export GID
 
+build: build_ui build_docker
+
+install:
+	@echo "INSTALL MISSING!"
+
 run_backend:
 	@cd backend && python manage.py runserver
 
 run_frontend:
 	@cd frontend && npm run serve
 
-install:
-	@echo "INSTALL MISSING!"
-
+run_docker: build_docker
+	@echo "DOCKER START MISSING!"
 
 backend_tests:
-	@echo "BACKEND TESTS MISSING!"
+	backend/manage.py test
 
 backend_coverage:
 	coverage run backend/manage.py test
@@ -27,12 +31,12 @@ backend_pylint:
 	@echo "BACKEND PYLINT MISSING!"
 
 
-docker_build:
+build_ui:
+	npm run build
+
+build_docker:
 	docker build . \
 		--tag annot8:latest \
 		--build-arg UID=${UID} \
 		--build-arg GID=${GID}
-
-docker_start: docker_build
-	@echo "DOCKER START MISSING!"
 
