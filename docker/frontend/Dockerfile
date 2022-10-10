@@ -5,8 +5,8 @@
 FROM node:16 as builder
 
 # copy files
-COPY		.	/annot8/frontend/
-WORKDIR    		/annot8/frontend
+COPY  ./frontend /annot8/frontend/
+WORKDIR /annot8/frontend
 
 # install packages
 RUN npx browserslist@latest --update-db

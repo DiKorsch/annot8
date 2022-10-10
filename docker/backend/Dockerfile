@@ -18,13 +18,12 @@ RUN apt update && \
 WORKDIR /code
 
 # install dependencies
-COPY requirements.txt /code
+COPY ./backend /code
 RUN python -m pip install --upgrade pip
 RUN pip install numpy
 RUN pip install -r /code/requirements.txt
 RUN rm /code/requirements.txt
 
-COPY . /code
 #
 RUN python -c "from django.core.management.utils import get_random_secret_key as new_key; print(new_key())" > /code/secret.txt
 RUN chown -R ${UID}:${GID} /code/
