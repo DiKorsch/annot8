@@ -74,10 +74,7 @@ services:
 
 
   db:
-    build:
-      context: .
-      dockerfile: ./docker/mysql/Dockerfile
-    image: annot8_db:latest
+    image: mariadb:latest
     container_name: annot8_db
 
     volumes:
