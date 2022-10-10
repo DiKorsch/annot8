@@ -16,6 +16,7 @@ from annot8.settings.logger import *
 # Application definition
 
 INSTALLED_APPS = [
+    'annot8',
     'annot8_api',
 
     'django.contrib.admin',

@@ -35,8 +35,8 @@ build_ui:
 	npm run build
 
 build_docker:
-	docker build . \
-		--tag annot8:latest \
+	docker build backend \
+		--tag annot8_backend:latest \
 		--build-arg UID=${UID} \
 		--build-arg GID=${GID}
 

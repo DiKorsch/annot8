@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+
+  frontend:
+    build: ./frontend
+    image: annot8_frontend:latest
+    container_name: annot8_frontend
+
+    volumes:
+      - ./frontend/nginx.conf:/etc/nginx/conf.d/default.conf
+
+    ports:
+      - ${FRONTEND_PORT:-80}:80
+
+  migration:
+    user: ${UID:-0}:${GID:-0}
+    build:
+      context: ./backend
+      args:
+        GID: ${GID:-0}
+        UID: ${UID:-0}
+
+    image: annot8_backend:latest
+    container_name: annot8_migration
+
+    command:
+      - sh
+      - -c
+      - |
+        python manage.py wait_for_db
+        python manage.py migrate
+        python manage.py loaddata fixtures/labels
+
+  backend:
+    user: ${UID:-0}:${GID:-0}
+    image: annot8_backend:latest
+    container_name: annot8_backend
+
+    ports:
+      - ${BACKEND_PORT:-8000}:8000
+
+    command:
+      - sh
+      - -c
+      - |
+        python manage.py wait_for_db
+        python manage.py runserver 0.0.0.0:8000
+
+    depends_on:
+      - migration
