@@ -10,7 +10,7 @@ from pathlib import Path
 
 # SECURITY WARNING: keep the secret key used in production secret!
 
-SECRET_KEY_FILE = Path(os.environ.get("PYCS_SECRET_KEYFILE", BASE_DIR / 'secret.txt'))
+SECRET_KEY_FILE = Path(os.environ.get("ANNOT8_SECRET_KEYFILE", BASE_DIR / 'secret.txt'))
 
 if not SECRET_KEY_FILE.exists():
     with open(SECRET_KEY_FILE, "w") as f:
@@ -24,11 +24,20 @@ SECRET_KEY = open(SECRET_KEY_FILE).read()
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
+    'hemera4.inf-cv.uni-jena.de',
+    'api.inf-cv.uni-jena.de',
 ]
 
+FRONTEND_PORT = os.environ.get("FRONTEND_PORT", 8080)
+
 CORS_ORIGIN_WHITELIST = (
-    'http://localhost:8080',
-    'http://127.0.0.1:8080',
+    f'http://localhost:{FRONTEND_PORT}',
+    f'http://127.0.0.1:{FRONTEND_PORT}',
+    f'http://hemera4.inf-cv.uni-jena.de:{FRONTEND_PORT}',
+)
+
+CSRF_TRUSTED_ORIGINS = (
+    'https://api.inf-cv.uni-jena.de',
 )
 
 CORS_ALLOW_HEADERS = list(default_headers) + [

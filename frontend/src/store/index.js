@@ -8,8 +8,6 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    apiURL: "http://127.0.0.1:8000/annot8/api/v1",
-    mediaURL: "http://127.0.0.1:8000",
     currentProject: null,
   },
 
@@ -29,12 +27,12 @@ export default new Vuex.Store({
       return state.currentProject;
     },
 
-    getAPIUrl: state => {
-      return state.apiURL;
+    getAPIUrl: () => {
+      return process.env.VUE_APP_API_URL;
     },
 
-    getMediaUrl: state => {
-      return state.mediaURL;
+    getMediaUrl: () => {
+      return  process.env.VUE_APP_MEDIA_URL;
     },
 
   },

@@ -57,6 +57,9 @@ services:
     ports:
       - ${BACKEND_PORT:-8000}:8000
 
+    environment:
+      - FRONTEND_PORT=${FRONTEND_PORT:-8080}
+
     command:
       - sh
       - -c
@@ -64,9 +67,11 @@ services:
         python manage.py wait_for_db
         python manage.py runserver 0.0.0.0:8000
 
+
     volumes:
       - /tmp/annot8/mysqld:/run/mysqld
       - ./backend/mysql.cnf:/code/mysql.cnf
+      - ./backend/media:/code/media
 
     depends_on:
       - migration
