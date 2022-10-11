@@ -1,0 +1,20 @@
+[Unit]
+Description=dockerized annotation tool Annot8
+Requires=docker.service
+After=docker.service
+
+[Service]
+User=1016
+Group=100
+
+WorkingDirectory=<FILL ME!>
+
+# Compose up
+ExecStart=/usr/bin/make docker.run
+
+# Compose down, remove containers and volumes
+ExecStop=/usr/bin/docker compose stop
+
+[Install]
+WantedBy=multi-user.target
+

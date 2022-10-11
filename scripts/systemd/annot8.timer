@@ -1,0 +1,9 @@
+[Unit]
+Description=Starts the annotation tool Annot8 1.5 min after the boot
+
+[Install]
+WantedBy=timers.target
+
+[Timer]
+OnBootSec=90sec
+

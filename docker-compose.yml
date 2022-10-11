@@ -7,7 +7,7 @@ services:
     profiles: ["production"]
     build:
       context: .
-      dockerfile: ./docker/frontend.Dockerfile
+      dockerfile: ./scripts/docker/frontend.Dockerfile
     image: annot8_frontend:latest
     container_name: annot8_frontend
 
@@ -23,7 +23,7 @@ services:
     user: ${UID:-0}:${GID:-0}
     build:
       context: .
-      dockerfile: ./docker/backend.Dockerfile
+      dockerfile: ./scripts/docker/backend.Dockerfile
       args:
         GID: ${GID:-0}
         UID: ${UID:-0}
@@ -51,7 +51,7 @@ services:
     image: annot8_backend:latest
     build:
       context: .
-      dockerfile: ./docker/backend.Dockerfile
+      dockerfile: ./scripts/docker/backend.Dockerfile
       args:
         GID: ${GID:-0}
         UID: ${UID:-0}
@@ -107,7 +107,7 @@ services:
     env_file: [".env.local"]
     build:
       context: .
-      dockerfile: ./docker/frontend.dev.Dockerfile
+      dockerfile: ./scripts/docker/frontend.dev.Dockerfile
     image: annot8_frontend:dev
     container_name: annot8_frontend.dev
 
@@ -128,7 +128,7 @@ services:
 
     build:
       context: .
-      dockerfile: ./docker/backend.dev.Dockerfile
+      dockerfile: ./scripts/docker/backend.dev.Dockerfile
       args:
         GID: ${GID:-0}
         UID: ${UID:-0}
