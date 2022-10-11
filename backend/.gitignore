@@ -176,6 +176,8 @@ cython_debug/
 
 secret.txt
 mysql.cnf
+mysql.dev.cnf
 
 media
+media*
 static

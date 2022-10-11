@@ -2,10 +2,12 @@ version: '3.8'
 
 services:
 
-  frontend:
+  # Production / deployment services
+  frontend:    &frontend
+    profiles: ["production"]
     build:
       context: .
-      dockerfile: ./docker/frontend/Dockerfile
+      dockerfile: ./docker/frontend.Dockerfile
     image: annot8_frontend:latest
     container_name: annot8_frontend
 
@@ -15,11 +17,13 @@ services:
     ports:
       - ${FRONTEND_PORT:-80}:80
 
-  migration:
+  migration:    &migration
+    profiles: ["production"]
+    env_file: [".env"]
     user: ${UID:-0}:${GID:-0}
     build:
       context: .
-      dockerfile: ./docker/backend/Dockerfile
+      dockerfile: ./docker/backend.Dockerfile
       args:
         GID: ${GID:-0}
         UID: ${UID:-0}
@@ -37,17 +41,17 @@ services:
 
     volumes:
       - /tmp/annot8/mysqld:/run/mysqld
-      - ./backend/mysql.cnf:/code/mysql.cnf
 
-    depends_on:
-      - db
+    depends_on: ["db"]
 
-  backend:
+  backend:    &backend
+    profiles: ["production"]
+    env_file: [".env"]
     user: ${UID:-0}:${GID:-0}
     image: annot8_backend:latest
     build:
       context: .
-      dockerfile: ./docker/backend/Dockerfile
+      dockerfile: ./docker/backend.Dockerfile
       args:
         GID: ${GID:-0}
         UID: ${UID:-0}
@@ -70,15 +74,17 @@ services:
 
     volumes:
       - /tmp/annot8/mysqld:/run/mysqld
-      - ./backend/mysql.cnf:/code/mysql.cnf
       - ./backend/media:/code/media
 
     depends_on:
-      - migration
-      - db
+      migration:
+        condition: service_completed_successfully
+      db:
+        condition: service_started
 
-
-  db:
+  db:     &db
+    profiles: ["production"]
+    env_file: [".env"]
     image: mariadb:latest
     container_name: annot8_db
 
@@ -93,5 +99,77 @@ services:
       - MARIADB_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MARIADB_HOST=${MYSQL_HOST}
 
+
+  # Development services
+
+  frontend.dev:
+    profiles: ["dev"]
+    env_file: [".env.local"]
+    build:
+      context: .
+      dockerfile: ./docker/frontend.dev.Dockerfile
+    image: annot8_frontend:dev
+    container_name: annot8_frontend.dev
+
     ports:
-      - ${MYSQL_PORT}:3306
+      - ${FRONTEND_PORT:-8080}:8080
+
+    volumes:
+      - ./frontend/src:/code/src
+      - ./frontend/public:/code/public
+      - ./frontend/.env.docker.dev:/code/.env
+      - ./frontend/babel.config.js:/code/babel.config.js
+      - ./frontend/vue.config.js:/code/vue.config.js
+
+  migration.dev:
+    <<: *migration
+    profiles: ["dev"]
+    env_file: [".env.local"]
+
+    build:
+      context: .
+      dockerfile: ./docker/backend.dev.Dockerfile
+      args:
+        GID: ${GID:-0}
+        UID: ${UID:-0}
+
+    image: annot8_backend:dev
+    container_name: annot8_migration.dev
+    depends_on: ["db.dev"]
+
+    volumes:
+      - /tmp/annot8/mysqld:/run/mysqld
+      - ./backend/annot8:/code/annot8
+      - ./backend/annot8_api:/code/annot8_api
+      - ./backend/manage.py:/code/manage.py
+      - ./backend/fixtures:/code/fixtures
+
+  backend.dev:
+    <<: *backend
+    profiles: ["dev"]
+    env_file: [".env.local"]
+    image: annot8_backend:dev
+    container_name: annot8_backend.dev
+
+    depends_on:
+      migration.dev:
+        condition: service_completed_successfully
+      db.dev:
+        condition: service_started
+
+    volumes:
+      - /tmp/annot8/mysqld:/run/mysqld
+      - ./backend/annot8:/code/annot8
+      - ./backend/annot8_api:/code/annot8_api
+      - ./backend/manage.py:/code/manage.py
+      - ./backend/media.dev:/code/media
+
+
+  db.dev:
+    <<: *db
+    container_name: annot8_db.dev
+    profiles: ["dev"]
+    env_file: [".env.local"]
+    volumes:
+      - /tmp/annot8/mysqld:/var/run/mysqld
+      - ./backend/db.dev:/var/lib/mysql

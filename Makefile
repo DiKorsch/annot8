@@ -5,7 +5,20 @@ GID := $(shell id -g)
 export UID
 export GID
 
-build: build_ui build_docker
+DOCKER_OPTS :=
+
+docker.run.dev:
+	docker compose --env-file .env.local --profile dev up $(DOCKER_OPTS)
+
+docker.build.dev:
+	docker compose --env-file .env.local --profile dev build $(DOCKER_OPTS)
+
+docker.run:
+	docker compose --env-file .env --profile production up $(DOCKER_OPTS)
+
+docker.build:
+	docker compose --env-file .env --profile production build $(DOCKER_OPTS)
+
 
 install:
 	@echo "INSTALL MISSING!"
@@ -15,9 +28,6 @@ run_backend:
 
 run_frontend:
 	@cd frontend && npm run serve
-
-run_docker: build_docker
-	@echo "DOCKER START MISSING!"
 
 backend_tests:
 	@cd backend && python manage.py test
@@ -29,14 +39,4 @@ backend_coverage:
 
 backend_pylint:
 	@echo "BACKEND PYLINT MISSING!"
-
-
-build_ui:
-	npm run build
-
-build_docker:
-	docker build backend \
-		--tag annot8_backend:latest \
-		--build-arg UID=${UID} \
-		--build-arg GID=${GID}
 

@@ -1,8 +1,8 @@
 frontend/node_modules
 
-backend/media
-backend/db
-backend/mysql.cnf
+backend/media*
+backend/db*
+backend/*.cnf
 backend/secret.txt
 
 Dockerfile
