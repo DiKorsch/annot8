@@ -72,6 +72,42 @@ class DataService {
         console.log("ERROR:", error)
       })
   }
+
+  addCollaborator(projectId, collaborator) {
+    let data = new FormData();
+
+    data.append('collaborator_username', collaborator);
+
+    let config = {
+      headers: {'content-type': 'multipart/form-data'},
+    }
+
+    return api.post(`project/${projectId}/add_collaborator/`, data, config)
+      .then(() => {
+        return true;
+      }).catch((error) => {
+        console.log("ERROR:", error)
+        return false;
+      });
+  }
+
+  removeCollaborator(projectId, collaborator) {
+    let data = new FormData();
+
+    data.append('collaborator_username', collaborator);
+
+    let config = {
+      headers: {'content-type': 'multipart/form-data'},
+    }
+
+    return api.post(`project/${projectId}/remove_collaborator/`, data, config)
+      .then(() => {
+        return true;
+      }).catch((error) => {
+        console.log("ERROR:", error)
+        return false;
+      });
+  }
 }
 
 

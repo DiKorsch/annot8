@@ -5,7 +5,16 @@ from annot8_api import models
 class BaseSerializer(serializers.ModelSerializer):
     pass
 
+class CollaboratorListingField(serializers.RelatedField):
+    def to_representation(self, user):
+        return user.username
+
 class ProjectSerializer(BaseSerializer):
+    # We want the collaborators and the creator to not be serialized by their id,
+    # but instead by their username.
+    # Field is read only - alternatively one could specify a queryset.
+    collaborators = CollaboratorListingField(many=True, read_only=True)
+    user = serializers.StringRelatedField()
 
     class Meta:
         model = models.Project

@@ -5,7 +5,7 @@
         <h1>Project Information</h1>
       </v-col>
       <v-col :cols=2 >
-        <v-btn :to = "{ name: 'projects' }" block color="error">
+        <v-btn :to = "{ name: 'projects' }" block color="accent">
           <v-icon>mdi-reply</v-icon> Back
         </v-btn>
       </v-col>
@@ -18,7 +18,7 @@
               <v-col>{{ project.name }}</v-col>
               <v-col class="d-flex align-end flex-column">
                 <v-dialog
-                  v-model="dialog"
+                  v-model="proj_delete_dialog"
                   width="500"
                 >
                   <template v-slot:activator="{ on, attrs }">
@@ -54,7 +54,7 @@
                       >
                         Yes, delete!
                       </v-btn>
-                      <v-btn text @click="dialog=false">
+                      <v-btn text @click="proj_delete_dialog=false">
                         No
                       </v-btn>
                     </v-card-actions>
@@ -72,6 +72,79 @@
               <v-list-item-content>
                 <v-list-item-title>Description</v-list-item-title>
                 <v-list-item-subtitle>{{ project.description }}</v-list-item-subtitle>
+              </v-list-item-content>
+            </v-list-item>
+
+            <v-list-item>
+              <v-list-item-content>
+                <v-list-item-title>Creator</v-list-item-title>
+                <v-list-item-subtitle>{{ project.user }}</v-list-item-subtitle>
+              </v-list-item-content>
+            </v-list-item>
+
+            <v-list-item>
+              <v-list-item-content>
+                <v-list-item-title>Collaborators</v-list-item-title>
+
+                <v-list-item-subtitle v-if="project.collaborators.length">
+                  <ul>
+                    <li v-for="(collaborator, index) in project.collaborators" :key="index">
+                      {{ collaborator }}
+                    </li>
+                  </ul>
+                </v-list-item-subtitle>
+                <v-list-item-subtitle v-else>None</v-list-item-subtitle>
+
+                <v-col :cols=3 >
+                  <v-dialog
+                    v-model="managed_collaborator_dialog"
+                    width="500"
+                  >
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-btn
+                        block color="accent"
+                        v-bind="attrs"
+                        v-on="on"
+                      >
+                        Manage Collaborators
+                      </v-btn>
+                    </template>
+
+                    <v-card>
+                      <v-card-title class="text-h5 grey lighten-2">
+                       Manage Collaborators
+                      </v-card-title>
+
+                      <v-card-text>
+                        <v-container>
+                            Please enter the name of the user that you want to add or remove:
+
+                            <v-text-field
+                              label="Username"
+                              v-model="managed_collaborator"
+                              solo
+                            ></v-text-field>
+
+                            <span style="color:red">
+                              {{ this.error_managed_collaborator }}
+                            </span>
+                        </v-container>
+                      </v-card-text>
+
+                      <v-divider></v-divider>
+
+                      <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn @click="addCollaborator">
+                          Add Collaborator
+                        </v-btn>
+                        <v-btn @click="removeCollaborator">
+                          Remove Collaborator
+                        </v-btn>
+                      </v-card-actions>
+                    </v-card>
+                  </v-dialog>
+                </v-col>
               </v-list-item-content>
             </v-list-item>
 
@@ -132,8 +205,11 @@
 
     data (){
       return {
-        dialog: false,
+        proj_delete_dialog: false,
+        managed_collaborator_dialog: false,
         project: null,
+        managed_collaborator: '',
+        error_managed_collaborator: '',
       }
     },
 
@@ -160,6 +236,34 @@
               this.$router.push({name: "projects"})
             }
           });
+      },
+
+      addCollaborator () {
+        DataService.addCollaborator(this.projectId, this.managed_collaborator)
+          .then((ok) => {
+            if (ok){
+              this.error_managed_collaborator="";
+              this.$router.push({name: "projects"});
+            } else {
+              this.error_managed_collaborator="Collaborator could not be added. \
+              Please check whether the username is spelled correctly. \
+              Also, make sure that the user is not already a collaborator or \
+              creator of the project!";
+            }
+          });
+      },
+
+      removeCollaborator () {
+        DataService.removeCollaborator(this.projectId, this.managed_collaborator)
+          .then((ok) => {
+          if (ok){
+            this.error_managed_collaborator="";
+            this.$router.push({name: "projects"});
+          } else {
+            this.error_managed_collaborator="Collaborator could not be removed. \
+            Please make sure that the username is spelled correctly!";
+          }
+        });
       }
     }
 

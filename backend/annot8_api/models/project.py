@@ -23,6 +23,12 @@ class Project(base.BaseModel):
         related_query_name="project",
     )
 
+    collaborators = models.ManyToManyField(
+        User,
+        related_name="collaborators",
+        related_query_name="collaborators",
+    )
+
     description = models.TextField()
 
     root_folder = models.CharField(max_length=255,
@@ -33,6 +39,8 @@ class Project(base.BaseModel):
 
     serializer_fields = base.BaseModel.serializer_fields + [
         "name",
+        "user",
+        "collaborators",
         "description",
         "data_folder",
         "root_folder",
