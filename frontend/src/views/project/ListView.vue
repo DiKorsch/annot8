@@ -1,14 +1,16 @@
 <template>
   <v-container fluid>
     <v-row>
-      <v-col :cols=10>
+      <v-col class="col-8">
         <h1>Projects</h1>
       </v-col>
-      <v-col :cols=2 >
-        <v-btn :to = "{ name: 'create_project' }" block color="primary">
+      <v-col class="col-4" align="right">
+        <v-btn
+          :to = "{ name: 'create_project' }"
+          color="primary">
           Add Project
           <v-icon>mdi-plus</v-icon>
-      </v-btn>
+        </v-btn>
       </v-col>
     </v-row>
     <v-row dense>
