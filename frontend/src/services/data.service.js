@@ -41,36 +41,38 @@ class DataService {
       });
   }
 
-  getFiles(projectId) {
-    return api.get(`/project/${projectId}/files`)
-      .then((response) => {
-        return response.data;
-      })
-      .catch((error) =>{
-        if (error.response.status == 404)
-          return null;
-      });
-  }
+  files = {
+    get: function(projectId){
+      return api.get(`/project/${projectId}/files`)
+        .then((response) => {
+          return response.data;
+        })
+        .catch((error) =>{
+          if (error.response.status == 404)
+            return null;
+        });
+    },
 
-  uploadFile(projectId, file){
-    let data = new FormData();
+    upload: function(projectId, file){
+      let data = new FormData();
 
-    data.append('file', file);
+      data.append('file', file);
 
-    let config = {
-      headers: {'content-type': 'multipart/form-data'},
-      onUploadProgress: function (progressEvent) {
-        console.log(progressEvent)
-      },
+      let config = {
+        headers: {'content-type': 'multipart/form-data'},
+        onUploadProgress: function (progressEvent) {
+          console.log(progressEvent)
+        },
+      }
+
+      return api.post(`project/${projectId}/file/`, data, config)
+        .then((response) => {
+          console.log("OK", response.status);
+        })
+        .catch((error) =>{
+          console.log("ERROR:", error)
+        })
     }
-
-    return api.post(`project/${projectId}/file/`, data, config)
-      .then((response) => {
-        console.log("OK", response.status);
-      })
-      .catch((error) =>{
-        console.log("ERROR:", error)
-      })
   }
 
   collaborator = {

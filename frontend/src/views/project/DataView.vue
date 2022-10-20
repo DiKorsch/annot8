@@ -103,11 +103,11 @@
     methods: {
       upload(files){
         for (const file of files)
-          DataService.uploadFile(this.projectId, file)
+          DataService.files.upload(this.projectId, file)
       },
 
       getFiles(){
-        DataService.getFiles(this.projectId)
+        DataService.files.get(this.projectId)
           .then((files) => {
             this.files = files;
           })
