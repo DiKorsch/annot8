@@ -158,7 +158,7 @@
     },
 
     created () {
-      DataService.getProject(this.projectId)
+      DataService.project.get(this.projectId)
         .then((project) => {
           this.project = project;
         })
@@ -166,7 +166,7 @@
 
     methods: {
       deleteProj () {
-        DataService.deleteProject(this.projectId)
+        DataService.project.delete(this.projectId)
           .then((ok) => {
             if (ok){
               this.$router.push({name: "projects"})

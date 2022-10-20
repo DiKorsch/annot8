@@ -18,7 +18,7 @@ export const data = {
   actions : {
 
     getProjects({ commit }) {
-      DataService.getProjects().then(
+      DataService.project.get().then(
         (projects) => {
           commit("setProjects", projects)
         })

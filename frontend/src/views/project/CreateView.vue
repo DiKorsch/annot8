@@ -127,7 +127,7 @@
         if (this.$v.$invalid)
           return
 
-        DataService.createProject(this.project).then(
+        DataService.project.create(this.project).then(
           (project) => {
             this.$router.push({ name: 'project', params: { id: project.id}})
         })

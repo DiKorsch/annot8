@@ -2,43 +2,46 @@ import api from "./api";
 
 class DataService {
 
-  getProjects() {
-    return api.get("/project/")
-      .then((response) => {
-        return response.data;
-      });
-  }
+  project = {
+    get: function(projectId){
+      if (projectId === undefined)
+        return api.get("/project/")
+          .then((response) => {
+            return response.data;
+          });
 
-  getProject(projectId) {
-    return api.get(`/project/${projectId}`)
-      .then((response) => {
-        return response.data;
-      })
-      .catch((error) =>{
-        if (error.response.status == 404)
-          return null;
-      });
-  }
+      return api.get(`/project/${projectId}`)
+        .then((response) => {
+          return response.data;
+        })
+        .catch((error) =>{
+          if (error.response.status == 404)
+            return null;
+        });
+    },
 
-  deleteProject(projectId) {
-    return api.delete(`/project/${projectId}`)
-      .then(() => {
-        return true;
-      })
-      .catch((error) =>{
-        if (error.response.status == 404)
-          return false;
-      });
-  }
+    delete: function(projectId) {
+      return api.delete(`/project/${projectId}`)
+        .then(() => {
+          return true;
+        })
+        .catch((error) =>{
+          if (error.response.status == 404)
+            return false;
+        });
+    },
 
-  createProject(project) {
-    return api.post("/project/", {
-      'name': project.name,
-      'description': project.description,
-    }).then(
-      (response) => {
-        return response.data;
-      });
+    create: function(project){
+      let data = {
+        'name': project.name,
+        'description': project.description,
+      };
+      return api.post("/project/", data).then(
+        (response) => {
+          return response.data;
+        });
+
+    }
   }
 
   files = {
