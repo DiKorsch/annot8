@@ -19,7 +19,7 @@ if config_file.is_file():
     PW = config["client"]["password"]
 else:
     logging.warning("No mysql config file was found. Settings will be read from environment variables")
-    HOST = os.environ.get("MYSQL_DATABASE")
+    HOST = os.environ.get("MYSQL_HOST")
     PORT = os.environ.get("MYSQL_PORT", 3306)
     DB = os.environ.get("MYSQL_DATABASE")
     USER = os.environ.get("MYSQL_USER")

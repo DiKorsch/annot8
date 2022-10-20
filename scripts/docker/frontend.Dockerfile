@@ -1,3 +1,7 @@
+# get the user and group. if not defined, fallback to root
+ARG UID=root
+ARG GID=root
+
 ########################################
 # build webui                          #
 ########################################
