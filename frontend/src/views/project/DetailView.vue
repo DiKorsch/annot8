@@ -16,7 +16,7 @@
           <v-container fluid>
             <v-row>
               <v-col>{{ project.name }}</v-col>
-              <v-col class="d-flex align-end flex-column">
+              <v-col v-if="isOwner" class="d-flex align-end flex-column">
                 <v-btn
                   fab
                   color="error"
@@ -77,7 +77,8 @@
                   <v-avatar left>
                     <v-icon>mdi-account-circle</v-icon>
                   </v-avatar>
-                  {{ project.user }}
+                  <span v-if="isOwner">You</span>
+                  <span v-else>{{ project.user }}</span>
                 </v-chip>
               </v-row>
             </v-col>
@@ -128,7 +129,7 @@
 </template>
 
 <script>
-  // import { mapState } from 'vuex'
+  import { mapGetters } from 'vuex'
   import DataService from '@/services/data.service';
 
   export default {
@@ -137,16 +138,20 @@
     data (){
       return {
         proj_delete_dialog: false,
-        managed_collaborator_dialog: false,
         project: null,
-        managed_collaborator: '',
-        error_managed_collaborator: '',
       }
     },
 
     computed: {
 
-      // ...mapState(['data']),
+      ...mapGetters('auth', [
+        'username',
+      ]),
+
+      isOwner(){
+        return this.username == this.project.user;
+      },
+
       projectId() {
         return this.$route.params.id;
       },

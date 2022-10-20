@@ -7,7 +7,7 @@
           cols=6
           v-for="(user, i) in project.collaborators"
           :key="i"
-          close
+          :close="isOwner || user === username"
           close-icon="mdi-close"
           outlined
           @click:close="removeCollab(user)"
@@ -15,14 +15,16 @@
           <v-avatar left>
             <v-icon>mdi-account-circle</v-icon>
           </v-avatar>
-          {{ user }}
+
+          <span v-if="user === username">You</span>
+          <span v-else>{{ user }}</span>
         </v-chip>
       </v-row>
     </div>
 
     <div v-else>None</div>
    </v-col>
-   <v-col class="col-4" align="right">
+   <v-col v-if="isOwner" class="col-4" align="right">
     <v-tooltip top>
       <template v-slot:activator="{on, attrs}">
         <v-btn
@@ -84,6 +86,7 @@
 
 <script>
 import DataService from '@/services/data.service';
+import { mapGetters } from 'vuex'
 
 export default {
   name: "ProjectCollaborators",
@@ -93,6 +96,16 @@ export default {
 
     error: undefined,
   }),
+
+  computed: {
+    ...mapGetters('auth', [
+      'username',
+    ]),
+
+    isOwner(){
+      return this.username == this.project.user;
+    },
+  },
 
   props: {
     project: undefined,

@@ -24,6 +24,16 @@ class ProjectViewSet(BaseViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
+    def is_owner(self):
+        return self.get_object().user == self.request.user
+
+    def destroy(self, request, *args, **kwargs):
+        if not self.is_owner():
+            return Response({"status": "Only the owner can delete a project"},
+                status=status.HTTP_400_BAD_REQUEST)
+        return super().destroy(request, *args, **kwargs)
+
+
     @action(detail=True, methods=['post'])
     def file(self, request, pk=None):
         if "file" not in request.FILES:
@@ -84,11 +94,11 @@ class ProjectViewSet(BaseViewSet):
         project = self.get_object()
         creator = project.user
 
-        if request.user != creator:
+        user = get_object_or_404(User, username=name)
+
+        if user != request.user and request.user != creator:
             return Response({"status": "Only the creator can modify the collaborators of a project"},
                 status=status.HTTP_400_BAD_REQUEST)
-
-        user = get_object_or_404(User, username=name)
 
         if user not in project.collaborators.all():
             return Response({"status": "User to remove is not a collaborator of the project"},
