@@ -3,8 +3,8 @@
   "model": "auth.user",
   "pk": 1,
   "fields": {
-    "password": "pbkdf2_sha256$320000$TG7PUl3ivSLQLJtHwlOh9s$HbVridMmqqCGZWwTkf1wQTyEw0/5qr7k5K7XarTkQ04=",
-    "last_login": "2022-10-14T13:37:47.904Z",
+    "password": "pbkdf2_sha256$390000$uzFS6cB8XaJ6oPBr63XesJ$YiAr9sYpF6BmA3zl5MnOERPc/MHr7Ji9EANEcXChDXk=",
+    "last_login": "2022-10-20T07:36:57.404Z",
     "is_superuser": true,
     "username": "korsch",
     "first_name": "",
@@ -13,6 +13,42 @@
     "is_staff": true,
     "is_active": true,
     "date_joined": "2022-10-14T13:37:42.888Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 2,
+  "fields": {
+    "password": "pbkdf2_sha256$390000$ppbP68EIyAJPPjoRENWp5O$TObCfl4EQB7xaeFt4K59f+jmjUzmQq7bgKIEohN+HGw=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "user1",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2022-10-19T13:05:15.055Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 3,
+  "fields": {
+    "password": "pbkdf2_sha256$390000$NzSEUKyBDbuRKZEeG701wQ$Sa2ITDmwm08+ugOqJF4Pla7TJoVFuo9YK0w3DnFj/os=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "user2",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2022-10-19T13:05:37.134Z",
     "groups": [],
     "user_permissions": []
   }
