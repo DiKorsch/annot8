@@ -73,41 +73,36 @@ class DataService {
       })
   }
 
-  addCollaborator(projectId, collaborator) {
-    let data = new FormData();
+  collaborator = {
+    remove: function(projectId, username){
+      return api.delete(`project/${projectId}/collaborator/${username}`)
+        .then(() => {
+          return true;
+        }).catch((error) => {
+          console.log("ERROR:", error)
+          return false;
+        });
+    },
 
-    data.append('collaborator_username', collaborator);
+    add: function(projectId, username){
+      let data = new FormData();
 
-    let config = {
-      headers: {'content-type': 'multipart/form-data'},
+      data.append('username', username);
+
+      let config = {
+        headers: {'content-type': 'multipart/form-data'},
+      }
+
+      return api.post(`project/${projectId}/collaborator/`, data, config)
+        .then(() => {
+          return true;
+        }).catch((error) => {
+          console.log("ERROR:", error)
+          return false;
+        });
     }
-
-    return api.post(`project/${projectId}/add_collaborator/`, data, config)
-      .then(() => {
-        return true;
-      }).catch((error) => {
-        console.log("ERROR:", error)
-        return false;
-      });
   }
 
-  removeCollaborator(projectId, collaborator) {
-    let data = new FormData();
-
-    data.append('collaborator_username', collaborator);
-
-    let config = {
-      headers: {'content-type': 'multipart/form-data'},
-    }
-
-    return api.post(`project/${projectId}/remove_collaborator/`, data, config)
-      .then(() => {
-        return true;
-      }).catch((error) => {
-        console.log("ERROR:", error)
-        return false;
-      });
-  }
 }
 
 

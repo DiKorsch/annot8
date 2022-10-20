@@ -50,43 +50,49 @@ class ProjectViewSet(BaseViewSet):
         serializer = FileSerializer(files, many=True)
         return Response(serializer.data)
 
-    @action(detail=True, methods=['post'])
-    def add_collaborator(self, request, pk=None):
-        if "collaborator_username" not in request.POST:
-            return Response({"status": "Collaborator username missing"},
-                status=status.HTTP_400_BAD_REQUEST)
 
+
+    @action(detail=True, methods=["post"], url_path="collaborator")
+    def collaborator_add(self, request, pk=None):
+        name = request.POST.get("username")
         project = self.get_object()
         creator = project.user
 
-        collaborator = request.POST['collaborator_username']
-        collaborator = get_object_or_404(User, username=collaborator)
-
-        if creator.username == collaborator.username:
-            return Response({"status": "Collaborator cannot be the creator of the project"},
-                status=status.HTTP_400_BAD_REQUEST)
-
-        if collaborator in project.collaborators.all():
-            return Response({"status": "User to add is already a collaborator of the project"},
-                status=status.HTTP_400_BAD_REQUEST)
-
-        project.collaborators.add(collaborator)
-        return Response({'status': 'Collaborator added'})
-
-    @action(detail=True, methods=['post'])
-    def remove_collaborator(self, request, pk=None):
-        if "collaborator_username" not in request.POST:
+        if name is None:
             return Response({"status": "Collaborator username missing"},
                 status=status.HTTP_400_BAD_REQUEST)
 
+        if request.user != creator:
+            return Response({"status": "Only the creator can modify the collaborators of a project"},
+                status=status.HTTP_400_BAD_REQUEST)
+
+        user = get_object_or_404(User, username=name)
+        if creator.username == user.username:
+            return Response({"status": "Collaborator cannot be the creator of the project"},
+                status=status.HTTP_400_BAD_REQUEST)
+
+        if user in project.collaborators.all():
+            return Response({"status": "User to add is already a collaborator of the project"},
+                status=status.HTTP_400_BAD_REQUEST)
+
+        project.collaborators.add(user)
+        return Response({'status': 'Collaborator added'})
+
+
+    @action(detail=True, methods=['delete'], url_path=r"collaborator/(?P<name>[a-z0-9]+)")
+    def collaborator_remove(self, request, pk=None, name=None):
         project = self.get_object()
+        creator = project.user
 
-        collaborator = request.POST['collaborator_username']
-        collaborator = get_object_or_404(User, username=collaborator)
+        if request.user != creator:
+            return Response({"status": "Only the creator can modify the collaborators of a project"},
+                status=status.HTTP_400_BAD_REQUEST)
 
-        if not collaborator in project.collaborators.all():
+        user = get_object_or_404(User, username=name)
+
+        if user not in project.collaborators.all():
             return Response({"status": "User to remove is not a collaborator of the project"},
                 status=status.HTTP_400_BAD_REQUEST)
 
-        project.collaborators.remove(collaborator)
+        project.collaborators.remove(user)
         return Response({'status': 'Collaborator added'})

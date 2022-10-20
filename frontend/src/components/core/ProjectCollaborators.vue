@@ -102,7 +102,7 @@ export default {
     removeCollab: function (user) {
       console.log(`Removing ${user}`)
       this.error = undefined;
-      DataService.removeCollaborator(this.project.id, user)
+      DataService.collaborator.remove(this.project.id, user)
         .then((ok) => {
           if (!ok){
             this.error = "Collaborator could not be added. \
@@ -118,7 +118,7 @@ export default {
     addCollab: function() {
       console.log(`Adding ${this.name_to_add}`)
       this.error = undefined;
-      DataService.addCollaborator(this.project.id, this.name_to_add)
+      DataService.collaborator.add(this.project.id, this.name_to_add)
         .then((ok) => {
           if (!ok){
             this.error = "Collaborator could not be added. \
