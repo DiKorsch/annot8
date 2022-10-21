@@ -21,10 +21,10 @@
 
       </v-card-text>
       <v-divider/>
-      <v-card-title>
-        Images of the project
+      <v-card-title v-if="files.length !== 0">
+        Images ({{files.length}}) of the project
       </v-card-title>
-      <v-card-text>
+      <v-card-text v-if="files.length !== 0">
         <v-row justify="center" v-if="nPages > 1">
           <v-col cols="8">
             <v-container class="max-width">
