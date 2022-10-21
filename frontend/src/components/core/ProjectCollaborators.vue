@@ -41,9 +41,7 @@
       <span>Add new collaborator</span>
     </v-tooltip>
 
-    <v-dialog
-      v-model="dialog"
-      width="500">
+    <v-dialog v-model="dialog" width="500">
 
       <v-card>
         <v-card-title class="grey lighten-2">

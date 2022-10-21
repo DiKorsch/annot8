@@ -27,7 +27,8 @@
           <v-card-title>Name: {{project.name}}</v-card-title>
           <v-card-text>
               <p>Desc: {{project.description}}</p>
-              <p>Root: {{project.root_folder}}</p>
+              <!-- <p>Root: {{projec.rootFolder}}</p> -->
+              <p>UUID: {{project.uuid}}</p>
           </v-card-text>
         </v-card>
       </v-col>

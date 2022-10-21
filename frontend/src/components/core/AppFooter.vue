@@ -27,7 +27,7 @@
       <v-divider></v-divider>
 
       <v-card-text class="white--text pa-1">
-        {{ new Date().getFullYear() }} — <strong>PyCS2</strong>
+        {{ new Date().getFullYear() }} — <strong>Annot8</strong>
       </v-card-text>
     </v-card>
 

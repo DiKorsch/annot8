@@ -96,18 +96,18 @@
 
           <v-row v-if="project.label_provider">
             <v-col class="col-6">Label Provider</v-col>
-            <v-col class="col-6">{{ project.label_provider }}</v-col>
+            <v-col class="col-6">{{ project.labelProvider }}</v-col>
           </v-row>
 
           <v-divider class="my-4"></v-divider>
 
           <v-row>
             <v-col class="col-6">Root Folder</v-col>
-            <v-col class="col-6">{{ project.root_folder }}</v-col>
+            <v-col class="col-6">{{ project.rootFolder }}</v-col>
           </v-row>
           <v-row>
             <v-col class="col-6">Data Folder</v-col>
-            <v-col class="col-6">{{ project.data_folder }}</v-col>
+            <v-col class="col-6">{{ project.dataFolder }}</v-col>
           </v-row>
         </v-card-text>
       </div>

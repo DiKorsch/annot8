@@ -19,7 +19,10 @@ class ProjectViewSet(BaseViewSet):
     serializer_class = ProjectSerializer
 
     def get_queryset(self):
-        return Project.objects.filter(Q(user=self.request.user) | Q(collaborators__in=[self.request.user])).distinct()
+        return Project.objects.filter(
+            Q(user=self.request.user) |
+            Q(collaborators__in=[self.request.user])
+        ).distinct()
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)

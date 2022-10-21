@@ -1,5 +1,8 @@
 import api from "./api";
 
+import File from "@/store/models/file"
+import Project from "@/store/models/project"
+
 class DataService {
 
   project = {
@@ -7,12 +10,14 @@ class DataService {
       if (projectId === undefined)
         return api.get("/project/")
           .then((response) => {
-            return response.data;
+            return response.data.map((data) => {
+              return new Project(data);
+            });
           });
 
       return api.get(`/project/${projectId}`)
         .then((response) => {
-          return response.data;
+          return new Project(response.data);
         })
         .catch((error) =>{
           if (error.response.status == 404)
@@ -46,12 +51,15 @@ class DataService {
 
   files = {
     get: function(projectId){
-      return api.get(`/project/${projectId}/files`)
+      return api.get(`/project/${projectId}/files/`)
         .then((response) => {
-          return response.data;
+          return response.data.map((data) => {
+            return new File(data);
+          })
         })
         .catch((error) =>{
-          if (error.response.status == 404)
+          console.warn(error)
+          if (error.response?.status == 404)
             return null;
         });
     },
@@ -75,12 +83,25 @@ class DataService {
         .catch((error) =>{
           console.log("ERROR:", error)
         })
+    },
+
+    delete: function(fileId){
+      if (fileId === undefined)
+        return false;
+      return api.delete(`file/${fileId}/`)
+        .then(() => {
+          return true;
+        })
+        .catch((error) => {
+          console.warn("Error while deleting image: ", error)
+          return false;
+        })
     }
   }
 
   collaborator = {
     remove: function(projectId, username){
-      return api.delete(`project/${projectId}/collaborator/${username}`)
+      return api.delete(`project/${projectId}/collaborator/${username}/`)
         .then(() => {
           return true;
         }).catch((error) => {

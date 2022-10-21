@@ -94,8 +94,13 @@ export default new VueRouter({
                 component: Data
               },
               {
-                path: 'annotations',
+                path: 'annotate',
                 name: 'annotations',
+                component: Annotations
+              },
+              {
+                path: 'annotate/:fileId',
+                name: 'annotate',
                 component: Annotations
               },
             ]

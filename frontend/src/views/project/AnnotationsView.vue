@@ -10,5 +10,24 @@
         </v-btn>
       </v-col>
     </v-row>
+
+    Project: {{projectId}}, File: {{fileId}}
   </v-container>
 </template>
+
+
+<script>
+
+export default {
+  computed: {
+    projectId() {
+      return this.$route.params.id;
+    },
+
+    fileId() {
+      return this.$route.params.fileId;
+    },
+  },
+
+}
+</script>
