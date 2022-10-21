@@ -113,6 +113,10 @@ export default {
       return Math.ceil(this.files.length / this.elementsPerPage)
     },
 
+    queryPage: function (){
+      return Number(this.$route.query?.page) || 1;
+    },
+
     start: function() {
       return (this.page - 1) * this.elementsPerPage;
     },
@@ -129,13 +133,27 @@ export default {
 
   created() {
     this.getFiles();
-
     window.addEventListener("keydown", this.handleKeys);
   },
 
   destroyed() {
 
     window.removeEventListener("keydown", this.handleKeys);
+  },
+
+  watch: {
+
+    page: function(newVal){
+
+      if (this.queryPage === newVal)
+        return;
+
+      this.$router.replace({
+        name: 'data',
+        params: {id: this.projectId},
+        query: {page: newVal}
+      })
+    }
   },
 
   methods: {
@@ -157,6 +175,7 @@ export default {
       DataService.files.get(this.projectId)
         .then((files) => {
           this.files = files;
+          this.page = Math.min(this.queryPage, this.nPages) ;
         })
     },
 
