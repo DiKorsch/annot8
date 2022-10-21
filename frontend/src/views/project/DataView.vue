@@ -22,13 +22,20 @@
       </v-card-text>
       <v-divider/>
       <v-card-title>
-        Data List
+        Images of the project
       </v-card-title>
       <v-card-text>
+        <v-row justify="center">
+          <v-col cols="8">
+            <v-container class="max-width">
+              <v-pagination v-model="page" :length="nPages"
+              ></v-pagination>
+            </v-container>
+          </v-col>
+        </v-row>
         <v-row dense>
-
           <v-col
-            v-for="file in files"
+            v-for="file in currentFiles"
             :key="file.id"
             class="col-6 col-lg-4 d-flex child-flex"
           >
@@ -40,9 +47,21 @@
 
         </v-row>
 
+        <v-row justify="center">
+          <v-col cols="8">
+            <v-container class="max-width">
+              <v-pagination v-model="page" :length="nPages"
+              ></v-pagination>
+            </v-container>
+          </v-col>
+        </v-row>
 
       </v-card-text>
     </v-card>
+
+
+
+    <!-- Image deletion Dialog -->
     <v-dialog v-model="deleteDialog" width="600">
       <v-card>
         <core-LazyImage :file="fileToDelete" />
@@ -59,6 +78,7 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <!-- End Image deletion Dialog -->
 
   </v-container>
 </template>
@@ -67,19 +87,40 @@
 import DataService from '@/services/data.service';
 
 export default {
-  computed: {
-    projectId() {
-      return this.$route.params.id;
-    },
-  },
 
   data() {
     return{
       files: [],
+      page: 1,
       deleteDialog: false,
       fileToDelete: undefined,
     }
   },
+
+  props: {
+    elementsPerPage: {
+      type: Number,
+      default: 6
+    },
+  },
+
+  computed: {
+    projectId() {
+      return this.$route.params.id;
+    },
+
+    nPages: function() {
+      return Math.ceil(this.files.length / this.elementsPerPage)
+    },
+
+    currentFiles: function() {
+      let start = (this.page - 1) * this.elementsPerPage;
+      let end = this.page * this.elementsPerPage;
+
+      return this.files.slice(start, end);
+    }
+  },
+
 
   created() {
     this.getFiles();
