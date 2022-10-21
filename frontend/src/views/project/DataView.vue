@@ -16,7 +16,7 @@
       <v-card-text>
         <core-ImageUploader
           :multiple="true"
-          @upload="upload"
+          @uploaded="$router.go()"
         />
 
       </v-card-text>
@@ -25,7 +25,7 @@
         Images of the project
       </v-card-title>
       <v-card-text>
-        <v-row justify="center">
+        <v-row justify="center" v-if="nPages > 1">
           <v-col cols="8">
             <v-container class="max-width">
               <v-pagination v-model="page" :length="nPages"
@@ -47,7 +47,7 @@
 
         </v-row>
 
-        <v-row justify="center">
+        <v-row justify="center" v-if="nPages > 1">
           <v-col cols="8">
             <v-container class="max-width">
               <v-pagination v-model="page" :length="nPages"
@@ -127,12 +127,6 @@ export default {
   },
 
   methods: {
-    upload(files){
-      for (const file of files)
-        DataService.files.upload(this.projectId, file)
-
-      this.$router.go(); // reload current view
-    },
 
     getFiles(){
       DataService.files.get(this.projectId)

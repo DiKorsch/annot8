@@ -64,7 +64,7 @@ class DataService {
         });
     },
 
-    upload: function(projectId, file){
+    upload: function(projectId, file, callback, progress,){
       let data = new FormData();
 
       data.append('file', file);
@@ -72,16 +72,17 @@ class DataService {
       let config = {
         headers: {'content-type': 'multipart/form-data'},
         onUploadProgress: function (progressEvent) {
-          console.log(progressEvent)
+          if (progress !== undefined)
+            progress(file, progressEvent);
         },
       }
 
       return api.post(`project/${projectId}/file/`, data, config)
         .then((response) => {
-          console.log("OK", response.status);
+          callback(file, true, response);
         })
         .catch((error) =>{
-          console.log("ERROR:", error)
+          callback(file, false, error);
         })
     },
 

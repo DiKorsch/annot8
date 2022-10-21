@@ -70,6 +70,7 @@
 
 <script>
 const prettyBytes = require('pretty-bytes');
+import DataService from '@/services/data.service';
 
 export default {
   name: "UploadComponent",
@@ -82,8 +83,14 @@ export default {
   data() {
     return {
       dragover: false,
-      uploadedFiles: []
+      uploadedFiles: [],
     };
+  },
+
+  computed: {
+    projectId() {
+      return this.$route.params.id;
+    },
   },
 
   methods: {
@@ -128,16 +135,41 @@ export default {
       if (!this.uploadedFiles.length > 0) {
         let message = "There are no files to upload";
         console.log(message)
-        // this.$store.dispatch("addNotification", {
-        //   message,
-        //   colour: "error"
-        // });
-
       } else {
         // Send uploaded files to parent component
-        this.$emit("upload", this.uploadedFiles);
+        // this.$emit("upload", );
+
+        this.upload(this.uploadedFiles);
       }
-    }
+    },
+
+    upload(files) {
+      for (const file of files){
+        DataService.files.upload(
+          this.projectId, file,
+          this.uploadReady,
+          this.progress
+        )
+      }
+    },
+
+    progress(file, event) {
+      let percent = event.loaded / event.total * 100;
+      console.log(`Upload Progress ${file.name}: ${percent}%`)
+    },
+
+    uploadReady(file, ok, content){
+      if(!ok)
+        return console.warn(file, content);
+
+      let i = this.uploadedFiles.indexOf(file);
+
+      if (i != -1)
+        this.uploadedFiles.splice(i, 1)
+
+      if (this.uploadedFiles.length == 0)
+        this.$emit("uploaded")
+    },
   }
 };
 </script>
