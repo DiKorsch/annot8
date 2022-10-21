@@ -1,7 +1,7 @@
 <template>
     <v-img
       v-if="file !== undefined"
-      :src="`${getMediaUrl}${file.url}`"
+      :src="`${getMediaUrl}${thumb}`"
       :lazy-src="`https://via.placeholder.com/150x100/?text=Image`"
       aspect-ratio="1.333"
       class="grey lighten-2"
@@ -29,9 +29,21 @@ export default {
 
   props: {
     'file': undefined,
+    'thumbSize': {
+      type:  String,
+      default: 'small',
+    }
   },
   computed: {
     ...mapGetters(['getMediaUrl']),
+
+    thumb: function() {
+      let thumbs = this.file?.thumbs;
+      if (thumbs !== undefined && thumbs[this.thumbSize] !== undefined )
+        return thumbs[this.thumbSize]
+
+      return this.file.url;
+    }
   },
 }
 

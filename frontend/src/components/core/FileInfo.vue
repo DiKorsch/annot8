@@ -2,7 +2,7 @@
 <div style="border-style: 1px solid;">
 
   <v-card>
-    <core-LazyImage :file="file"/>
+    <core-LazyImage :file="file" thumbSize="medium"/>
     <v-card-title>{{file.name}}</v-card-title>
     <!-- <v-card-text>
       {{file}}

@@ -48,6 +48,7 @@ class ProjectViewSet(BaseViewSet):
             file = File.create(request.FILES['file'], project)
 
         except Exception as e:
+            print(e)
             return Response({"status": str(e)},
                 status=status.HTTP_400_BAD_REQUEST)
 

@@ -4,7 +4,10 @@ import uuid
 from django.conf import settings
 from django.core.files.uploadedfile import UploadedFile
 from django.db import models
+from django.dispatch import receiver
+from django_q.tasks import async_task
 
+from PIL import Image
 from pathlib import Path
 
 from annot8_api.models import base
@@ -23,11 +26,18 @@ def project_directory(instance: "File", filename: str):
 
 
 class File(base.BaseModel):
+    __name__ = "File"
 
     EXTENSIONS = [
         (Extensions.JPG, "JPG Image"),
         (Extensions.JPEG, "JPEG Image"),
         (Extensions.PNG, "PNG Image"),
+    ]
+
+    THUMBNAILS = [
+        ("small", 360),
+        ("medium", 960),
+        ("large", 1920),
     ]
 
     class Meta:
@@ -48,6 +58,7 @@ class File(base.BaseModel):
     serializer_fields = base.BaseModel.serializer_fields + [
         "project",
         "url",
+        "thumbs"
     ]
 
 
@@ -55,6 +66,23 @@ class File(base.BaseModel):
     def url(self):
         return self.path.url
 
+    @property
+    def thumbs(self):
+        thumbs = {}
+        for th_name, _ in self.THUMBNAILS:
+            path = Path(self.path.path)
+            url = Path(self.path.url)
+            name = path.name
+
+            thumb = path.parent / "thumbs" / th_name / name
+            thumb_url = url.parent / "thumbs" / th_name / name
+
+            if thumb.exists():
+                thumbs[th_name] = str(thumb_url)
+            else:
+                thumbs[th_name] = str(url)
+
+        return thumbs
 
     @classmethod
     def create(cls, uploaded_file: UploadedFile, project: Project):
@@ -65,3 +93,26 @@ class File(base.BaseModel):
         )
 
         return file
+
+    def create_thumbnails(self):
+        path = Path(self.path.path)
+        folder = path.parent / "thumbs"
+        name = path.name
+        with Image.open(path) as im:
+            for th_name, size in self.THUMBNAILS:
+                dest = folder / th_name / name
+
+                w, h = im.size
+                ratio = size / w
+                newW, newH = int(ratio * w), int(ratio * h)
+
+                thumb = im.resize((newW, newH))
+                dest.parent.mkdir(exist_ok=True, parents=True)
+                thumb.save(dest)
+
+@receiver(models.signals.post_save, sender=File)
+def create_thumbnails(sender, instance, created, raw, **kwargs):
+    if not raw and created:
+        async_task(instance.create_thumbnails)
+
+
