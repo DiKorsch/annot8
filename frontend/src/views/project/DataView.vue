@@ -12,9 +12,18 @@
     </v-row>
 
     <v-card>
-      <v-card-title>Data Upload</v-card-title>
+      <v-card-title
+        id="uploader-header"
+        @click="showUploader = !showUploader"
+        >
+        Data Upload
+        <v-spacer/>
+        <v-icon v-if="showUploader">mdi-chevron-down</v-icon>
+        <v-icon v-else>mdi-chevron-left</v-icon>
+      </v-card-title>
       <v-card-text>
         <core-ImageUploader
+          v-if="showUploader"
           :multiple="true"
           @uploaded="$router.go()"
         />
@@ -94,6 +103,8 @@ export default {
       page: 1,
       deleteDialog: false,
       fileToDelete: undefined,
+
+      showUploader: true,
     }
   },
 
@@ -176,6 +187,7 @@ export default {
         .then((files) => {
           this.files = files;
           this.page = Math.min(this.queryPage, this.nPages) ;
+          this.showUploader = files.length === 0;
         })
     },
 
@@ -195,4 +207,8 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+  #uploader-header {
+    cursor: pointer;
+  }
+</style>

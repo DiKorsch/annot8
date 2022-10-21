@@ -18,7 +18,7 @@
           @mouseleave="dragover = false"
 
         >
-          <v-icon :class="[dragover ? 'mt-2, mb-6' : 'mt-5']" size="60">
+          <v-icon :class="[dragover ? 'mt-2, mb-6' : 'mt-5']" size="48">
             mdi-cloud-upload
           </v-icon>
           <p>
@@ -28,7 +28,7 @@
         <v-virtual-scroll
           v-if="uploadedFiles.length > 0"
           :items="uploadedFiles"
-          height="150"
+          height="200"
           item-height="50"
         >
           <template v-slot:default="{ item }">
