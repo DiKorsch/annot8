@@ -22,7 +22,7 @@
       </v-card-text>
       <v-divider/>
       <v-card-title v-if="files.length !== 0">
-        Images ({{files.length}}) of the project
+        Images {{this.start+1}} - {{this.end}} out of {{files.length}}
       </v-card-title>
       <v-card-text v-if="files.length !== 0">
         <v-row justify="center" v-if="nPages > 1">
@@ -113,20 +113,45 @@ export default {
       return Math.ceil(this.files.length / this.elementsPerPage)
     },
 
-    currentFiles: function() {
-      let start = (this.page - 1) * this.elementsPerPage;
-      let end = this.page * this.elementsPerPage;
+    start: function() {
+      return (this.page - 1) * this.elementsPerPage;
+    },
 
-      return this.files.slice(start, end);
+    end: function() {
+      return Math.min(this.page * this.elementsPerPage, this.files.length);
+    },
+
+    currentFiles: function() {
+      return this.files.slice(this.start, this.end);
     }
   },
 
 
   created() {
     this.getFiles();
+
+    window.addEventListener("keydown", this.handleKeys);
+  },
+
+  destroyed() {
+
+    window.removeEventListener("keydown", this.handleKeys);
   },
 
   methods: {
+
+    handleKeys(event){
+      switch (event.key){
+        case "ArrowLeft":
+          event.preventDefault();
+          this.page = Math.max(1, this.page-1);
+          break;
+        case "ArrowRight":
+          event.preventDefault();
+          this.page = Math.min(this.nPages, this.page+1);
+          break;
+      }
+    },
 
     getFiles(){
       DataService.files.get(this.projectId)
