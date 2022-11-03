@@ -1,20 +1,20 @@
 <template>
-  <v-container fluid id="selector">
+  <v-container fluid>
     <v-row dense>
-      <v-col cols=12 class="pr-6">
-        <v-row class="" dense>
+      <v-col cols=12>
+        <v-row dense>
           <v-col
             cols=1
             v-for="image in currentImages" :key="image.id"
             @click="$emit('selected', image)"
             :class="{'active': image.id == selectedImage}"
           >
-            <core-LazyImage :file="image"/>
+            <core-LazyImage :file="image" maxHeight="70px"/>
           </v-col>
 
         </v-row>
         <v-row dense>
-          <v-col cols=12 class="pa-0 ma-0">
+          <v-col cols=12>
             <core-CustomPaginator v-model="page" :length="nPages"/>
           </v-col>
         </v-row>
@@ -86,7 +86,6 @@ export default {
   methods: {
     selectPageFor(imageId){
       this.imgIdx = imageId;
-      console.log
       this.updatePage()
     },
     updatePage() {
@@ -103,8 +102,11 @@ export default {
 
 <style scoped>
   #selector {
-    bottom: 0px;
-    position: absolute;
+    /*bottom: 0px;*/
+    /*position: absolute;*/
+
+
+    border: 1px dashed;
   }
 
   .active {

@@ -14,16 +14,21 @@
       </v-col>
     </v-row>
 
+    <v-card>
+
     <core-ImageAnnotator
       :file="selectedFile"
     />
+    <v-footer :padless="true">
 
-    <core-ImageSelector
-      ref="selector"
-      :images="files"
-      :selectedImage="selected"
-      @selected="select"
-    />
+      <core-ImageSelector
+        ref="selector"
+        :images="files"
+        :selectedImage="selected"
+        @selected="select"
+      />
+    </v-footer>
+    </v-card>
   </v-container>
 
 
