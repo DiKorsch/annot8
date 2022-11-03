@@ -3,8 +3,9 @@
       v-if="file !== undefined"
       :src="`${getMediaUrl}${thumb}`"
       :lazy-src="`https://via.placeholder.com/150x100/?text=Image`"
-      aspect-ratio="1.333"
       class="grey lighten-2"
+      :max-height="maxHeight"
+      :contain="true"
     >
       <template v-slot:placeholder>
         <v-row
@@ -28,11 +29,12 @@ export default {
   name: "LazyImage",
 
   props: {
-    'file': undefined,
-    'thumbSize': {
+    file: undefined,
+    thumbSize: {
       type:  String,
       default: 'small',
-    }
+    },
+    maxHeight: undefined,
   },
   computed: {
     ...mapGetters(['getMediaUrl']),

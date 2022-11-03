@@ -1,13 +1,10 @@
 <template>
   <v-row justify="center" v-if="length > 1">
     <v-col cols="8">
-      <v-container class="max-width">
         <v-pagination
           v-model="localValue"
           :length="length"
         />
-
-      </v-container>
     </v-col>
   </v-row>
 </template>
