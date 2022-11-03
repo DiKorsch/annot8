@@ -34,14 +34,7 @@
         Images {{this.start+1}} - {{this.end}} out of {{files.length}}
       </v-card-title>
       <v-card-text v-if="files.length !== 0">
-        <v-row justify="center" v-if="nPages > 1">
-          <v-col cols="8">
-            <v-container class="max-width">
-              <v-pagination v-model="page" :length="nPages"
-              ></v-pagination>
-            </v-container>
-          </v-col>
-        </v-row>
+        <core-CustomPaginator v-model="page" :length="nPages"/>
         <v-row dense>
           <v-col
             v-for="file in currentFiles"
@@ -55,15 +48,7 @@
           </v-col>
 
         </v-row>
-
-        <v-row justify="center" v-if="nPages > 1">
-          <v-col cols="8">
-            <v-container class="max-width">
-              <v-pagination v-model="page" :length="nPages"
-              ></v-pagination>
-            </v-container>
-          </v-col>
-        </v-row>
+        <core-CustomPaginator v-model="page" :length="nPages"/>
 
       </v-card-text>
     </v-card>
@@ -97,16 +82,14 @@ import DataService from '@/services/data.service';
 
 export default {
 
-  data() {
-    return{
-      files: [],
-      page: 1,
-      deleteDialog: false,
-      fileToDelete: undefined,
+  data: () => ({
+    files: [],
+    page: 1,
+    deleteDialog: false,
+    fileToDelete: undefined,
 
-      showUploader: true,
-    }
-  },
+    showUploader: true,
+  }),
 
   props: {
     elementsPerPage: {
