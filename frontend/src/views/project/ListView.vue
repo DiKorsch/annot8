@@ -14,24 +14,14 @@
       </v-col>
     </v-row>
     <v-row dense>
-      <v-col
-        v-for="project in projects"
-        :key="project.id"
-        :cols=4
-      >
-        <v-card
-          outlined elevation="2"
-          max-width=450px class="mx-auto"
-          :to="{ name: 'project', params: { id: project.id }}"
-          >
-          <v-card-title>Name: {{project.name}}</v-card-title>
-          <v-card-text>
-              <p>Desc: {{project.description}}</p>
-              <!-- <p>Root: {{projec.rootFolder}}</p> -->
-              <p>UUID: {{project.uuid}}</p>
-          </v-card-text>
-        </v-card>
-      </v-col>
+        <core-ProjectInfo
+          v-for="project in projects"
+          :key="project.id"
+          ref="projectInfos"
+          :project="project"
+          :cols="4"
+          @selected="select"
+        />
     </v-row>
   </v-container>
 
@@ -47,8 +37,23 @@
       projects: 'getProjects'
     }),
 
+    data: () => ({
+      selectedProject: undefined,
+    }),
+
     created () {
       this.$store.dispatch('data/getProjects')
+    },
+
+    methods: {
+
+      select(projectID) {
+        this.selectedProject = projectID;
+        let infos = this.$refs['projectInfos'];
+        infos.forEach((info) => {
+          info.selected = info.project.id === projectID;
+        })
+      }
     },
   }
 </script>

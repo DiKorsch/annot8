@@ -105,7 +105,7 @@ export default {
         'projects'),
 
       new MenuItem(
-        'Project Info',
+        'Options',
         'mdi-cog',
         'project',
         true
@@ -127,7 +127,7 @@ export default {
 
       new MenuItem(
         'Annotations',
-        'mdi-account-hard-hat',
+        'mdi-pencil',
         'annotations',
         true
         ),

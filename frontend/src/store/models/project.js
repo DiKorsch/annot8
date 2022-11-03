@@ -1,5 +1,7 @@
 export default class Project {
   constructor(data) {
+    if (data === undefined)
+      data = {}
     this.id = data.id;
     this.name = data.name;
     this.description = data.description;
