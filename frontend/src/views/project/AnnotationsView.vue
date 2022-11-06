@@ -14,21 +14,31 @@
       </v-col>
     </v-row>
 
-    <v-card>
+    <v-card v-if="files.length != 0">
 
-    <core-ImageAnnotator
-      :file="selectedFile"
-    />
-    <v-footer :padless="true">
-
-      <core-ImageSelector
-        ref="selector"
-        :images="files"
-        :selectedImage="selected"
-        @selected="select"
+      <core-ImageAnnotator
+        :file="selectedFile"
       />
-    </v-footer>
+      <v-footer :padless="true">
+
+        <core-ImageSelector
+          ref="selector"
+          :images="files"
+          :selectedImage="selected"
+          @selected="select"
+        />
+      </v-footer>
     </v-card>
+
+    <v-alert
+      v-else
+      border="top"
+      colored-border
+      type="info"
+      elevation="2"
+    >
+      No files found in this project! Please <router-link :to="{name: 'data'}">upload</router-link> images for annotation!
+    </v-alert>
   </v-container>
 
 
@@ -67,8 +77,8 @@ export default {
       DataService.files.get(this.projectId)
         .then((files) => {
           this.files = files;
-
-          this.select(this.selectedFile)
+          if (files.length != 0)
+            this.select(this.selectedFile)
         })
     },
 
