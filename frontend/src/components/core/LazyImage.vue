@@ -1,11 +1,15 @@
 <template>
     <v-img
       v-if="file !== undefined"
+      ref="vImg"
       :src="`${getMediaUrl}${thumb}`"
       :lazy-src="`https://via.placeholder.com/150x100/?text=Image`"
       class="grey lighten-2"
       :max-height="maxHeight"
+      :max-width="maxWidth"
       :contain="true"
+      :aspect-ratio="ratio"
+      @load="loaded"
     >
       <template v-slot:placeholder>
         <v-row
@@ -19,6 +23,8 @@
           ></v-progress-circular>
         </v-row>
       </template>
+
+      <slot></slot>
     </v-img>
 </template>
 
@@ -36,6 +42,10 @@ export default {
     },
     maxHeight: undefined,
   },
+
+  data: () => ({
+    ratio: 1.0,
+  }),
   computed: {
     ...mapGetters(['getMediaUrl']),
 
@@ -45,8 +55,19 @@ export default {
         return thumbs[this.thumbSize]
 
       return this.file.url;
+    },
+
+    maxWidth: function() {
+      return this.ratio * this.maxHeight;
     }
   },
+
+  methods: {
+    loaded: function() {
+      let img = this.$refs.vImg.image;
+      this.ratio = img.width / img.height;
+    }
+  }
 }
 
 
