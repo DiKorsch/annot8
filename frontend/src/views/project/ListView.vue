@@ -14,14 +14,14 @@
       </v-col>
     </v-row>
     <v-row dense>
-        <core-ProjectInfo
-          v-for="project in projects"
-          :key="project.id"
-          ref="projectInfos"
-          :project="project"
-          :cols="4"
-          @selected="select"
-        />
+      <core-ProjectInfo
+        v-for="project in projects"
+        :key="project.id"
+        ref="projectInfos"
+        :project="project"
+        :cols="4"
+        @selected="select"
+      />
     </v-row>
   </v-container>
 

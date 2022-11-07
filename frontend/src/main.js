@@ -5,6 +5,7 @@ import store from './store'
 import vuetify from './plugins/vuetify'
 import setupInterceptors from './services/setupInterceptors';
 import Vuex from 'vuex';
+import DataService from '@/services/data.service';
 
 Vue.config.productionTip = false
 
@@ -19,11 +20,13 @@ router.beforeEach((to, from, next) => {
 
   let isProjectView = to.matched.some(record => record.meta.projectView);
 
-  let currentProject = null;
   if (isProjectView)
-    currentProject = to.params.id;
-
-  store.commit('setCurrentProject', currentProject);
+      DataService.project.get(to.params.id).then(
+        (project) => {
+          store.commit('setCurrentProject', project);
+        })
+  else
+    store.commit('setCurrentProject', undefined);
 
   next()
 })

@@ -7,17 +7,20 @@
       color="grey lighten-4"
       class="pa-4"
     >
-      <router-link :to="{ name: 'index' }">
-      <v-avatar
-        class="mb-4"
-        color="grey darken-1"
-        size="64"
-      ></v-avatar>
 
-      </router-link>
-      <v-row>
-        <v-col cols=6>{{ username }}</v-col>
-        <v-col cols=3>
+      <v-row class="align-center">
+        <v-col class="d-flex flex-column col-3">
+          <v-btn
+            v-if="loggedIn"
+            icon
+            prominent
+            x-large
+            :to="{name: 'index'}"
+          >
+            <v-icon>mdi-account</v-icon>
+          </v-btn>
+          {{ username }}</v-col>
+        <v-col class="d-flex justify-end col-9">
           <v-btn
             v-if="loggedIn"
             :to = "{ name: 'logout' }"
@@ -41,20 +44,40 @@
     <v-divider></v-divider>
 
     <v-list v-if="loggedIn" >
-      <v-list-item
+      <div
         v-for="link in getActiveLinks"
         :key="link.id"
-        :to="getLink(link)"
-        link
       >
-        <v-list-item-icon>
-          <v-icon>{{ link.icon }}</v-icon>
-        </v-list-item-icon>
+        <v-list-item
+          :to="link.url(getCurrentProject)"
+          link
+        >
+          <v-list-item-icon>
+            <v-icon>{{ link.icon }}</v-icon>
+          </v-list-item-icon>
 
-        <v-list-item-content>
-          <v-list-item-title>{{ link.text }}</v-list-item-title>
-        </v-list-item-content>
-      </v-list-item>
+          <v-list-item-content>
+            <v-list-item-title>{{ link.text }}</v-list-item-title>
+          </v-list-item-content>
+
+
+        </v-list-item>
+
+        <div v-if="!link.projectMenu && isProjectViewActive">
+
+        <v-divider></v-divider>
+
+        <v-list-item>
+          <v-list-item-content>
+            <v-chip outlined pill>
+              <v-icon left>mdi-book</v-icon>
+              {{ getCurrentProject.name }}
+            </v-chip>
+          </v-list-item-content>
+        </v-list-item>
+        <v-divider></v-divider>
+        </div>
+      </div>
     </v-list>
   </v-navigation-drawer>
 </template>
@@ -70,6 +93,16 @@ class MenuItem {
     this.icon = icon;
     this.dest = dest;
     this.projectMenu = projectMenu;
+  }
+
+  url(project){
+    if (this.projectMenu){
+
+        return {name: this.dest, params: {id: project.id}}
+
+      }
+      else
+        return {name: this.dest}
   }
 }
 
@@ -90,9 +123,7 @@ export default {
     ]),
 
     getActiveLinks () {
-      return this.links.filter((item) => {
-        return !item.projectMenu || (this.isProjectViewActive && item.projectMenu);
-      });
+      return this.links.filter(this.isActive);
     },
 
   },
@@ -136,15 +167,8 @@ export default {
 
 
   methods: {
-    getLink(link) {
-
-      if (link.projectMenu){
-
-        return {name: link.dest, params: {id: this.getCurrentProject}}
-
-      }
-      else
-        return {name: link.dest}
+    isActive(link) {
+      return !link.projectMenu || (this.isProjectViewActive && link.projectMenu)
     }
   }
 

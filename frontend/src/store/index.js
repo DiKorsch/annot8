@@ -8,7 +8,7 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    currentProject: null,
+    currentProject: undefined,
   },
 
   mutations: {
@@ -20,7 +20,7 @@ export default new Vuex.Store({
   getters: {
 
     isProjectViewActive: state => {
-      return state.currentProject !== null;
+      return state.currentProject !== undefined;
     },
 
     getCurrentProject: state => {
