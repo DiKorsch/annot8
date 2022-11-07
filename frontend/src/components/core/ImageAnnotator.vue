@@ -7,12 +7,10 @@
           thumbSize="large"
           maxHeight="675"
         >
-        <div class="overlay"
-          ref="overlay"
-          @mouseenter="mouseEnter"
-          @mousemove="mouseMove"
-          @mouseleave="mouseLeave">
-        </div>
+
+        <core-ImageAnnotations
+          :annotations="file.annotations"
+        />
       </core-LazyImage>
     </div>
 </template>
@@ -25,28 +23,5 @@ export default {
     file: undefined
   },
 
-  methods: {
-
-    mouseEnter() {
-      console.log('mouseenter');
-      // this.$el.addEventListener('mousemove', this.mouseMove, false);
-    },
-    mouseLeave() {
-      console.log('mouseleave');
-      // this.$el.removeEventListener('mousemove', this.mouseMove());
-    },
-    mouseMove(event) {
-      console.info(event.layerX, event.layerY);
-    }
-  }
 }
 </script>
-
-<style scoped>
-  .overlay{
-    background-color: rgba(255, 0, 0, 0.3);
-    position: absolute;
-    width: 100%;
-    height: 100%;
-  }
-</style>
