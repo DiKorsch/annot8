@@ -36,7 +36,6 @@ class ProjectViewSet(BaseViewSet):
                 status=status.HTTP_400_BAD_REQUEST)
         return super().destroy(request, *args, **kwargs)
 
-
     @action(detail=True, methods=['post'])
     def file(self, request, pk=None):
         if "file" not in request.FILES:

@@ -1,17 +1,24 @@
 <template>
-
     <div align="center">
+      <v-row>
+        <v-col cols="auto">
+          <core-ImageAnnotatorOptionBar />
+        </v-col>
 
-        <core-LazyImage
-          :file="file"
-          thumbSize="large"
-          maxHeight="675"
-        >
+        <v-col>
+          <core-LazyImage
+            :file="file"
+            thumbSize="large"
+            maxHeight="675"
+          >
 
-        <core-ImageAnnotations
-          :annotations="file.annotations"
-        />
-      </core-LazyImage>
+          <core-ImageAnnotations
+            :fileLabel="file.label"
+            :fileId="file.id"
+            />
+          </core-LazyImage>
+        </v-col>
+      </v-row>
     </div>
 </template>
 

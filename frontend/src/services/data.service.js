@@ -1,10 +1,10 @@
 import api from "./api";
 
 import File from "@/store/models/file"
+import BBox from "@/store/models/bbox"
 import Project from "@/store/models/project"
 
 class DataService {
-
   project = {
     get: function(projectId){
       if (projectId === undefined)
@@ -45,7 +45,6 @@ class DataService {
         (response) => {
           return response.data;
         });
-
     }
   }
 
@@ -97,7 +96,48 @@ class DataService {
           console.warn("Error while deleting image: ", error)
           return false;
         })
+    },
+
+    add_bbox: function(fileId, x, y, width, height, label) {
+      let data = new FormData();
+
+      data.append('x', x);
+      data.append('y', y);
+      data.append('width', width);
+      data.append('height', height);
+      if (!(typeof label === "undefined")) {
+          data.append('label', label);
+      }
+
+      let config = {
+        headers: {'content-type': 'multipart/form-data'},
+      }
+
+      return api.post(`file/${fileId}/bbox/`, data, config)
+        .then(() => {
+          return true;
+        }).catch((error) => {
+          console.log("ERROR:", error)
+          return false;
+        });
     }
+  }
+
+  bboxes = {
+      get: function(fileId) {
+        return api.get(`/file/${fileId}/bboxes/`)
+          .then((response) => {
+            console.log(response);
+            return response.data.map((data) => {
+              return new BBox(data);
+            })
+          })
+          .catch((error) =>{
+            console.warn(error)
+            if (error.response?.status == 404)
+              return null;
+          });
+      }
   }
 
   collaborator = {

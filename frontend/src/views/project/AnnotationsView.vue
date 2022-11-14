@@ -15,7 +15,6 @@
     </v-row>
 
     <v-card v-if="files.length != 0">
-
       <core-ImageAnnotator
         :file="selectedFile"
       />

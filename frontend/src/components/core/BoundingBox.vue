@@ -26,8 +26,9 @@ export default {
       return {
         top: `${this.value.y * 100}%`,
         left: `${this.value.x * 100}%`,
-        width: `${this.value.w * 100}%`,
-        height: `${this.value.h * 100}%`,
+        width: `${this.value.width * 100}%`,
+        height: `${this.value.height * 100}%`,
+        // Label: localValue.label
       }
     }
   },
