@@ -14,6 +14,7 @@ export default new Vuetify({
         primary: '#002F5D', // brand color of Uni Jena (dark blue)
         secondary: '#EDEDED', // dark gray
         accent: '#AE9A63', // accent color of Uni Jena (gold)
+        background: '#FFFFFF',
       },
     },
   },

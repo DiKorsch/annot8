@@ -9,10 +9,12 @@ export default class BBox {
     if (data.annotation !== null) {
       this.label = data.annotation.label;
       this.annotator = data.annotation.annotator;
+      this.annotationId = data.annotation.id;
       this.confirmators = data.annotation.confirmators;
     } else {
       this.label = null;
       this.annotator = null;
+      this.annotationId = null;
       this.confirmators = null;
     }
   }

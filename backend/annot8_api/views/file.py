@@ -47,9 +47,7 @@ class FileViewSet(BaseViewSet):
 
             if "label" in request.POST:
                 annotation = Annotation.create(described_object=bbox,
-                            label=request.POST.get("label"), annotator=user
-                    )
-
+                            label=request.POST.get("label"), annotator=user)
         except Exception as e:
             print(e)
             return Response({"status": str(e)},
@@ -57,3 +55,27 @@ class FileViewSet(BaseViewSet):
 
         else:
             return Response({'status': 'BBox added'})
+
+@action(detail=True, methods=["post"], url_path="label")
+def label_set(self, request, pk=None):
+    if not "label" in request.POST:
+        return Response({"status": "Label missing"},
+            status=status.HTTP_400_BAD_REQUEST)
+    label = request.POST.get("label")
+    user = self.request.user
+    file = self.get_object()
+
+    # Create a corresponding annotation / update the existing one.
+    try:
+        annotation, created = Annotation.objects.get_or_create(described_object=file)
+        annotation.label = label
+        annotation.annotator = user
+        annotation.confirmators.clear()
+        annotation.save()
+    except Exception as e:
+        print(e)
+        return Response({"status": str(e)},
+            status=status.HTTP_400_BAD_REQUEST)
+
+    else:
+        return Response({'status': 'Label added to file'})

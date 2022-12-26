@@ -120,6 +120,27 @@ class DataService {
           console.log("ERROR:", error)
           return false;
         });
+    },
+
+    set_label: function(fileId, label) {
+      if (fileId === undefined || label === undefined)
+        return false;
+
+      let data = new FormData();
+
+      data.append('label', label);
+
+      let config = {
+        headers: {'content-type': 'multipart/form-data'},
+      }
+
+      return api.post(`bbox/${fileId}/label/`, data, config)
+        .then(() => {
+          return true;
+        }).catch((error) => {
+          console.log("Error while labeling file:", error)
+          return false;
+        });
     }
   }
 
@@ -137,7 +158,73 @@ class DataService {
             if (error.response?.status == 404)
               return null;
           });
+      },
+
+      delete: function(bboxId){
+        if (bboxId === undefined)
+          return false;
+        return api.delete(`bbox/${bboxId}/`)
+          .then(() => {
+            return true;
+          })
+          .catch((error) => {
+            console.warn("Error while deleting bounding box: ", error)
+            return false;
+          })
+      },
+
+      set_label: function(bboxId, label) {
+        if (bboxId === undefined || label === undefined)
+          return false;
+
+        let data = new FormData();
+
+        data.append('label', label);
+
+        let config = {
+          headers: {'content-type': 'multipart/form-data'},
+        }
+
+        return api.post(`bbox/${bboxId}/label/`, data, config)
+          .then(() => {
+            return true;
+          }).catch((error) => {
+            console.log("Error while labeling bounding box:", error)
+            return false;
+          });
       }
+    }
+
+  confirmator = {
+    add: function(annotationId) {
+      return api.post(`annotation/${annotationId}/confirmator/`)
+        .then(() => {
+          return true;
+        }).catch((error) => {
+          console.log("Error while confirming annotation:", error)
+          return false;
+        });
+    },
+
+    toggle: function(annotationId) {
+      return api.post(`annotation/${annotationId}/toggle_confirmator/`)
+        .then(() => {
+          return true;
+        }).catch((error) => {
+          console.log("Error while changing confirmation status of annotation:", error)
+          return false;
+        });
+    },
+
+    remove: function (annotationId) {
+      return api.remove(`annotation/${annotationId}/confirmator/`)
+        .then(() => {
+          return true;
+        }).catch((error) => {
+          console.log("Error while un-confirming annotation:", error)
+          return false;
+        });
+    }
   }
 
   collaborator = {

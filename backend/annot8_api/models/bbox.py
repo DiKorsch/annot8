@@ -4,7 +4,6 @@ from annot8_api.models import describable_object
 from annot8_api.models import file
 
 class BoundingBox(describable_object.DescribableObject):
-
     described_file = models.ForeignKey(
         file.File,
         on_delete=models.CASCADE,

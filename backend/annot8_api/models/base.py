@@ -1,7 +1,7 @@
-
+from polymorphic import models as polymorphic_models
 from django.db import models
 
-class BaseModel(models.Model):
+class BaseModel(polymorphic_models.PolymorphicModel):
 
     created = models.DateTimeField(auto_now_add=True)
 
@@ -16,4 +16,3 @@ class BaseModel(models.Model):
     read_only_fields = [
         "created",
     ]
-

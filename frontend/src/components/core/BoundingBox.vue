@@ -1,7 +1,15 @@
 <template>
-  <div class="bounding-box" :style="style">
-    <v-chip label x-small color="primary">
-      {{ localValue.label }}
+  <div
+    class="bounding-box"
+    :style="style"
+    :class="{highlighted: highlightId === localValue.id}"
+    @click="$emit('selectedBBox', localValue)"
+  >
+    <v-chip
+      label x-small
+      :class="{highlighted: highlightId === localValue.id}"
+    >
+      {{(typeof localValue.label !== 'undefined' && localValue.label !== null) ? localValue.label : 'Unknown'}}
     </v-chip>
   </div>
 </template>
@@ -13,7 +21,8 @@ export default {
   model: {prop: "value", event: "input"},
 
   props: {
-    value: undefined
+    value: undefined,
+    highlightId: undefined,
   },
 
   computed: {
@@ -48,6 +57,9 @@ export default {
 
   .bounding-box:hover{
     background-color: rgba(0, 0, 255.0, 0.4);
+  }
 
+  .bounding-box.highlighted{
+    background-color: rgba(148.0, 0, 211.0, 0.4);
   }
 </style>

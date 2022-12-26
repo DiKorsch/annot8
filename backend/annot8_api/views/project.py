@@ -108,4 +108,4 @@ class ProjectViewSet(BaseViewSet):
                 status=status.HTTP_400_BAD_REQUEST)
 
         project.collaborators.remove(user)
-        return Response({'status': 'Collaborator added'})
+        return Response({'status': 'Collaborator removed'})
