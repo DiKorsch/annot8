@@ -89,9 +89,32 @@
             <v-col class="col-6"><core-ProjectCollaborators :project="project"/></v-col>
           </v-row>
 
-          <v-row v-if="project.model">
-            <v-col class="col-6">Model</v-col>
-            <v-col class="col-6">{{ project.model }}</v-col>
+          <v-row>
+            <v-col class="col-6">Detector</v-col>
+            <v-col class="col-6">
+              Current detector: {{project.detector}} <br>
+
+              Select detector:
+              <select v-model="selectedDetector" @change="selectDetector(selectedDetector)">
+                <option :value="detector" v-for="(detector, index) in project.detectors" :key="index">
+                  {{detector}}
+                </option>
+              </select>
+            </v-col>
+          </v-row>
+
+          <v-row>
+            <v-col class="col-6">Classifier</v-col>
+            <v-col class="col-6">
+              Current classifier: {{project.classifier}} <br>
+
+              Select classifier:
+              <select v-model="selectedClassifier" @change="selectClassifier(selectedClassifier)">
+                <option :value="classifier" v-for="(classifier, index) in project.classifiers" :key="index">
+                  {{classifier}}
+                </option>
+              </select>
+            </v-col>
           </v-row>
 
           <v-row v-if="project.label_provider">
@@ -139,6 +162,8 @@
       return {
         proj_delete_dialog: false,
         project: null,
+        selectedClassifier: '',
+        selectedDetector: '',
       }
     },
 
@@ -167,6 +192,22 @@
     methods: {
       deleteProj () {
         DataService.project.delete(this.projectId)
+          .then((ok) => {
+            if (ok){
+              this.$router.push({name: "projects"})
+            }
+          });
+      },
+      selectClassifier (classifier) {
+        DataService.classifier.select(this.projectId, classifier)
+          .then((ok) => {
+            if (ok){
+              this.$router.push({name: "projects"})
+            }
+          });
+      },
+      selectDetector (detector) {
+        DataService.detector.select(this.projectId, detector)
           .then((ok) => {
             if (ok){
               this.$router.push({name: "projects"})

@@ -127,6 +127,9 @@
         if (this.$v.$invalid)
           return
 
+        this.project.classifier = "Moth Classifier";
+        this.project.detector = "Moth Detector";
+
         DataService.project.create(this.project).then(
           (project) => {
             this.$router.push({ name: 'project', params: { id: project.id}})

@@ -10,9 +10,10 @@
         </v-col>
 
         <v-col>
-          <div v-if="(interaction === 'info-box' || interaction == 'confirm-box' || interaction === 'label-box') && typeof selectedBBox !== 'undefined'">
+          <div v-if="(interaction === 'info-box' || interaction == 'confirm-box' || interaction === 'label-box' || interaction === 'predict-box') && typeof selectedBBox !== 'undefined'">
             <h4>Selected Bounding Box:</h4>
             Label: {{ this.selectedBBox.label }} <br>
+            Predicted Label: {{ this.selectedBBox.predicted_label }} (by: {{ this.selectedBBox.prediction_model }}) <br>
             Confirmators: {{ this.selectedBBox.confirmators }}
           </div>
 
@@ -52,8 +53,12 @@ export default {
   methods: {
     setInteraction(interaction) {
       this.interaction = interaction;
+
       if (!(interaction === "info-box" || interaction === "label-box" || interaction === "confirm-box") && typeof this.selectedBBox !== 'undefined') {
         this.selectedBBox = undefined;
+      }
+      if (interaction === "generate-box") {
+        this.$refs.imageAnnotations.generateBBoxes();
       }
     },
     resetInteraction() {
@@ -72,6 +77,8 @@ export default {
         this.$refs.imageAnnotations.removeBBox(this.selectedBBox);
       } else if (this.interaction === "label-box") {
         this.$refs.imageAnnotations.labelBBox(this.selectedBBox, "Dummy label 2");
+      } else if (this.interaction === "predict-box") {
+        this.$refs.imageAnnotations.predictBBox(this.selectedBBox);
       } else if (this.interaction === "confirm-box") {
         this.$refs.imageAnnotations.confirmBBox(this.selectedBBox);
       }

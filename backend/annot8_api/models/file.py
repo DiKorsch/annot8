@@ -7,6 +7,7 @@ from django.db import models
 from django.dispatch import receiver
 from django_q.tasks import async_task
 
+import numpy as np
 from PIL import Image
 from pathlib import Path
 
@@ -93,6 +94,11 @@ class File(describable_object.DescribableObject):
         )
 
         return file
+
+    def as_numpy(self):
+        path = Path(self.path.path)
+        with Image.open(path) as im:
+            return np.asarray(im)
 
     def create_thumbnails(self):
         path = Path(self.path.path)

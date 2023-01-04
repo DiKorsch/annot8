@@ -2,14 +2,14 @@
   <div
     class="bounding-box"
     :style="style"
-    :class="{highlighted: highlightId === localValue.id}"
+    :class="{highlighted: highlightId === localValue.id, pipeline: localValue.pipelineGenerated}"
     @click="$emit('selectedBBox', localValue)"
   >
     <v-chip
       label x-small
       :class="{highlighted: highlightId === localValue.id}"
     >
-      {{(typeof localValue.label !== 'undefined' && localValue.label !== null) ? localValue.label : 'Unknown'}}
+      {{getLabel}}
     </v-chip>
   </div>
 </template>
@@ -39,6 +39,18 @@ export default {
         height: `${this.value.height * 100}%`,
         // Label: localValue.label
       }
+    },
+
+    getLabel: function() {
+      if ((typeof this.value.label !== 'undefined' && this.value.label !== null) || (typeof this.value.predicted_label !== 'undefined' && this.value.predicted_label !== null)) {
+        if (this.value.label !== null) {
+          return this.value.label;
+        } else {
+          return this.value.predicted_label;
+        }
+      } else {
+        return "Unknown";
+      }
     }
   },
 
@@ -57,6 +69,10 @@ export default {
 
   .bounding-box:hover{
     background-color: rgba(0, 0, 255.0, 0.4);
+  }
+
+  .bounding-box.pipeline{
+    background-color: rgba(0.0, 126.0, 0.0, 0.4);
   }
 
   .bounding-box.highlighted{

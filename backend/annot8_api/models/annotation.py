@@ -9,14 +9,6 @@ class Annotation(base.BaseModel):
 
     # An annotation describes a describable object. If the describable object
     # is deleted, the annotation should be too.
-    """
-    described_object = models.ForeignKey(
-        describable_object.DescribableObject,
-        on_delete=models.CASCADE,
-        related_name="annotations",
-        related_query_name="annotation",
-    )
-    """
     described_object = models.OneToOneField(
         describable_object.DescribableObject,
         on_delete=models.CASCADE,

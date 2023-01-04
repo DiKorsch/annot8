@@ -91,6 +91,15 @@ export default {
       }
     },
 
+    generateBBoxes() {
+      DataService.files.generate_bboxes(this.fileId)
+        .then((ok) => {
+          if (!ok){
+            console.log("Failed to add generate bounding boxes.");
+          }
+          this.getBBoxes();
+        });
+    },
     drawBBox(event) {
       if (this.x !== null && this.y !== null) {
         this.add_bbox(this.x, this.y, event.layerX, event.layerY)
@@ -170,6 +179,16 @@ export default {
         .then((ok) => {
           if (!ok){
             console.log("Failed to label bounding box.");
+          }
+          this.getBBoxes();
+        });
+    },
+
+    predictBBox(bbox) {
+      DataService.bboxes.predict(bbox.id)
+        .then((ok) => {
+          if (!ok){
+            console.log("Failed to predict bounding box.");
           }
           this.getBBoxes();
         });

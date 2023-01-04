@@ -21,6 +21,12 @@ class ProjectSerializer(BaseSerializer):
         fields = models.Project.serializer_fields
         read_only_fields = models.Project.read_only_fields
 
+class PredictionSerializer(BaseSerializer):
+    class Meta:
+        model = models.Prediction
+        fields = models.Prediction.serializer_fields
+        read_only_fields = models.Prediction.read_only_fields
+
 class AnnotationSerializer(BaseSerializer):
     # We want the confirmators and the annotator to not be serialized by their id,
     # but instead by their username.
@@ -43,8 +49,9 @@ class FileSerializer(BaseSerializer):
 
 class BoundingBoxSerializer(BaseSerializer):
     annotation = AnnotationSerializer()
+    prediction = PredictionSerializer()
 
     class Meta:
         model = models.BoundingBox
-        fields = models.BoundingBox.serializer_fields + ["annotation"]
+        fields = models.BoundingBox.serializer_fields + ["annotation", "prediction"]
         read_only_fields = models.BoundingBox.read_only_fields

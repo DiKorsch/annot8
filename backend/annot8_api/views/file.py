@@ -31,6 +31,44 @@ class FileViewSet(BaseViewSet):
         response = Response(serializer.data)
         return Response(serializer.data)
 
+    @action(detail=True, methods=["post"], url_path="bbox_generate")
+    def bbox_generate(self, request, pk=None):
+        file = self.get_object()
+        project = file.project
+
+        # Get detector.
+        detector = project.get_detector()
+        if detector is None:
+            return Response({"status": "Project does not have a detector"},
+                status=status.HTTP_400_BAD_REQUEST)
+
+        # Get classifier.
+        classifier = project.get_classifier()
+
+        # Remove all prior pipeline-generated bounding boxes.
+        BoundingBox.objects.filter(described_file=file, pipeline_generated=True).delete()
+
+        # Perform detection.
+        generated_bboxes = detector(file.as_numpy())
+        for bbox in generated_bboxes:
+            # Generate bounding boxes.
+            w = bbox.x1 - bbox.x0
+            h = bbox.y1 - bbox.y0
+            if w <= 0 or h <= 0:
+                continue
+            bbox = BoundingBox.create(file, bbox.x0, bbox.y0, w, h, True)
+
+            # If possible, generate predictions.
+            if not classifier is None:
+                try:
+                    label, logits = classifier(bbox.as_numpy())
+                    bbox.prediction_add(label, logits, project.classifier)
+                except Exception as e:
+                    print("Generating prediction for bounding box failed due to: " + str(e))
+
+
+        return Response({'status': 'BBoxes generated'})
+
     @action(detail=True, methods=["post"], url_path="bbox")
     def bbox_add(self, request, pk=None):
         if not set(["x", "y", "width", "height"]).issubset(request.POST):
@@ -42,7 +80,7 @@ class FileViewSet(BaseViewSet):
         try:
             bbox = BoundingBox.create(file, request.POST.get("x"),
                         request.POST.get("y"), request.POST.get("width"),
-                        request.POST.get("height")
+                        request.POST.get("height"), False, user
                 )
 
             if "label" in request.POST:

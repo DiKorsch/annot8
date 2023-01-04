@@ -23,6 +23,28 @@
       </v-card>
 
       <v-card
+        ref="predict_box"
+        title="predict bounding box (P)"
+        @click="$emit('interaction', 'predict-box')"
+        color="secondary"
+        class="mt-2">
+        <v-icon :color="interaction === 'predict-box' ? 'accent' : 'primary'">
+          mdi-rocket-launch
+        </v-icon>
+      </v-card>
+
+      <v-card
+        ref="generate_box"
+        title="generate new bounding boxes (R)"
+        @click="$emit('interaction', 'generate-box')"
+        color="secondary"
+        class="mt-2">
+        <v-icon :color="interaction === 'generate-box' ? 'accent' : 'primary'">
+          mdi-shape-square-plus
+        </v-icon>
+      </v-card>
+
+      <v-card
         ref="extreme_clicking"
         title="extreme clicking (E)"
         @click="$emit('interaction', 'extreme-clicking')"
@@ -98,6 +120,12 @@ export default {
           break;
         case 't':
           this.$refs.label_box.$el.click();
+          break;
+        case 'p':
+          this.$refs.predict_box.$el.click();
+          break;
+        case 'r':
+          this.$refs.generate_box.$el.click();
           break;
         case 'f':
           this.$refs.remove_box.$el.click();

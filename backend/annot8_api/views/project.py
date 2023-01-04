@@ -45,12 +45,10 @@ class ProjectViewSet(BaseViewSet):
 
         try:
             file = File.create(request.FILES['file'], project)
-
         except Exception as e:
             print(e)
             return Response({"status": str(e)},
                 status=status.HTTP_400_BAD_REQUEST)
-
         else:
             return Response({'status': 'File uploaded'})
 
@@ -63,6 +61,41 @@ class ProjectViewSet(BaseViewSet):
         serializer = FileSerializer(files, many=True)
         return Response(serializer.data)
 
+    @action(detail=True, methods=["post"], url_path="classifier")
+    def classifier_select(self, request, pk=None):
+        classifier = request.POST.get("classifier")
+        project = self.get_object()
+
+        if classifier is None:
+            return Response({"status": "Classifier missing"},
+                status=status.HTTP_400_BAD_REQUEST)
+        if not classifier in project.classifiers():
+            return Response({"status": "Classifier name is invalid"},
+                status=status.HTTP_400_BAD_REQUEST)
+
+        project.classifier = classifier
+        project.save()
+        project.reload_classifier()
+        return Response({'status': 'Classifier selected'})
+
+
+    @action(detail=True, methods=["post"], url_path="detector")
+    def detector_select(self, request, pk=None):
+        detector = request.POST.get("detector")
+        project = self.get_object()
+
+        if detector is None:
+            return Response({"status": "Detector missing"},
+                status=status.HTTP_400_BAD_REQUEST)
+        if not detector in Project.detectors():
+            return Response({"status": "Detector name is invalid"},
+                status=status.HTTP_400_BAD_REQUEST)
+
+        project.detector = detector
+        project.save()
+        project.reload_detector()
+        print("Selected detector " + project.detector)
+        return Response({'status': 'Detector selected'})
 
 
     @action(detail=True, methods=["post"], url_path="collaborator")

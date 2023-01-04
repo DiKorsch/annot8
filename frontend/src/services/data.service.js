@@ -40,12 +40,14 @@ class DataService {
       let data = {
         'name': project.name,
         'description': project.description,
+        'classifier': project.classifier,
+        'detector': project.detector,
       };
       return api.post("/project/", data).then(
         (response) => {
           return response.data;
         });
-    }
+    },
   }
 
   files = {
@@ -98,6 +100,16 @@ class DataService {
         })
     },
 
+    generate_bboxes: function(fileId) {
+      return api.post(`file/${fileId}/bbox_generate/`)
+        .then(() => {
+          return true;
+        }).catch((error) => {
+          console.log("Error while generating bounding box:", error)
+          return false;
+        });
+    },
+
     add_bbox: function(fileId, x, y, width, height, label) {
       let data = new FormData();
 
@@ -140,6 +152,40 @@ class DataService {
         }).catch((error) => {
           console.log("Error while labeling file:", error)
           return false;
+        });
+    }
+  }
+
+  classifier = {
+    select: function(projectId, classifier) {
+      let data = new FormData();
+
+      data.append('classifier', classifier);
+
+      let config = {
+        headers: {'content-type': 'multipart/form-data'},
+      }
+
+      return api.post(`project/${projectId}/classifier/`, data, config).then(
+        (response) => {
+          return response.data;
+        });
+    }
+  }
+
+  detector = {
+    select: function(projectId, detector) {
+      let data = new FormData();
+
+      data.append('detector', detector);
+
+      let config = {
+        headers: {'content-type': 'multipart/form-data'},
+      }
+
+      return api.post(`project/${projectId}/detector/`, data, config).then(
+        (response) => {
+          return response.data;
         });
     }
   }
@@ -190,6 +236,16 @@ class DataService {
             return true;
           }).catch((error) => {
             console.log("Error while labeling bounding box:", error)
+            return false;
+          });
+      },
+
+      predict: function(bboxId) {
+        return api.post(`bbox/${bboxId}/predict/`)
+          .then(() => {
+            return true;
+          }).catch((error) => {
+            console.log("Error while predicting bounding box:", error)
             return false;
           });
       }

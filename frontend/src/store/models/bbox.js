@@ -2,6 +2,10 @@ export default class BBox {
   constructor(data) {
     this.id = data.id
     this.fileId = data.described_file;
+    this.pipelineGenerated = data.pipeline_generated;
+    if (!data.pipeline_generated) {
+      this.creator = data.creator;
+    }
     this.x = data.x;
     this.y = data.y;
     this.width = data.width;
@@ -16,6 +20,13 @@ export default class BBox {
       this.annotator = null;
       this.annotationId = null;
       this.confirmators = null;
+    }
+    if (data.prediction !== null) {
+      this.predicted_label = data.prediction.top_1_label;
+      this.prediction_model = data.prediction.model;
+    } else {
+      this.predicted_label = null;
+      this.prediction_model = null;
     }
   }
 }

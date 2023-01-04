@@ -10,7 +10,10 @@ export default class Project {
     this.collaborators = data.collaborators;
     this.rootFolder = data.root_folder;
     this.dataFolder = data.data_folder;
-    this.model = data.model;
+    this.classifier = data.classifier;
+    this.classifiers = data.classifiers;
+    this.detector = data.detector;
+    this.detectors = data.detectors;
     this.labelProvider = data.label_provider;
 
     this.uuid = data.root_folder?.split("/").pop();
