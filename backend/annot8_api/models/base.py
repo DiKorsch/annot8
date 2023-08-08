@@ -16,3 +16,7 @@ class BaseModel(polymorphic_models.PolymorphicModel):
     read_only_fields = [
         "created",
     ]
+
+
+class DescribableObject(BaseModel):
+    pass

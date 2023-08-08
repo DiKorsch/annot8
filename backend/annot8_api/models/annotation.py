@@ -1,16 +1,15 @@
 
 from django.db import models
 from annot8_api.models import base
-from annot8_api.models import describable_object
 from django.contrib.auth.models import User
-from labeltree.models import label
+# from labeltree.models import label
 
 class Annotation(base.BaseModel):
 
     # An annotation describes a describable object. If the describable object
     # is deleted, the annotation should be too.
     described_object = models.OneToOneField(
-        describable_object.DescribableObject,
+        base.DescribableObject,
         on_delete=models.CASCADE,
         related_name = "annotation",
         related_query_name = "annotation",
@@ -38,7 +37,8 @@ class Annotation(base.BaseModel):
     ]
 
     @classmethod
-    def create(cls, described_object: describable_object.DescribableObject, label: str, annotator: User):
+    def create(cls, described_object: base.DescribableObject, label: str,
+        annotator: User):
 
         annotation = cls.objects.create(
             described_object = described_object,

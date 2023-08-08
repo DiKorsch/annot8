@@ -1,6 +1,6 @@
 
-from annot8_api.models import Prediction
 from annot8_api.models import base
+from annot8_api.models import prediction as pred_mod
 
 from django.db import models
 # from labeltree.models import label
@@ -10,7 +10,7 @@ class Logit(base.BaseModel):
     # One prediction can have multiple logits, but logits cannot exist without
     # a corresponding prediction.
     prediction = models.ForeignKey(
-        Prediction,
+        pred_mod.Prediction,
         on_delete=models.CASCADE,
         related_name="logit",
         related_query_name = "logit",
@@ -27,7 +27,7 @@ class Logit(base.BaseModel):
     ]
 
     @classmethod
-    def create(cls, prediction: Prediction, label: int, logit: float):
+    def create(cls, prediction: pred_mod.Prediction, label: int, logit: float):
 
         logit = cls.objects.create(
             prediction = prediction,

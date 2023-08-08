@@ -6,12 +6,12 @@ from django.contrib.auth.models import User
 from django.db import models
 from pathlib import Path
 
-from annot8_api.models import describable_object
+from annot8_api.models import base
 from annot8_api.models import file
 from annot8_api.models import logit
 from annot8_api.models import prediction
 
-class BoundingBox(describable_object.DescribableObject):
+class BoundingBox(base.DescribableObject):
     described_file = models.ForeignKey(
         file.File,
         on_delete=models.CASCADE,
@@ -32,7 +32,7 @@ class BoundingBox(describable_object.DescribableObject):
     width = models.FloatField()
     height = models.FloatField()
 
-    serializer_fields = describable_object.DescribableObject.serializer_fields + [
+    serializer_fields = base.DescribableObject.serializer_fields + [
         "described_file",
         "pipeline_generated",
         "creator",

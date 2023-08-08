@@ -10,7 +10,7 @@ import numpy as np
 from PIL import Image
 from pathlib import Path
 
-from annot8_api.models import describable_object
+from annot8_api.models import base
 from annot8_api.models.project import Project
 
 
@@ -25,7 +25,7 @@ def project_directory(instance: "File", filename: str):
     return f"{data_folder}/{filename}"
 
 
-class File(describable_object.DescribableObject):
+class File(base.DescribableObject):
     __name__ = "File"
 
     EXTENSIONS = [
@@ -55,7 +55,7 @@ class File(describable_object.DescribableObject):
 
     path = models.ImageField(upload_to=project_directory)
 
-    serializer_fields = describable_object.DescribableObject.serializer_fields + [
+    serializer_fields = base.DescribableObject.serializer_fields + [
         "project",
         "url",
         "thumbs"

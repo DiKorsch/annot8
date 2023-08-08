@@ -1,7 +1,6 @@
 
 from django.db import models
 from annot8_api.models import base
-from annot8_api.models import describable_object
 # from labeltree.models import label
 
 class Prediction(base.BaseModel):
@@ -9,7 +8,7 @@ class Prediction(base.BaseModel):
     # A prediction describes a describable object. If the describable object
     # is deleted, the prediction should be too.
     described_object = models.OneToOneField(
-        describable_object.DescribableObject,
+        base.DescribableObject,
         on_delete=models.CASCADE,
         related_name = "prediction",
         related_query_name = "prediction",
@@ -26,7 +25,8 @@ class Prediction(base.BaseModel):
     ]
 
     @classmethod
-    def create(cls, described_object: describable_object.DescribableObject, top_1_label: int, model: str):
+    def create(cls, described_object: base.DescribableObject,
+        top_1_label: int, model: str):
 
         prediction = cls.objects.create(
             described_object = described_object,
