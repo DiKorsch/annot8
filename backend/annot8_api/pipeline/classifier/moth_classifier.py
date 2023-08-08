@@ -10,7 +10,6 @@ from pathlib import Path
 
 from chainercv import transforms as tr
 from cvmodelz.models import ModelFactory
-from pathlib import Path
 
 class MothClassifier(BaseClassifier):
     name = "Moth Classifier"
@@ -48,7 +47,7 @@ class Classifier:
         assert weights.exists(), \
             f"could not find classifier weights: {weights}!"
         assert n_classes == len(class_id2name), \
-            f"number of classes does not match the size of the mapping!"
+            "number of classes does not match the size of the mapping!"
 
         self.input_size = input_size
         self.model = ModelFactory.new(model_type)
@@ -74,7 +73,7 @@ class Classifier:
     def __call__(self, im: np.ndarray) -> int:
 
         assert isinstance(im, (list, np.ndarray)), \
-            f"im should be either a list or a numpy array!"
+            "im should be either a list or a numpy array!"
 
         if isinstance(im, np.ndarray):
             assert im.ndim == 3, \

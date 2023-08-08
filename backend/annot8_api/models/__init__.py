@@ -5,3 +5,14 @@ from annot8_api.models.annotation import Annotation
 from annot8_api.models.prediction import Prediction
 from annot8_api.models.bbox import BoundingBox
 from annot8_api.models.logit import Logit
+
+
+__all__ = [
+    "File",
+    "Project",
+    "DescribableObject",
+    "Annotation",
+    "Prediction",
+    "BoundingBox",
+    "Logit",
+]

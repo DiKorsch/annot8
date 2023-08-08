@@ -63,7 +63,7 @@ django.db.utils.OperationalError: Problem installing fixture [...] Could not loa
 you will need to change the charset of the schema and the labeltree tables. First, login to the mysql server via CLI or some other interface. Then change the charset:
 
 ```sql
-ALTER DATABASE annot8 CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER DATABASE annot8 CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE annot8;
 ALTER TABLE labeltree_label CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE labeltree_labelgroup CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

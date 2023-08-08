@@ -1,5 +1,4 @@
 import enum
-import uuid
 
 from django.conf import settings
 from django.core.files.uploadedfile import UploadedFile

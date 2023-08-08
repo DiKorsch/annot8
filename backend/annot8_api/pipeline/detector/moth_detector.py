@@ -1,9 +1,7 @@
 import cv2
 import numpy as np
 
-from blob_detector import utils
 from blob_detector.core.bbox import BBox
-from blob_detector.core.bbox_proc import Splitter
 from blob_detector.core.binarizers import BinarizerType
 from blob_detector.core.pipeline import Pipeline
 

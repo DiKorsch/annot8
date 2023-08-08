@@ -1,5 +1,5 @@
-from polymorphic import models as polymorphic_models
 from django.db import models
+from polymorphic import models as polymorphic_models
 
 class BaseModel(polymorphic_models.PolymorphicModel):
 

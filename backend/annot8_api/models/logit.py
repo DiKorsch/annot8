@@ -1,7 +1,8 @@
 
-from django.db import models
-from annot8_api.models import base
 from annot8_api.models import Prediction
+from annot8_api.models import base
+
+from django.db import models
 # from labeltree.models import label
 
 class Logit(base.BaseModel):

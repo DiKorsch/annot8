@@ -1,14 +1,15 @@
-from django.db import models
-from django.contrib.auth.models import User
-
 import numpy as np
+
+
 from PIL import Image
+from django.contrib.auth.models import User
+from django.db import models
 from pathlib import Path
 
 from annot8_api.models import describable_object
 from annot8_api.models import file
-from annot8_api.models import prediction
 from annot8_api.models import logit
+from annot8_api.models import prediction
 
 class BoundingBox(describable_object.DescribableObject):
     described_file = models.ForeignKey(
