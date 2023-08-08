@@ -47,7 +47,11 @@ class BoundingBox(base.DescribableObject):
         with Image.open(path) as im:
             # Note: x, y, with and height are in [0,1].
             w, h = im.size
-            bbox = np.asarray(im)[int(self.x*w):int((self.x+self.width)*w), int(self.y*h):int((self.y+self.height)*h)]
+            x0, y0 = int(self.x * w), int(self.y * h)
+            x1, y1 = int((self.x + self.width) * w), int((self.y + self.height) * h)
+            # I think, x and y should be switched!
+            bbox = np.asarray(im)[x0:x1, y0:y1]
+
         return bbox
 
     def prediction_add(self, label, logits, classifier_name):
@@ -66,26 +70,23 @@ class BoundingBox(base.DescribableObject):
     def create(cls, described_file: file.File, x: int, y: int, width: int,
             height: int, pipeline_generated: bool = False, user: User = None):
 
-        if user is None and pipeline_generated is True:
-            bbox = cls.objects.create(
-                described_file = described_file,
-                pipeline_generated = True,
-                x = x,
-                y = y,
-                width = width,
-                height = height
-            )
-        elif user is not None and pipeline_generated is False:
-            bbox = cls.objects.create(
-                described_file = described_file,
-                pipeline_generated = False,
-                creator = user,
-                x = x,
-                y = y,
-                width = width,
-                height = height
-            )
+        if pipeline_generated:
+            if user is not None:
+                raise ValueError("Omit the 'user' parameter for"
+                    "pipeline generated bounding boxes!")
         else:
-            raise ValueError("Supply a creator if the bounding box is created by a user and ommit it if it is not.")
+            if user is None:
+                raise ValueError("The 'user' parameter is required for"
+                    "manually annotated bounding boxes!")
+
+        bbox = cls.objects.create(
+            described_file = described_file,
+            pipeline_generated = pipeline_generated,
+            creator = user,
+            x = x,
+            y = y,
+            width = width,
+            height = height
+        )
 
         return bbox
