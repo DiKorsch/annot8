@@ -63,23 +63,34 @@ export default {
   },
 
   methods: {
+
+    getCoordinates(event) {
+      var bounds = event.currentTarget.getBoundingClientRect();
+      var x = event.clientX - bounds.left;
+      var y = event.clientY - bounds.top;
+      return {x, y}
+    },
+
     mouseEnter() {
-      console.log('mouseenter');
+      console.debug('mouseenter');
       // this.$el.addEventListener('mousemove', this.mouseMove, false);
     },
     mouseLeave() {
-      console.log('mouseleave');
+      console.debug('mouseleave');
       // this.$el.removeEventListener('mousemove', this.mouseMove());
     },
     mouseMove(event) {
+      var coords = this.getCoordinates(event);
       if (this.x !== null && this.y !== null && this.interaction === "draw-box") {
-          this.currentBBox = this.calculateBBox(this.x, this.y, event.layerX, event.layerY);
+          this.currentBBox = this.calculateBBox(this.x, this.y, coords.x, coords.y);
       }
-      // console.info(event.layerX, event.layerY);
+
     },
     mouseClicked(event) {
+      var coords = this.getCoordinates(event);
+
       if (this.interaction === "draw-box") {
-        this.drawBBox(event);
+        this.drawBBox(coords.x, coords.y);
       }
     },
 
@@ -100,26 +111,28 @@ export default {
           this.getBBoxes();
         });
     },
-    drawBBox(event) {
+    drawBBox(x, y) {
+
       if (this.x !== null && this.y !== null) {
-        this.add_bbox(this.x, this.y, event.layerX, event.layerY)
+        this.add_bbox(this.x, this.y, x, y)
         this.resetDrawBBox();
       } else {
-        this.x = event.layerX;
-        this.y = event.layerY;
+        this.x = x;
+        this.y = y;
       }
     },
     resetDrawBBox() {
       this.x = null;
       this.y = null;
       this.currentBBox = undefined;
-      console.log("Resetted draw_box")
+      console.debug("Reset draw_box")
     },
 
     calculateBBox(x1, y1, x2, y2) {
       if (x1 === null || y1 === null || x2 === null || y2 === null) {
         return undefined;
       }
+
 
       /*// Scale bounding box coordinates to [0,1].
       x1 = (x1 + 1) / this.$refs.overlay.clientWidth;
