@@ -37,7 +37,7 @@ export default {
     },
 
     style: function() {
-      let alpha = this.hovered ? 0.4 : 0.3;
+      // let alpha = this.hovered ? 0.4 : 0.3;
 
       return {
         top: `${this.value.y * 100}%`,

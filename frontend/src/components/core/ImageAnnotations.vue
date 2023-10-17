@@ -34,29 +34,29 @@
 <script>
 import DataService from '@/services/data.service';
 
-class Box {
+// class Box {
 
 
-  constructor (x, y){
-    this.x0 = x
-    this.y0 = y
+//   constructor (x, y){
+//     this.x0 = x
+//     this.y0 = y
 
-    this.x = x
-    this.y = y
-    this.w = 0
-    this.h = 0
-  }
+//     this.x = x
+//     this.y = y
+//     this.w = 0
+//     this.h = 0
+//   }
 
-  update(x, y){
-    this.x = Math.min(this.x0, x)
-    this.y = Math.min(this.y0, y)
+//   update(x, y){
+//     this.x = Math.min(this.x0, x)
+//     this.y = Math.min(this.y0, y)
 
-    this.w = Math.max(this.x0, x) - this.x;
-    this.h = Math.max(this.y0, y) - this.y;
+//     this.w = Math.max(this.x0, x) - this.x;
+//     this.h = Math.max(this.y0, y) - this.y;
 
-    console.log(this.x, this.y, this.w, this.h)
-  }
-}
+//     console.log(this.x, this.y, this.w, this.h)
+//   }
+// }
 
 export default {
   name: "ImageAnnotations",
@@ -88,15 +88,12 @@ export default {
     currentBBox: undefined,
     bboxes: [],
     toggleBBoxUpdate: false,
+    newBox: undefined,
   }),
 
   created: function () {
     this.getBBoxes();
   },
-
-  data: () => ({
-    newBox: undefined,
-  }),
 
   methods: {
     addBox: function(box){
