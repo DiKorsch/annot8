@@ -2,12 +2,15 @@
   <div
     class="bounding-box"
     :style="style"
-    :class="{highlighted: highlighted, pipeline: localValue.pipelineGenerated, hovered:hovered}"
+    :class="{
+        pipeline: localValue.pipelineGenerated,
+        selected: selected,
+        highlight: highlight,
+        hidden: hidden}"
     @click="$emit('selectedBBox', localValue)"
   >
     <v-chip v-if="hasLabel"
       label x-small
-      :class="{highlighted: highlighted}"
     >
       {{getLabel}}
     </v-chip>
@@ -22,12 +25,12 @@ export default {
 
   props: {
     value: undefined,
-    highlighted: undefined,
   },
 
   data: () => ({
     selected: false,
-    hovered: false,
+    highlight: false,
+    hidden: false,
   }),
 
   computed: {
@@ -38,6 +41,7 @@ export default {
 
     style: function() {
       // let alpha = this.hovered ? 0.4 : 0.3;
+      // let color = this.hovered ? 0.4 : 0.3;
 
       return {
         top: `${this.value.y * 100}%`,
@@ -73,9 +77,6 @@ export default {
       console.log("right click box:", e)
     },
 
-    highlight() {
-      this.hovered = true;
-    }
   },
 
 }
@@ -84,11 +85,23 @@ export default {
 
 
 <style scoped>
+  .bounding-box.hidden{
+    display: none;
+  }
+
   .bounding-box{
     position: absolute;
 
     background-color: rgba(0, 0, 255.0, 0.3);
     color: whitesmoke;
+    border-width: 1px;
+    border-style: solid;
+    border-color: rgba(0, 0, 0, 0.6);;
+  }
+
+
+  .bounding-box.selected, .bounding-box.highlight{
+    border-width: 2px;
   }
 
   .bounding-box:hover{
@@ -96,15 +109,19 @@ export default {
   }
 
   .bounding-box.pipeline{
+    background-color: rgba(0.0, 126.0, 0.0, 0.3);
+  }
+
+  .bounding-box.pipeline:hover{
     background-color: rgba(0.0, 126.0, 0.0, 0.4);
   }
 
   .bounding-box.highlighted{
-    background-color: rgba(148.0, 0, 211.0, 0.4);
+/*    background-color: rgba(148.0, 0, 211.0, 0.4);*/
   }
 
   .bounding-box.hovered{
-    background-color: rgba(148.0, 120, 211.0, 0.4);
+/*    background-color: rgba(148.0, 120, 211.0, 0.4);*/
   }
 
   .box-label {

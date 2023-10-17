@@ -15,12 +15,11 @@
       :value="box"
       :key="box.id"
       :ref="`box-${box.id}`"
-      :highlighed="typeof selectedBBox !== 'undefined'"
       @selectedBBox="$emit('selectedBBox', $event)"
     />
 
     <core-BoundingBox
-      v-if="typeof currentBBox !== 'undefined'"
+      v-if="currentBBox !== undefined"
       :value="currentBBox"
     />
 
@@ -33,46 +32,17 @@
 
 
 <script>
-import DataService from '@/services/data.service';
-
-// class Box {
-
-
-//   constructor (x, y){
-//     this.x0 = x
-//     this.y0 = y
-
-//     this.x = x
-//     this.y = y
-//     this.w = 0
-//     this.h = 0
-//   }
-
-//   update(x, y){
-//     this.x = Math.min(this.x0, x)
-//     this.y = Math.min(this.y0, y)
-
-//     this.w = Math.max(this.x0, x) - this.x;
-//     this.h = Math.max(this.y0, y) - this.y;
-
-//     console.log(this.x, this.y, this.w, this.h)
-//   }
-// }
 
 export default {
   name: "ImageAnnotations",
 
   props: {
     fileLabel: undefined,
-    fileId: undefined,
+    bboxes: undefined,
     interaction: undefined,
-    selectedBBox: undefined,
   },
 
   watch: {
-    fileId: function() { // watch it
-      this.getBBoxes();
-    },
     interaction: function(oldInteraction, newInteraction) {
       if (oldInteraction === "draw_box" && newInteraction !== "draw_box") {
         this.x = null;
@@ -87,20 +57,11 @@ export default {
     x: null,
     y: null,
     currentBBox: undefined,
-    bboxes: [],
     toggleBBoxUpdate: false,
     newBox: undefined,
   }),
 
-  created: function () {
-    this.getBBoxes();
-  },
-
   methods: {
-    addBox: function(box){
-      console.log()
-      console.log(box.x, box.y, box.w, box.h)
-    },
 
     getCoordinates(event) {
       var bounds = event.currentTarget.getBoundingClientRect();
@@ -109,10 +70,25 @@ export default {
       return {x, y}
     },
 
+    toggleSelect(boxId) {
+      if (boxId !== undefined){
+        let comp = this.$refs[`box-${boxId}`][0];
+        let wasSelected = comp.selected;
+        for (let _box of this.bboxes)
+          this.$refs[`box-${_box.id}`][0].selected = false;
+        comp.selected = !wasSelected;
+        return comp.selected;
+      }
+    },
+
     highlight(boxId) {
       if (boxId !== undefined)
-        this.$refs[`box-${boxId}`].hovered = true;
+        this.$refs[`box-${boxId}`][0].highlight = true;
+      else
+        for (let _box of this.bboxes)
+          this.$refs[`box-${_box.id}`][0].highlight = false;
     },
+
 
     mouseEnter() {
       console.debug('mouseenter');
@@ -145,25 +121,19 @@ export default {
       }
     },
 
-    generateBBoxes() {
-      DataService.files.generate_bboxes(this.fileId)
-        .then((ok) => {
-          if (!ok){
-            console.log("Failed to add generate bounding boxes.");
-          }
-          this.getBBoxes();
-        });
-    },
     drawBBox(x, y) {
 
       if (this.x !== null && this.y !== null) {
-        this.add_bbox(this.x, this.y, x, y)
+        // second click
+        this.$emit("addBBox", this.currentBBox)
         this.resetDrawBBox();
       } else {
+        // first click
         this.x = x;
         this.y = y;
       }
     },
+
     resetDrawBBox() {
       this.x = null;
       this.y = null;
@@ -175,33 +145,6 @@ export default {
       if (x1 === null || y1 === null || x2 === null || y2 === null) {
         return undefined;
       }
-
-
-      /*// Scale bounding box coordinates to [0,1].
-      x1 = (x1 + 1) / this.$refs.overlay.clientWidth;
-      x2 = (x2 + 1) / this.$refs.overlay.clientWidth;
-      y1 = (y1 + 1) / this.$refs.overlay.clientHeight;
-      y2 = (y2 + 1) / this.$refs.overlay.clientHeight;
-
-      // Calculate width + height.
-      this.width = Math.abs(x2 - x1);
-      this.height = Math.abs(y2 - y1);
-
-      // Switch x1 / x2 and y1 / y2 if necessary.
-      if (x1 > x2) {
-        x1 = x2;
-      }
-      if (y1 > y2) {
-        y1 = y2;
-      }
-
-      return {
-        x: x1,
-        y: y1,
-        width: this.width,
-        height: this.height,
-      }*/
-
       // Scale bounding box coordinates to [0,1].
       var W = this.$refs.overlay.clientWidth
       var H = this.$refs.overlay.clientHeight
@@ -219,71 +162,7 @@ export default {
       }
     },
 
-    add_bbox(x1, y1, x2, y2, label) {
-      // Add bounding box.
-      // Label does not necessarily have to be set!
-      DataService.files.add_bbox(this.fileId, this.currentBBox.x, this.currentBBox.y, this.currentBBox.width, this.currentBBox.height, label)
-      // DataService.files.add_bbox(this.fileId, x1, y1, this.width, this.height, label)
-        .then((ok) => {
-          if (!ok){
-            console.log("Failed to add bounding box.");
-          }
-          this.getBBoxes();
-        });
-    },
 
-    labelBBox(bbox, label) {
-      DataService.bboxes.set_label(bbox.id, label)
-        .then((ok) => {
-          if (!ok){
-            console.log("Failed to label bounding box.");
-          }
-          this.getBBoxes();
-        });
-    },
-
-    predictBBox(bbox) {
-      DataService.bboxes.predict(bbox.id)
-        .then((ok) => {
-          if (!ok){
-            console.log("Failed to predict bounding box.");
-          }
-          this.getBBoxes();
-        });
-    },
-
-    removeBBox(bbox) {
-      DataService.bboxes.delete(bbox.id)
-        .then((ok) => {
-          if (!ok){
-            console.log("Failed to remove bounding box.");
-          }
-          this.getBBoxes();
-        });
-    },
-
-    confirmBBox(bbox) {
-      if (bbox.annotationId === null) {
-        console.log("Cannot confirm bbox annotation because the given bbox has no annotation.")
-        return false;
-      }
-
-      DataService.confirmator.toggle(bbox.annotationId)
-        .then((ok) => {
-          if (!ok){
-            console.log("Failed to change confirmation status of bounding box.");
-          }
-          this.getBBoxes();
-        });
-    },
-
-    getBBoxes() {
-      DataService.bboxes.get(this.fileId)
-        .then((bboxes) => {
-          this.bboxes = bboxes;
-        });
-      this.toggleBBoxUpdate=!this.toggleBBoxUpdates; // toggle to change key and trigger update
-    },
   }
 
 }

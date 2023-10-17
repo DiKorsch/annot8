@@ -16,16 +16,16 @@
           <core-LazyImage
             :file="file"
             thumbSize="large"
-            maxHeight="675"
+            :maxHeight="maxHeight"
           >
 
             <core-ImageAnnotations
               ref="imageAnnotations"
               :interaction="interaction"
               :fileLabel="file.label"
-              :fileId="file.id"
-              :selectedBBox="selectedBBox"
-              @selectedBBox="selectBBox($event)"
+              :bboxes="bboxes"
+              @addBBox="addBBox($event)"
+              @selectedBBox="bboxClicked($event)"
             />
           </core-LazyImage>
         </v-col>
@@ -33,8 +33,8 @@
         <v-col cols="3">
           <core-InfoBox v-if="showInfo"
             :selectedBBox="selectedBBox"
-            :fileId="file.id"
-            maxHeight="675"
+            :bboxes="bboxes"
+            :maxHeight="maxHeight"
             @highlight="$refs.imageAnnotations.highlight($event)"
           />
         </v-col>
@@ -43,21 +43,48 @@
 </template>
 
 <script>
+
+import DataService from '@/services/data.service';
+
 export default {
   name: "ImageAnnotator",
 
   props: {
-    file: undefined
+    file: undefined,
+    maxHeight: {
+      type: Number,
+      default: () => 675
+    },
   },
 
   data: () => ({
-    interaction: 'draw-box',
+    interaction: 'select',
     selectedBBox: undefined,
 
-    showInfo: false
+    showInfo: false,
+    bboxes: [],
   }),
 
+  created: function () {
+    this.getBBoxes();
+  },
+
+  watch: {
+    file: function(){
+      this.getBBoxes();
+    }
+  },
+
+  computed: {
+    fileId: function() {
+      return this.file.id;
+    },
+
+  },
+
+
   methods: {
+
     setInteraction(interaction) {
       this.interaction = interaction;
 
@@ -65,7 +92,7 @@ export default {
         this.selectedBBox = undefined;
       }
       if (interaction === "generate-box") {
-        this.$refs.imageAnnotations.generateBBoxes();
+        this.estimateBBoxes();
       }
     },
     resetInteraction() {
@@ -73,21 +100,104 @@ export default {
         this.$refs.imageAnnotations.resetDrawBBox();
       }
     },
-    selectBBox(event) {
-      // Set selected BBox.
-      this.selectedBBox = event;
 
-      // Manage corresponding interactions.
-      if (typeof this.selectedBBox === 'undefined') {
+    addBBox(bbox, label) {
+      // Add bounding box.
+      // Label does not necessarily have to be set!
+      DataService.files.add_bbox(this.fileId, bbox.x, bbox.y, bbox.width, bbox.height, label)
+        .then((ok) => {
+          if (!ok){
+            console.log("Failed to add bounding box.");
+          }
+          this.$emit('updateBboxes');
+          this.getBBoxes();
+        });
+    },
+
+    estimateBBoxes() {
+      DataService.files.generate_bboxes(this.fileId)
+        .then((ok) => {
+          if (!ok){
+            console.log("Failed to add generate bounding boxes.");
+          }
+          this.getBBoxes();
+        });
+    },
+
+    labelBBox(bbox, label) {
+      DataService.bboxes.set_label(bbox.id, label)
+        .then((ok) => {
+          if (!ok){
+            console.log("Failed to label bounding box.");
+          }
+          this.emit('updateBboxes');
+          this.getBBoxes();
+        });
+    },
+
+    predictBBox(bbox) {
+      DataService.bboxes.predict(bbox.id)
+        .then((ok) => {
+          if (!ok){
+            console.log("Failed to predict bounding box.");
+          }
+          this.emit('updateBboxes');
+          this.getBBoxes();
+        });
+    },
+
+    removeBBox(bbox) {
+      DataService.bboxes.delete(bbox.id)
+        .then((ok) => {
+          if (!ok){
+            console.log("Failed to remove bounding box.");
+          }
+          this.getBBoxes();
+        });
+    },
+
+    confirmBBox(bbox) {
+      if (bbox.annotationId === null) {
+        console.log("Cannot confirm bbox annotation because the given bbox has no annotation.")
+        return false;
+      }
+
+      DataService.confirmator.toggle(bbox.annotationId)
+        .then((ok) => {
+          if (!ok){
+            console.log("Failed to change confirmation status of bounding box.");
+          }
+          this.getBBoxes();
+        });
+    },
+
+    getBBoxes() {
+      DataService.bboxes.get(this.fileId)
+        .then((bboxes) => {
+          this.bboxes = bboxes;
+        });
+      this.toggleBBoxUpdate=!this.toggleBBoxUpdates; // toggle to change key and trigger update
+    },
+
+    bboxClicked(bbox) {
+      // Set selected BBox.
+      this.selectedBBox = bbox;
+      console.log("Clicked on", bbox?.id)
+
+      // // Manage corresponding interactions.
+      if (this.selectedBBox === undefined) {
         return;
+      } else if (this.interaction === "select") {
+        if(!this.$refs.imageAnnotations.toggleSelect(bbox?.id))
+          this.selectedBBox = undefined;
       } else if (this.interaction === "remove-box") {
-        this.$refs.imageAnnotations.removeBBox(this.selectedBBox);
-      } else if (this.interaction === "label-box") {
-        this.$refs.imageAnnotations.labelBBox(this.selectedBBox, "Dummy label 2");
-      } else if (this.interaction === "predict-box") {
-        this.$refs.imageAnnotations.predictBBox(this.selectedBBox);
-      } else if (this.interaction === "confirm-box") {
-        this.$refs.imageAnnotations.confirmBBox(this.selectedBBox);
+        this.removeBBox(this.selectedBBox);
+      // } else if (this.interaction === "label-box") {
+      //   this.labelBBox(this.selectedBBox, "Dummy label 2");
+      // } else if (this.interaction === "predict-box") {
+      //   this.predictBBox(this.selectedBBox);
+      // } else if (this.interaction === "confirm-box") {
+      //   this.confirmBBox(this.selectedBBox);
       }
     }
   }

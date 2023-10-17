@@ -32,30 +32,18 @@
 </template>
 
 <script>
-import DataService from '@/services/data.service';
 
 export default {
   name: "InfoBox",
   props: {
-    fileId: undefined,
+    bboxes: undefined,
     selectedBBox: undefined,
     maxHeight: undefined,
   },
   data: () => ({
-    bboxes: [],
   }),
 
-  created: function () {
-    this.getBBoxes();
-  },
   methods: {
-    getBBoxes() {
-      DataService.bboxes.get(this.fileId)
-        .then((bboxes) => {
-          this.bboxes = bboxes;
-        });
-      this.toggleBBoxUpdate=!this.toggleBBoxUpdates; // toggle to change key and trigger update
-    },
 
     select(boxId) {
       console.log("Selected", boxId)
