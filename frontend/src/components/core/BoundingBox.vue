@@ -25,6 +25,11 @@ export default {
     highlightId: undefined,
   },
 
+  data: () => ({
+    selected: false,
+    hovered: false,
+  }),
+
   computed: {
     localValue: {
       get: function(){ return this.value },
@@ -32,6 +37,8 @@ export default {
     },
 
     style: function() {
+      let alpha = this.hovered ? 0.4 : 0.3;
+
       return {
         top: `${this.value.y * 100}%`,
         left: `${this.value.x * 100}%`,
@@ -52,6 +59,15 @@ export default {
         return "Unknown";
       }
     }
+  },
+
+  methods: {
+    handleLeftClick: function(e) {
+      console.log("left click box:", e)
+    },
+    handleRightClick: function(e) {
+      console.log("right click box:", e)
+    },
   },
 
 }
@@ -77,5 +93,11 @@ export default {
 
   .bounding-box.highlighted{
     background-color: rgba(148.0, 0, 211.0, 0.4);
+  }
+
+  .box-label {
+    /*position: absolute;
+    left: 2px;
+    top: 2px;*/
   }
 </style>

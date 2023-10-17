@@ -20,12 +20,41 @@
       v-if="typeof currentBBox !== 'undefined'"
       :value="currentBBox"
     />
+
+    <core-BoundingBox
+      v-if="newBox !== undefined"
+      v-model="newBox"
+    />
   </div>
 </template>
 
 
 <script>
 import DataService from '@/services/data.service';
+
+class Box {
+
+
+  constructor (x, y){
+    this.x0 = x
+    this.y0 = y
+
+    this.x = x
+    this.y = y
+    this.w = 0
+    this.h = 0
+  }
+
+  update(x, y){
+    this.x = Math.min(this.x0, x)
+    this.y = Math.min(this.y0, y)
+
+    this.w = Math.max(this.x0, x) - this.x;
+    this.h = Math.max(this.y0, y) - this.y;
+
+    console.log(this.x, this.y, this.w, this.h)
+  }
+}
 
 export default {
   name: "ImageAnnotations",
@@ -62,7 +91,15 @@ export default {
     this.getBBoxes();
   },
 
+  data: () => ({
+    newBox: undefined,
+  }),
+
   methods: {
+    addBox: function(box){
+      console.log()
+      console.log(box.x, box.y, box.w, box.h)
+    },
 
     getCoordinates(event) {
       var bounds = event.currentTarget.getBoundingClientRect();
