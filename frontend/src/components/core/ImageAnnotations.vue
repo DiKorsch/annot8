@@ -11,10 +11,11 @@
       {{ this.getDisplayLabel(this.fileLabel) }}
     </v-chip>
     <core-BoundingBox
-      v-for="(box, i) in this.bboxes"
+      v-for="box in this.bboxes"
       :value="box"
-      :key="i"
-      :highlightId="typeof selectedBBox !== 'undefined' ? selectedBBox.id : undefined"
+      :key="box.id"
+      :ref="`box-${box.id}`"
+      :highlighed="typeof selectedBBox !== 'undefined'"
       @selectedBBox="$emit('selectedBBox', $event)"
     />
 
@@ -106,6 +107,11 @@ export default {
       var x = event.clientX - bounds.left;
       var y = event.clientY - bounds.top;
       return {x, y}
+    },
+
+    highlight(boxId) {
+      if (boxId !== undefined)
+        this.$refs[`box-${boxId}`].hovered = true;
     },
 
     mouseEnter() {

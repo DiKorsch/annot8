@@ -2,12 +2,12 @@
   <div
     class="bounding-box"
     :style="style"
-    :class="{highlighted: highlightId === localValue.id, pipeline: localValue.pipelineGenerated}"
+    :class="{highlighted: highlighted, pipeline: localValue.pipelineGenerated, hovered:hovered}"
     @click="$emit('selectedBBox', localValue)"
   >
     <v-chip v-if="hasLabel"
       label x-small
-      :class="{highlighted: highlightId === localValue.id}"
+      :class="{highlighted: highlighted}"
     >
       {{getLabel}}
     </v-chip>
@@ -22,7 +22,7 @@ export default {
 
   props: {
     value: undefined,
-    highlightId: undefined,
+    highlighted: undefined,
   },
 
   data: () => ({
@@ -72,6 +72,10 @@ export default {
     handleRightClick: function(e) {
       console.log("right click box:", e)
     },
+
+    highlight() {
+      this.hovered = true;
+    }
   },
 
 }
@@ -97,6 +101,10 @@ export default {
 
   .bounding-box.highlighted{
     background-color: rgba(148.0, 0, 211.0, 0.4);
+  }
+
+  .bounding-box.hovered{
+    background-color: rgba(148.0, 120, 211.0, 0.4);
   }
 
   .box-label {

@@ -6,16 +6,12 @@
             :interaction="interaction"
             @interaction="setInteraction($event)"
             @reset="resetInteraction()"
+            :showInfo="showInfo"
+            @showInfo="showInfo=!showInfo"
           />
         </v-col>
 
         <v-col>
-          <div v-if="(interaction === 'info-box' || interaction == 'confirm-box' || interaction === 'label-box' || interaction === 'predict-box') && typeof selectedBBox !== 'undefined'">
-            <h4>Selected Bounding Box:</h4>
-            Label: {{ this.selectedBBox.label }} <br>
-            Predicted Label: {{ this.selectedBBox.predicted_label }} (by: {{ this.selectedBBox.prediction_model }}) <br>
-            Confirmators: {{ this.selectedBBox.confirmators }}
-          </div>
 
           <core-LazyImage
             :file="file"
@@ -33,6 +29,15 @@
             />
           </core-LazyImage>
         </v-col>
+
+        <v-col cols="3">
+          <core-InfoBox v-if="showInfo"
+            :selectedBBox="selectedBBox"
+            :fileId="file.id"
+            maxHeight="675"
+            @highlight="$refs.imageAnnotations.highlight($event)"
+          />
+        </v-col>
       </v-row>
     </div>
 </template>
@@ -48,6 +53,8 @@ export default {
   data: () => ({
     interaction: 'draw-box',
     selectedBBox: undefined,
+
+    showInfo: false
   }),
 
   methods: {

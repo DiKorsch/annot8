@@ -80,10 +80,10 @@
       <v-card
         ref="info_box"
         title="Show info of a bounding box (I)"
-        @click="$emit('interaction', 'info-box')"
+        @click="$emit('showInfo')"
         color="secondary"
         class="mt-2">
-        <v-icon :color="interaction === 'info-box' ? 'accent' : 'primary'">
+        <v-icon :color="showInfo ? 'accent' : 'primary'">
           mdi-information-outline
         </v-icon>
       </v-card>
@@ -97,7 +97,11 @@
 export default {
   props: {
     interaction: undefined,
+    showInfo: undefined,
   },
+
+  data: () => ({
+  }),
 
   created: function () {
     // subscribe to keypress events
