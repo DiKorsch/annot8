@@ -7,7 +7,9 @@
     @mousemove="mouseMove"
     @mouseleave="mouseLeave"
   >
-    <v-chip small label>{{ this.getDisplayLabel(this.fileLabel) }}</v-chip>
+    <v-chip v-if="fileLabel" small label>
+      {{ this.getDisplayLabel(this.fileLabel) }}
+    </v-chip>
     <core-BoundingBox
       v-for="(box, i) in this.bboxes"
       :value="box"
@@ -80,6 +82,7 @@ export default {
   },
 
   data: () => ({
+    minSize: 32,
     x: null,
     y: null,
     currentBBox: undefined,
@@ -197,15 +200,17 @@ export default {
       }*/
 
       // Scale bounding box coordinates to [0,1].
-      x1 = (x1 + 1) / this.$refs.overlay.clientWidth;
-      x2 = (x2 + 1) / this.$refs.overlay.clientWidth;
-      y1 = (y1 + 1) / this.$refs.overlay.clientHeight;
-      y2 = (y2 + 1) / this.$refs.overlay.clientHeight;
+      var W = this.$refs.overlay.clientWidth
+      var H = this.$refs.overlay.clientHeight
+      x1 = (x1 + 1) / W;
+      x2 = (x2 + 1) / W;
+      y1 = (y1 + 1) / H;
+      y2 = (y2 + 1) / H;
 
       // Switch x1 / x2 and y1 / y2 if necessary.
       return {
-        width: Math.abs(x2 - x1),
-        height: Math.abs(y2 - y1),
+        width: Math.max(Math.abs(x2 - x1), this.minSize / W),
+        height: Math.max(Math.abs(y2 - y1), this.minSize / H),
         x: Math.min(x1, x2),
         y: Math.min(y1, y2),
       }

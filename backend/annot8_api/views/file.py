@@ -28,7 +28,6 @@ class FileViewSet(BaseViewSet):
         bboxes = file.bboxes
 
         serializer = BoundingBoxSerializer(bboxes, many=True)
-        response = Response(serializer.data)
         return Response(serializer.data)
 
     @action(detail=True, methods=["post"], url_path="bbox_generate")
@@ -59,7 +58,7 @@ class FileViewSet(BaseViewSet):
             bbox = BoundingBox.create(file, bbox.x0, bbox.y0, w, h, True)
 
             # If possible, generate predictions.
-            if not classifier is None:
+            if classifier is not None:
                 try:
                     label, logits = classifier(bbox.as_numpy())
                     bbox.prediction_add(label, logits, project.classifier)
@@ -84,7 +83,7 @@ class FileViewSet(BaseViewSet):
                 )
 
             if "label" in request.POST:
-                annotation = Annotation.create(described_object=bbox,
+                Annotation.create(described_object=bbox,
                             label=request.POST.get("label"), annotator=user)
         except Exception as e:
             print(e)
@@ -94,26 +93,26 @@ class FileViewSet(BaseViewSet):
         else:
             return Response({'status': 'BBox added'})
 
-@action(detail=True, methods=["post"], url_path="label")
-def label_set(self, request, pk=None):
-    if not "label" in request.POST:
-        return Response({"status": "Label missing"},
-            status=status.HTTP_400_BAD_REQUEST)
-    label = request.POST.get("label")
-    user = self.request.user
-    file = self.get_object()
+    @action(detail=True, methods=["post"], url_path="label")
+    def label_set(self, request, pk=None):
+        if "label" not in request.POST:
+            return Response({"status": "Label missing"},
+                status=status.HTTP_400_BAD_REQUEST)
+        label = request.POST.get("label")
+        user = self.request.user
+        file = self.get_object()
 
-    # Create a corresponding annotation / update the existing one.
-    try:
-        annotation, created = Annotation.objects.get_or_create(described_object=file)
-        annotation.label = label
-        annotation.annotator = user
-        annotation.confirmators.clear()
-        annotation.save()
-    except Exception as e:
-        print(e)
-        return Response({"status": str(e)},
-            status=status.HTTP_400_BAD_REQUEST)
+        # Create a corresponding annotation / update the existing one.
+        try:
+            annotation, created = Annotation.objects.get_or_create(described_object=file)
+            annotation.label = label
+            annotation.annotator = user
+            annotation.confirmators.clear()
+            annotation.save()
+        except Exception as e:
+            print(e)
+            return Response({"status": str(e)},
+                status=status.HTTP_400_BAD_REQUEST)
 
-    else:
-        return Response({'status': 'Label added to file'})
+        else:
+            return Response({'status': 'Label added to file'})

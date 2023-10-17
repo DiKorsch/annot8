@@ -5,7 +5,7 @@
     :class="{highlighted: highlightId === localValue.id, pipeline: localValue.pipelineGenerated}"
     @click="$emit('selectedBBox', localValue)"
   >
-    <v-chip
+    <v-chip v-if="hasLabel"
       label x-small
       :class="{highlighted: highlightId === localValue.id}"
     >
@@ -49,7 +49,7 @@ export default {
     },
 
     getLabel: function() {
-      if ((typeof this.value.label !== 'undefined' && this.value.label !== null) || (typeof this.value.predicted_label !== 'undefined' && this.value.predicted_label !== null)) {
+      if (this.hasLabel) {
         if (this.value.label !== null) {
           return this.value.label;
         } else {
@@ -58,6 +58,10 @@ export default {
       } else {
         return "Unknown";
       }
+    },
+
+    hasLabel: function(){
+      return (typeof this.value.label !== 'undefined' && this.value.label !== null) || (typeof this.value.predicted_label !== 'undefined' && this.value.predicted_label !== null);
     }
   },
 

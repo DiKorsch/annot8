@@ -4,7 +4,6 @@ from django.shortcuts import get_object_or_404
 
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.decorators import permission_classes
 from rest_framework.response import Response
 
 from annot8_api.models import File
@@ -44,7 +43,7 @@ class ProjectViewSet(BaseViewSet):
         project = self.get_object()
 
         try:
-            file = File.create(request.FILES['file'], project)
+            File.create(request.FILES['file'], project)
         except Exception as e:
             print(e)
             return Response({"status": str(e)},
@@ -69,7 +68,7 @@ class ProjectViewSet(BaseViewSet):
         if classifier is None:
             return Response({"status": "Classifier missing"},
                 status=status.HTTP_400_BAD_REQUEST)
-        if not classifier in project.classifiers():
+        if classifier not in project.classifiers():
             return Response({"status": "Classifier name is invalid"},
                 status=status.HTTP_400_BAD_REQUEST)
 
@@ -87,7 +86,7 @@ class ProjectViewSet(BaseViewSet):
         if detector is None:
             return Response({"status": "Detector missing"},
                 status=status.HTTP_400_BAD_REQUEST)
-        if not detector in Project.detectors():
+        if detector not in Project.detectors():
             return Response({"status": "Detector name is invalid"},
                 status=status.HTTP_400_BAD_REQUEST)
 

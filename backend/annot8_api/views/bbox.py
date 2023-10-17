@@ -1,5 +1,4 @@
 from django.db.models import Q
-from django.shortcuts import get_object_or_404
 
 from rest_framework import status
 from rest_framework.decorators import action
@@ -40,7 +39,7 @@ class BBoxViewSet(BaseViewSet):
 
     @action(detail=True, methods=["post"], url_path="label")
     def label_set(self, request, pk=None):
-        if not "label" in request.POST:
+        if "label" not in request.POST:
             return Response({"status": "Label missing"},
                 status=status.HTTP_400_BAD_REQUEST)
         label = request.POST.get("label")

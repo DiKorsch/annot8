@@ -5,9 +5,6 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from annot8_api.models import Annotation
-from annot8_api.models import DescribableObject
-from annot8_api.models import File
-from annot8_api.models import BoundingBox
 
 from annot8_api.serializers import AnnotationSerializer
 from annot8_api.views.base import BaseViewSet
