@@ -36,6 +36,9 @@
             :bboxes="bboxes"
             :maxHeight="maxHeight"
             @highlight="$refs.imageAnnotations.highlight($event)"
+            @toggle="toggle($event)"
+            @select="select($event)"
+            @remove="removeBBox($event)"
           />
         </v-col>
       </v-row>
@@ -171,27 +174,35 @@ export default {
         });
     },
 
+    toggle(bbox){
+      this.$refs.imageAnnotations.toggleVisibility(bbox?.id)
+    },
+
+    select(bbox){
+      if(this.$refs.imageAnnotations.toggleSelect(bbox?.id))
+        this.selectedBBox = bbox;
+      else
+        this.selectedBBox = undefined;
+    },
+
     getBBoxes() {
       DataService.bboxes.get(this.fileId)
         .then((bboxes) => {
           this.bboxes = bboxes;
         });
-      this.toggleBBoxUpdate=!this.toggleBBoxUpdates; // toggle to change key and trigger update
+      // this.toggleBBoxUpdate=!this.toggleBBoxUpdates; // toggle to change key and trigger update
     },
 
     bboxClicked(bbox) {
-      // Set selected BBox.
-      this.selectedBBox = bbox;
       console.log("Clicked on", bbox?.id)
 
       // // Manage corresponding interactions.
-      if (this.selectedBBox === undefined) {
+      if (bbox === undefined) {
         return;
       } else if (this.interaction === "select") {
-        if(!this.$refs.imageAnnotations.toggleSelect(bbox?.id))
-          this.selectedBBox = undefined;
+        this.select(bbox);
       } else if (this.interaction === "remove-box") {
-        this.removeBBox(this.selectedBBox);
+        this.removeBBox(bbox);
       // } else if (this.interaction === "label-box") {
       //   this.labelBBox(this.selectedBBox, "Dummy label 2");
       // } else if (this.interaction === "predict-box") {

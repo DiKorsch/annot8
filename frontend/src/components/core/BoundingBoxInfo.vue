@@ -39,7 +39,12 @@ export default {
       if (this.bbox.label !== null) {
         return this.bbox.label
       } else
-      return `#${this.bbox.id}`
+    label: function() {
+      let label = this.bbox.label || this.bbox.predicted_label;
+      if (label === null || label === undefined)
+        return `#${this.bbox.id}`
+      else
+        return `#${this.bbox.id}: ${label}`
     }
   }
 }

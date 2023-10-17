@@ -1,6 +1,17 @@
 <template>
     <div class="options-bar" align="center">
       <v-card
+        ref="select"
+        title="select bounding box (Esc)"
+        @click="$emit('interaction', 'select')"
+        color="secondary"
+        class="mt-2">
+        <v-icon :color="interaction === 'select' ? 'accent' : 'primary'">
+          mdi-button-pointer
+        </v-icon>
+      </v-card>
+
+      <v-card
         ref="draw_box"
         title="draw bounding box (Q)"
         @click="$emit('interaction', 'draw-box')"
@@ -105,16 +116,16 @@ export default {
 
   created: function () {
     // subscribe to keypress events
-    window.addEventListener('keypress', this.keypressEvent);
+    window.addEventListener('keydown', this.keypressEvent);
   },
 
   destroyed: function () {
-    window.removeEventListener('keypress', this.keypressEvent)
+    window.removeEventListener('keydown', this.keypressEvent)
   },
 
   methods: {
     keypressEvent: function (event) {
-      console.log("Keyboard press");
+      console.log("Keyboard press:", event.key);
       switch (event.key) {
         case 'q':
           this.$refs.draw_box.$el.click();
@@ -140,9 +151,9 @@ export default {
         case 'i':
           this.$refs.info_box.$el.click();
           break;
-        // case 'Escape':
-         // this.$emit('reset');
-         // break;
+        case 'Escape':
+         this.$refs.select.$el.click();
+         break;
       }
     },
   }

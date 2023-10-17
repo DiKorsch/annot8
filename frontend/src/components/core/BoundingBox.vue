@@ -21,10 +21,10 @@
 
 export default {
   name: "BoundingBox",
-  model: {prop: "value", event: "input"},
+  model: {prop: "bbox", event: "input"},
 
   props: {
-    value: undefined,
+    bbox: undefined,
   },
 
   data: () => ({
@@ -35,8 +35,8 @@ export default {
 
   computed: {
     localValue: {
-      get: function(){ return this.value },
-      set: function(value){ this.$emit('input', value) },
+      get: function(){ return this.bbox },
+      set: function(bbox){ this.$emit('input', bbox) },
     },
 
     style: function() {
@@ -44,20 +44,20 @@ export default {
       // let color = this.hovered ? 0.4 : 0.3;
 
       return {
-        top: `${this.value.y * 100}%`,
-        left: `${this.value.x * 100}%`,
-        width: `${this.value.width * 100}%`,
-        height: `${this.value.height * 100}%`,
+        top: `${this.bbox.y * 100}%`,
+        left: `${this.bbox.x * 100}%`,
+        width: `${this.bbox.width * 100}%`,
+        height: `${this.bbox.height * 100}%`,
         // Label: localValue.label
       }
     },
 
     getLabel: function() {
       if (this.hasLabel) {
-        if (this.value.label !== null) {
-          return this.value.label;
+        if (this.bbox.label !== null) {
+          return this.bbox.label;
         } else {
-          return this.value.predicted_label;
+          return this.bbox.predicted_label;
         }
       } else {
         return "Unknown";
@@ -65,7 +65,7 @@ export default {
     },
 
     hasLabel: function(){
-      return (typeof this.value.label !== 'undefined' && this.value.label !== null) || (typeof this.value.predicted_label !== 'undefined' && this.value.predicted_label !== null);
+      return (typeof this.bbox.label !== 'undefined' && this.bbox.label !== null) || (typeof this.bbox.predicted_label !== 'undefined' && this.bbox.predicted_label !== null);
     }
   },
 
@@ -102,6 +102,11 @@ export default {
 
   .bounding-box.selected, .bounding-box.highlight{
     border-width: 2px;
+    display: initial;
+  }
+
+  .bounding-box.highlight.hidden{
+    border-style: dotted;
   }
 
   .bounding-box:hover{

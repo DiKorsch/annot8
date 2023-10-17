@@ -12,7 +12,7 @@
     </v-chip>
     <core-BoundingBox
       v-for="box in this.bboxes"
-      :value="box"
+      :bbox="box"
       :key="box.id"
       :ref="`box-${box.id}`"
       @selectedBBox="$emit('selectedBBox', $event)"
@@ -20,7 +20,7 @@
 
     <core-BoundingBox
       v-if="currentBBox !== undefined"
-      :value="currentBBox"
+      :bbox="currentBBox"
     />
 
     <core-BoundingBox
@@ -70,15 +70,24 @@ export default {
       return {x, y}
     },
 
+    toggleVisibility(boxId){
+      if (boxId === undefined)
+        return false;
+
+      let comp = this.$refs[`box-${boxId}`][0];
+
+      comp.hidden = !comp.hidden;
+    },
+
     toggleSelect(boxId) {
-      if (boxId !== undefined){
-        let comp = this.$refs[`box-${boxId}`][0];
-        let wasSelected = comp.selected;
-        for (let _box of this.bboxes)
-          this.$refs[`box-${_box.id}`][0].selected = false;
-        comp.selected = !wasSelected;
-        return comp.selected;
-      }
+      if (boxId === undefined)
+        return false;
+      let comp = this.$refs[`box-${boxId}`][0];
+      let wasSelected = comp.selected;
+      for (let _box of this.bboxes)
+        this.$refs[`box-${_box.id}`][0].selected = false;
+      comp.selected = !wasSelected;
+      return comp.selected;
     },
 
     highlight(boxId) {

@@ -15,15 +15,16 @@
             :bbox="item"
             @mouseenter.native="$emit('highlight', item.id)"
             @mouseleave.native="$emit('highlight', undefined)"
-            @toggle="toggle(item.id)"
-            @select="select(item.id)"
-            @remove="remove(item.id)"
+            @toggle="$emit('toggle', item)"
+            @select="$emit('select', item)"
+            @remove="$emit('remove', item)"
           />
         </template>
       </v-virtual-scroll>
       </div>
 
     <div v-if="this.selectedBBox !== undefined">
+      Bounding box: #{{ this.selectedBBox.id }} <br>
       Label: {{ this.selectedBBox.label }} <br>
       Predicted Label: {{ this.selectedBBox.predicted_label }} (by: {{ this.selectedBBox.prediction_model }}) <br>
       Confirmators: {{ this.selectedBBox.confirmators }}
@@ -45,15 +46,6 @@ export default {
 
   methods: {
 
-    select(boxId) {
-      console.log("Selected", boxId)
-    },
-    toggle(boxId) {
-      console.log("Toggle", boxId)
-    },
-    remove(boxId) {
-      console.log("removed", boxId)
-    },
   }
 }
 </script>
