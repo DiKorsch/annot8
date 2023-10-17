@@ -1,12 +1,15 @@
+import logging
+
 from django.db.models import Q
+from tqdm.auto import tqdm
 
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from annot8_api.models import File
-from annot8_api.models import BoundingBox
 from annot8_api.models import Annotation
+from annot8_api.models import BoundingBox
+from annot8_api.models import File
 from annot8_api.serializers import BoundingBoxSerializer
 from annot8_api.serializers import FileSerializer
 from annot8_api.views.base import BaseViewSet
@@ -49,14 +52,18 @@ class FileViewSet(BaseViewSet):
 
         # Perform detection.
         generated_bboxes = detector(file.as_numpy())
+        logging.info(f"Estimated {len(generated_bboxes)} detections")
+        boxes = []
         for bbox in generated_bboxes:
             # Generate bounding boxes.
             w = bbox.x1 - bbox.x0
             h = bbox.y1 - bbox.y0
-            if w <= 0 or h <= 0:
+            if not bbox.is_valid or w <= 0 or h <= 0:
                 continue
-            bbox = BoundingBox.create(file, bbox.x0, bbox.y0, w, h, True)
+            boxes.append(BoundingBox.create(file, bbox.x0, bbox.y0, w, h, True))
 
+        logging.info(f"Estimating species for {len(boxes)} valid boxes")
+        for bbox in tqdm(boxes):
             # If possible, generate predictions.
             if classifier is not None:
                 try:

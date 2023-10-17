@@ -4,7 +4,7 @@ import chainer
 import numpy as np
 import typing as T
 
-import json
+import yaml
 from django.conf import settings
 from pathlib import Path
 
@@ -19,8 +19,9 @@ class MothClassifier(BaseClassifier):
         super().__init__()
 
         classifier_dir = Path(settings.BASE_DIR, "fixtures/classifier/jena_moths_aug")
-        with open(classifier_dir / "id2name.json") as f:
-            id2name = json.load(f)
+
+        with open(classifier_dir / "unq2orig_labels.yml") as f:
+            id2name = yaml.load(f)
 
         self.cls = Classifier(
             model_type="cvmodelz.InceptionV3",

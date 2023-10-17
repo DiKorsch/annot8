@@ -30,7 +30,7 @@ class Detector:
                 ):
         super().__init__()
 
-        BBox.MIN_AREA = 4e-4
+        BBox.MIN_AREA = 4e-4 # roughly 32*32 / (1920*1080)
         self.img_proc = Pipeline()
         self.img_proc.find_border()
         if min_size > 0:
@@ -70,5 +70,8 @@ class Detector:
     def __call__(self, im):
         gray = cv2.cvtColor(im, cv2.COLOR_RGB2GRAY)
         res = self.img_proc(gray)
+        bbox_res = self.bbox_proc(res)
 
         return self.bbox_proc(res)
+
+        return bbox_res

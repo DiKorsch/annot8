@@ -49,10 +49,11 @@ class BoundingBox(base.DescribableObject):
             w, h = im.size
             x0, y0 = int(self.x * w), int(self.y * h)
             x1, y1 = int((self.x + self.width) * w), int((self.y + self.height) * h)
-            # I think, x and y should be switched!
-            bbox = np.asarray(im)[x0:x1, y0:y1]
 
-        return bbox
+            im = np.asarray(im)
+            crop = im[y0:y1, x0:x1]
+
+        return crop
 
     def prediction_add(self, label, logits, classifier_name):
         prediction.Prediction.objects.filter(described_object=self).delete()
