@@ -89,7 +89,7 @@ export default {
     display: none;
   }
 
-  .bounding-box{
+  .bounding-box {
     position: absolute;
 
     background-color: rgba(0, 0, 255.0, 0.3);
@@ -97,15 +97,17 @@ export default {
     border-width: 1px;
     border-style: solid;
     border-color: rgba(0, 0, 0, 0.6);;
+    padding: 2px;
   }
 
 
   .bounding-box.selected, .bounding-box.highlight{
     border-width: 2px;
+    padding: 1px;
     display: initial;
   }
 
-  .bounding-box.highlight.hidden{
+  .bounding-box.selected.hidden, .bounding-box.highlight.hidden{
     border-style: dotted;
   }
 
