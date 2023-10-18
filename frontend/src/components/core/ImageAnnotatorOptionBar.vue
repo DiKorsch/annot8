@@ -1,5 +1,64 @@
 <template>
+  <div class="action-container">
+
+    <v-btn-toggle dense v-model="action" class="action-buttons">
+      <v-btn v-for="button in buttons"
+          class="action-btn"
+          :key="button.action"
+          :ref="`btn-${button.action}`"
+          :value="button.action"
+          :title="button.title()"
+          @click="setAction(button.action)"
+      >
+        <v-icon :color="action === button.action ? 'accent' : 'primary'">
+          mdi-{{button.icon}}
+        </v-icon>
+      </v-btn>
+    </v-btn-toggle>
+
+    <v-btn-toggle dense multiple v-model="active_options" class="action-buttons" >
+      <v-btn v-for="button in options"
+          class="action-btn"
+          :key="button.action"
+          :ref="`btn-${button.action}`"
+          :value="button.action"
+          :title="button.title()"
+          @click="$emit(button.action)"
+      >
+        <v-icon :color="active_options.includes(button.action) ? 'accent' : 'primary'">
+          mdi-{{button.icon}}
+        </v-icon>
+      </v-btn>
+    </v-btn-toggle>
+
+    <v-btn-toggle dense class="action-buttons" v-model="modeAction">
+      <v-btn v-for="button in current_mode_buttons"
+          class="action-btn"
+          :key="button.action"
+          :ref="`btn-${button.action}`"
+          :value="button.action"
+          :title="button.title()"
+          @click="setModeAction(button.action, button.is_immediate)"
+      >
+        <v-icon :color="modeAction === button.action ? 'accent' : 'primary'">
+          mdi-{{button.icon}}
+        </v-icon>
+      </v-btn>
+    </v-btn-toggle>
+  </div>
+<!--
+
     <div class="options-bar" align="center">
+      <v-card v-for="button in buttons"
+        :key="button.action"
+        :ref="button.action"
+        :title="button.title()"
+        @click="$emit('interaction', button.action)"
+        color="secondary" class="mt-2"
+      >
+      </v-card>
+
+
       <v-card
         ref="select"
         title="select bounding box (Esc)"
@@ -8,6 +67,17 @@
         class="mt-2">
         <v-icon :color="interaction === 'select' ? 'accent' : 'primary'">
           mdi-button-pointer
+        </v-icon>
+      </v-card>
+
+      <v-card
+        ref="edit_box"
+        title="label bounding box (T)"
+        @click="$emit('interaction', 'edit-box')"
+        color="secondary"
+        class="mt-2">
+        <v-icon :color="interaction === 'edit-box' ? 'accent' : 'primary'">
+          mdi-lead-pencil
         </v-icon>
       </v-card>
 
@@ -98,20 +168,71 @@
           mdi-information-outline
         </v-icon>
       </v-card>
-
     </div>
+ -->
 </template>
 
 <script>
 // help: https://pictogrammers.github.io/@mdi/font/6.9.96/
 // option-bar from pycs
+
+class Button {
+  constructor(action, text, icon, key=undefined, is_immediate=false){
+    this.action = action
+    this.text = text
+    this.icon = icon
+    this.key = key
+    this.is_immediate = is_immediate
+  }
+
+  title(){
+    if (this.key !== undefined)
+      return `${this.text} (${this.key})`
+    else
+      return this.text
+  }
+}
+
 export default {
   props: {
-    interaction: undefined,
-    showInfo: undefined,
   },
 
   data: () => ({
+    buttons: [
+      new Button("select", "Select bounding box", "button-pointer", "Escape"),
+      new Button("add", "Add bounding box", "shape-square-plus", "a"),
+      new Button("edit", "Edit bounding box", "lead-pencil", "e"),
+      new Button("pipeline", "Open Pipeline", "brain", "p"),
+    ],
+
+    mode_buttons: {
+      add: [
+        new Button("draw-box", "Draw bounding box", "vector-rectangle", "d"),
+        new Button("extreme-clicking", "Extreme Clicking", "cursor-default-click-outline", "e"),
+        new Button("estimate", "Estimate bounding box", "auto-fix", "a"),
+        new Button("copy", "Copy from previous image", "content-copy", "c"),
+      ],
+      edit: [
+        new Button("resize", "Resize bounding box", "resize", "r"),
+        new Button("move", "Move bounding box", "move-resize-variant", "m"),
+        new Button("delete", "Delete bounding box", "trash-can", "d"),
+        new Button("confirm", "Cofirm bounding box", "check", "c"),
+        new Button("confirm-all", "Cofirm all bounding boxes", "check-all", "a"),
+        new Button("label", "Label bounding box", "label-outline", "l"),
+      ],
+      pipeline: [
+        new Button("detect", "Detect insects", "view-grid-plus-outline", "d", true),
+        new Button("classify", "Classify bounding box", "label-outline", "c"),
+        new Button("classify-all", "Classify all boxes", "label-multiple-outline", "p"),
+        new Button("detect-classify", "Detect and classify everything", "plus-box-multiple-outline", "a"),
+      ],
+    },
+    options: [
+      new Button("showInfo", "Show info box", "information-outline", "i"),
+    ],
+    action: "select",
+    modeAction: undefined,
+    active_options: [],
   }),
 
   created: function () {
@@ -124,38 +245,91 @@ export default {
   },
 
   methods: {
+
+    setAction: function(action){
+      this.action = action
+      this.$emit("action", action)
+    },
+
+    setModeAction: function(action, is_immediate = false){
+      if (is_immediate)
+        this.modeAction = undefined
+      else
+        this.modeAction = action
+      this.$emit("action", action)
+    },
+
     keypressEvent: function (event) {
       console.log("Keyboard press:", event.key);
-      switch (event.key) {
-        case 'q':
-          this.$refs.draw_box.$el.click();
-          break;
-        case 'e':
-          this.$refs.extreme_clicking.$el.click();
-          break;
-        case 't':
-          this.$refs.label_box.$el.click();
-          break;
-        case 'p':
-          this.$refs.predict_box.$el.click();
-          break;
-        case 'r':
-          this.$refs.generate_box.$el.click();
-          break;
-        case 'f':
-          this.$refs.remove_box.$el.click();
-          break;
-        case 'g':
-          this.$refs.confirm_box.$el.click();
-          break;
-        case 'i':
-          this.$refs.info_box.$el.click();
-          break;
-        case 'Escape':
-         this.$refs.select.$el.click();
-         break;
+
+      for (let btn of this.current_mode_buttons)
+        if (btn.key == event.key)
+          return this.setModeAction(btn.action)
+
+      for (let btn of this.buttons)
+        if (btn.key == event.key)
+          return this.setAction(btn.action)
+
+      for (let btn of this.options){
+        if (btn.key == event.key){
+          if (this.active_options.includes(btn.action))
+            this.active_options.pop(btn.action)
+          else
+            this.active_options.push(btn.action)
+          return this.$emit(btn.action)
+        }
       }
     },
+  },
+
+  computed: {
+    current_mode_buttons(){
+      return this.mode_buttons[this.action] || []
+    }
+  },
+
+  watch: {
+    action: function(newaction){
+      if (newaction === undefined)
+        this.action = "select"
+      this.modeAction = undefined
+    }
   }
 }
 </script>
+
+<style scoped>
+.action-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.action-buttons:first-child {
+  margin-top: 0px;
+}
+
+.action-buttons {
+  flex-direction: column;
+  margin-top: 10px;
+
+  border-radius: 0px;
+}
+
+.action-buttons button.action-btn.action-btn {
+  border-left: 0px solid;
+}
+
+.action-buttons button.action-btn.action-btn:not(:first-child){
+  border-top: 0px solid;
+}
+
+.action-buttons button.action-btn.action-btn:first-child{
+  border-top-left-radius: 0px;
+  border-top-right-radius: 5px;
+}
+
+.action-buttons button.action-btn.action-btn:last-child{
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 5px;
+}
+</style>

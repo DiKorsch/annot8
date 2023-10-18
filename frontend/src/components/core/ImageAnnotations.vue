@@ -44,7 +44,7 @@ export default {
 
   watch: {
     interaction: function(oldInteraction, newInteraction) {
-      if (oldInteraction === "draw_box" && newInteraction !== "draw_box") {
+      if (oldInteraction === "add" && newInteraction !== "add") {
         this.x = null;
         this.y = null;
         this.currentBBox = undefined;
@@ -77,6 +77,7 @@ export default {
       let comp = this.$refs[`box-${boxId}`][0];
 
       comp.hidden = !comp.hidden;
+      return comp.hidden;
     },
 
     toggleSelect(boxId) {
@@ -109,7 +110,7 @@ export default {
     },
     mouseMove(event) {
       var coords = this.getCoordinates(event);
-      if (this.x !== null && this.y !== null && this.interaction === "draw-box") {
+      if (this.x !== null && this.y !== null && this.interaction === "add") {
           this.currentBBox = this.calculateBBox(this.x, this.y, coords.x, coords.y);
       }
 
@@ -117,9 +118,8 @@ export default {
     mouseClicked(event) {
       var coords = this.getCoordinates(event);
 
-      if (this.interaction === "draw-box") {
+      if (this.interaction === "add")
         this.drawBBox(coords.x, coords.y);
-      }
     },
 
     getDisplayLabel(label) {

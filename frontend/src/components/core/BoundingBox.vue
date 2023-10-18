@@ -107,12 +107,17 @@ export default {
     display: initial;
   }
 
+  .bounding-box.highlight{
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  }
+
   .bounding-box.selected.hidden, .bounding-box.highlight.hidden{
     border-style: dotted;
   }
 
   .bounding-box:hover{
     background-color: rgba(0, 0, 255.0, 0.4);
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
   }
 
   .bounding-box.pipeline{

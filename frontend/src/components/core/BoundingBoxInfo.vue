@@ -13,7 +13,8 @@
       <v-icon
         small
         class="info-button"
-        @click.stop="$emit('toggle', bbox.id)">mdi-eye-outline
+        @click.stop="$emit('toggle', bbox.id)">
+          {{ this.hidden ? 'mdi-eye-off' : 'mdi-eye-outline' }}
       </v-icon>
       <v-icon
         small
@@ -37,6 +38,7 @@ export default {
 
   data: () => ({
     selected: false,
+    hidden: false,
   }),
 
   computed: {
@@ -47,10 +49,6 @@ export default {
 
     label: function() {
       return this.bbox.label || this.bbox.predicted_label;
-      // if (label === null || label === undefined)
-      //   return `#${this.bbox.id}`
-      // else
-      //   return `#${this.bbox.id}: ${label}`
     },
     has_label: function(){
       let lab = this.label;

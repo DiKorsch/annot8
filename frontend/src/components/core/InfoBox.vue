@@ -1,8 +1,29 @@
 <template>
   <div id="info-box">
     <h4>Info</h4>
-    {{this.bboxes.length}} Bounding boxes
 
+    <v-simple-table height="120px" class="info-table">
+      <template v-slot:default>
+        <thead>
+        </thead>
+        <tbody>
+          <tr>
+            <th class="text-left">File name</th>
+            <td class="text-right">{{file.name}}</td>
+          </tr>
+          <tr>
+            <th class="text-left">Bounding boxes</th>
+            <td class="text-right">{{bboxes.length}}</td>
+          </tr>
+          <tr>
+            <th class="text-left">File label</th>
+            <td class="text-right">{{file.label || "Not annotated"}}</td>
+          </tr>
+        </tbody>
+      </template>
+    </v-simple-table>
+
+    <h4>Annotations</h4>
     <v-virtual-scroll
       class="box-list"
       height="500"
@@ -37,6 +58,7 @@ export default {
   name: "InfoBox",
   props: {
     bboxes: undefined,
+    file: undefined,
     selectedBBox: undefined,
     maxHeight: undefined,
   },
@@ -72,13 +94,27 @@ export default {
         if (selected)
           box_info.$el.scrollIntoView({behavior: "smooth"})
       }
+    },
+    markHidden(boxId, hidden){
+      let box_info = this.$refs[`box-info-${boxId}`]
+      if (box_info !== undefined)
+        box_info.hidden = hidden
+    }
+  },
+
+  computed: {
+    file_name() {
+      return this.file?.name;
     }
   },
 }
 </script>
 
 <style scoped>
-#info-box {
+.info-table {
+  margin-bottom: 15px;
+}
+.box-list {
   background-color: whitesmoke;
 }
 

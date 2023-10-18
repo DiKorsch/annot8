@@ -3,10 +3,7 @@
       <v-row>
         <v-col cols="auto">
           <core-ImageAnnotatorOptionBar
-            :interaction="interaction"
-            @interaction="setInteraction($event)"
-            @reset="resetInteraction()"
-            :showInfo="showInfo"
+            @action="setInteraction($event)"
             @showInfo="showInfo=!showInfo"
           />
         </v-col>
@@ -32,8 +29,10 @@
 
         <v-col cols="3">
           <core-InfoBox v-if="showInfo"
+            ref="infoBox"
             :selectedBBox="selectedBBox"
             :bboxes="bboxes"
+            :file="file"
             :maxHeight="maxHeight"
             @highlight="$refs.imageAnnotations.highlight($event)"
             @toggle="toggle($event)"
@@ -92,10 +91,15 @@ export default {
     setInteraction(interaction) {
       this.interaction = interaction;
 
-      if (!(interaction === "info-box" || interaction === "label-box" || interaction === "confirm-box") && typeof this.selectedBBox !== 'undefined') {
-        this.selectedBBox = undefined;
+      console.log("new interaction:", interaction)
+      if (interaction === "add"){
+        // unselect the bbox if it is set
+        this.select(this.selectedBBox);
       }
-      if (interaction === "generate-box") {
+      // if (!(interaction === "info-box" || interaction === "label-box" || interaction === "confirm-box") && this.selectedBBox !== undefined) {
+      //   this.selectedBBox = undefined;
+      // }
+      if (interaction === "detect") {
         this.estimateBBoxes();
       }
     },
@@ -176,7 +180,8 @@ export default {
     },
 
     toggle(bbox){
-      this.$refs.imageAnnotations.toggleVisibility(bbox?.id)
+      let hidden = this.$refs.imageAnnotations.toggleVisibility(bbox?.id)
+      this.$refs.infoBox.markHidden(bbox?.id, hidden)
     },
 
     select(bbox){
@@ -195,22 +200,22 @@ export default {
     },
 
     bboxClicked(bbox) {
-      console.log("Clicked on", bbox?.id)
+      console.log("Clicked on", bbox?.id, this.interaction)
 
       // // Manage corresponding interactions.
-      if (bbox === undefined) {
+      if (bbox === undefined || this.interaction === "add")
         return;
-      } else if (this.interaction === "select") {
-        this.select(bbox);
-      } else if (this.interaction === "remove-box") {
-        this.removeBBox(bbox);
+      this.select(bbox);
+      // } else if (this.interaction === "select" || this.interaction === "edit") {
+      // } else if (this.interaction === "remove-box") {
+      //   this.removeBBox(bbox);
       // } else if (this.interaction === "label-box") {
       //   this.labelBBox(this.selectedBBox, "Dummy label 2");
       // } else if (this.interaction === "predict-box") {
       //   this.predictBBox(this.selectedBBox);
       // } else if (this.interaction === "confirm-box") {
       //   this.confirmBBox(this.selectedBBox);
-      }
+
     }
   }
 }
