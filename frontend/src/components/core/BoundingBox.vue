@@ -123,17 +123,4 @@ export default {
     background-color: rgba(0.0, 126.0, 0.0, 0.4);
   }
 
-  .bounding-box.highlighted{
-/*    background-color: rgba(148.0, 0, 211.0, 0.4);*/
-  }
-
-  .bounding-box.hovered{
-/*    background-color: rgba(148.0, 120, 211.0, 0.4);*/
-  }
-
-  .box-label {
-    /*position: absolute;
-    left: 2px;
-    top: 2px;*/
-  }
 </style>

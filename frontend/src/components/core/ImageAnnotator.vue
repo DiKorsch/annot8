@@ -75,6 +75,7 @@ export default {
   watch: {
     file: function(){
       this.getBBoxes();
+      this.selectedBBox = undefined;
     }
   },
 
