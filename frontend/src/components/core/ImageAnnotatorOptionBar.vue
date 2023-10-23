@@ -46,130 +46,6 @@
       </v-btn>
     </v-btn-toggle>
   </div>
-<!--
-
-    <div class="options-bar" align="center">
-      <v-card v-for="button in buttons"
-        :key="button.action"
-        :ref="button.action"
-        :title="button.title()"
-        @click="$emit('interaction', button.action)"
-        color="secondary" class="mt-2"
-      >
-      </v-card>
-
-
-      <v-card
-        ref="select"
-        title="select bounding box (Esc)"
-        @click="$emit('interaction', 'select')"
-        color="secondary"
-        class="mt-2">
-        <v-icon :color="interaction === 'select' ? 'accent' : 'primary'">
-          mdi-button-pointer
-        </v-icon>
-      </v-card>
-
-      <v-card
-        ref="edit_box"
-        title="label bounding box (T)"
-        @click="$emit('interaction', 'edit-box')"
-        color="secondary"
-        class="mt-2">
-        <v-icon :color="interaction === 'edit-box' ? 'accent' : 'primary'">
-          mdi-lead-pencil
-        </v-icon>
-      </v-card>
-
-      <v-card
-        ref="draw_box"
-        title="draw bounding box (Q)"
-        @click="$emit('interaction', 'draw-box')"
-        color="secondary"
-        class="mt-2">
-        <v-icon :color="interaction === 'draw-box' ? 'accent' : 'primary'">
-          mdi-checkbox-blank-outline
-        </v-icon>
-      </v-card>
-
-      <v-card
-        ref="label_box"
-        title="label bounding box (T)"
-        @click="$emit('interaction', 'label-box')"
-        color="secondary"
-        class="mt-2">
-        <v-icon :color="interaction === 'label-box' ? 'accent' : 'primary'">
-          mdi-lead-pencil
-        </v-icon>
-      </v-card>
-
-      <v-card
-        ref="predict_box"
-        title="predict bounding box (P)"
-        @click="$emit('interaction', 'predict-box')"
-        color="secondary"
-        class="mt-2">
-        <v-icon :color="interaction === 'predict-box' ? 'accent' : 'primary'">
-          mdi-rocket-launch
-        </v-icon>
-      </v-card>
-
-      <v-card
-        ref="generate_box"
-        title="generate new bounding boxes (R)"
-        @click="$emit('interaction', 'generate-box')"
-        color="secondary"
-        class="mt-2">
-        <v-icon :color="interaction === 'generate-box' ? 'accent' : 'primary'">
-          mdi-shape-square-plus
-        </v-icon>
-      </v-card>
-
-      <v-card
-        ref="extreme_clicking"
-        title="extreme clicking (E)"
-        @click="$emit('interaction', 'extreme-clicking')"
-        color="secondary"
-        class="mt-2">
-        <v-icon :color="interaction === 'extreme-clicking' ? 'accent' : 'primary'">
-          mdi-gas-burner
-        </v-icon>
-      </v-card>
-
-      <v-card
-        ref="confirm_box"
-        title="confirm bounding box (G)"
-        @click="$emit('interaction', 'confirm-box')"
-        color="secondary"
-        class="mt-2">
-        <v-icon :color="interaction === 'confirm-box' ? 'accent' : 'primary'">
-          mdi-clipboard-check-multiple
-        </v-icon>
-      </v-card>
-
-      <v-card
-        ref="remove_box"
-        title="remove bounding box (F)"
-        @click="$emit('interaction', 'remove-box')"
-        color="secondary"
-        class="mt-2">
-        <v-icon :color="interaction === 'remove-box' ? 'accent' : 'primary'">
-          mdi-trash-can-outline
-        </v-icon>
-      </v-card>
-
-      <v-card
-        ref="info_box"
-        title="Show info of a bounding box (I)"
-        @click="$emit('showInfo')"
-        color="secondary"
-        class="mt-2">
-        <v-icon :color="showInfo ? 'accent' : 'primary'">
-          mdi-information-outline
-        </v-icon>
-      </v-card>
-    </div>
- -->
 </template>
 
 <script>
@@ -198,6 +74,11 @@ export default {
   },
 
   data: () => ({
+    keyActions: [
+      // key, action2send
+      ["Delete", "delete"],
+    ],
+
     buttons: [
       new Button("select", "Select bounding box", "button-pointer", "Escape"),
       new Button("add", "Add bounding box", "shape-square-plus", "a"),
@@ -215,7 +96,7 @@ export default {
       edit: [
         new Button("resize", "Resize bounding box", "resize", "r"),
         new Button("move", "Move bounding box", "move-resize-variant", "m"),
-        new Button("delete", "Delete bounding box", "trash-can", "d"),
+        new Button("delete", "Delete bounding box", "trash-can", "Delete"),
         new Button("confirm", "Cofirm bounding box", "check", "c"),
         new Button("confirm-all", "Cofirm all bounding boxes", "check-all", "a"),
         new Button("label", "Label bounding box", "label-outline", "l"),
@@ -261,6 +142,9 @@ export default {
 
     keypressEvent: function (event) {
       console.log("Keyboard press:", event.key);
+      for (let action of this.keyActions)
+        if (action[0] == event.key)
+          return this.$emit("action", action[1])
 
       for (let btn of this.current_mode_buttons)
         if (btn.key == event.key)

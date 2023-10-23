@@ -1,5 +1,11 @@
 <template>
     <div align="center">
+      <dialogs-BoundingBoxDelete
+        :box="boxToDelete"
+        @close="boxToDelete = undefined"
+        @confirm="removeBBox($event)"
+      />
+
       <v-row>
         <v-col cols="auto">
           <core-ImageAnnotatorOptionBar
@@ -37,7 +43,7 @@
             @highlight="$refs.imageAnnotations.highlight($event)"
             @toggle="toggle($event)"
             @select="select($event)"
-            @remove="removeBBox($event)"
+            @remove="boxToDelete = $event"
           />
         </v-col>
       </v-row>
@@ -62,6 +68,7 @@ export default {
   data: () => ({
     interaction: 'select',
     selectedBBox: undefined,
+    boxToDelete: undefined,
 
     showInfo: false,
     bboxes: [],
@@ -89,18 +96,25 @@ export default {
   methods: {
 
     setInteraction(interaction) {
-      this.interaction = interaction;
 
-      console.log("new interaction:", interaction)
       if (interaction === "add"){
         // unselect the bbox if it is set
         this.select(this.selectedBBox);
       }
-      // if (!(interaction === "info-box" || interaction === "label-box" || interaction === "confirm-box") && this.selectedBBox !== undefined) {
-      //   this.selectedBBox = undefined;
-      // }
-      if (interaction === "detect") {
+
+      else if (interaction === "delete"){
+        this.boxToDelete = this.selectedBBox;
+        // because we do not want to change the interaction mode
+        interaction = this.interaction;
+      }
+
+      else if (interaction === "detect") {
         this.estimateBBoxes();
+      }
+
+      if (interaction !== this.interaction) {
+        this.interaction = interaction;
+        console.log("new interaction:", this.interaction)
       }
     },
     resetInteraction() {
@@ -161,6 +175,7 @@ export default {
             console.log("Failed to remove bounding box.");
           }
           this.getBBoxes();
+          this.boxToDelete = undefined;
         });
     },
 
