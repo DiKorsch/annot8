@@ -71,6 +71,7 @@ class Button {
 
 export default {
   props: {
+    interaction: undefined
   },
 
   data: () => ({
@@ -109,27 +110,25 @@ export default {
       ],
     },
     options: [
-      new Button("showInfo", "Show info box", "information-outline", "i"),
+      new Button("toggleInfoBox", "Show info box", "information-outline", "i"),
     ],
-    action: "select",
     modeAction: undefined,
     active_options: [],
   }),
 
-  created: function () {
-    // subscribe to keypress events
-    window.addEventListener('keydown', this.keypressEvent);
-  },
+  // created: function () {
+  //   // subscribe to keypress events
+  //   window.addEventListener('keydown', this.keypressEvent);
+  // },
 
-  destroyed: function () {
-    window.removeEventListener('keydown', this.keypressEvent)
-  },
+  // destroyed: function () {
+  //   window.removeEventListener('keydown', this.keypressEvent)
+  // },
 
   methods: {
 
     setAction: function(action){
       this.action = action
-      this.$emit("action", action)
     },
 
     setModeAction: function(action, is_immediate = false){
@@ -169,15 +168,24 @@ export default {
   computed: {
     current_mode_buttons(){
       return this.mode_buttons[this.action] || []
+    },
+
+    action: {
+      get() {
+        return this.interaction;
+      },
+      set(value) {
+        this.$emit("action", value)
+      }
     }
   },
 
   watch: {
-    action: function(newaction){
-      if (newaction === undefined)
-        this.action = "select"
-      this.modeAction = undefined
-    }
+    // action: function(newaction){
+    //   if (newaction === undefined)
+    //     this.action = "select"
+    //   this.modeAction = undefined
+    // }
   }
 }
 </script>

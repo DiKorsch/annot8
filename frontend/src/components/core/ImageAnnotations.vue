@@ -75,6 +75,8 @@ export default {
         return false;
 
       let comp = this.$refs[`box-${boxId}`][0];
+      if (comp === undefined)
+        return false;
 
       comp.hidden = !comp.hidden;
       return comp.hidden;
@@ -84,6 +86,8 @@ export default {
       if (boxId === undefined)
         return false;
       let comp = this.$refs[`box-${boxId}`][0];
+      if (comp === undefined)
+        return false;
       let wasSelected = comp.selected;
       for (let _box of this.bboxes)
         this.$refs[`box-${_box.id}`][0].selected = false;

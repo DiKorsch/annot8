@@ -72,6 +72,22 @@ class Detector:
         res = self.img_proc(gray)
         bbox_res = self.bbox_proc(res)
 
-        return self.bbox_proc(res)
+        # from matplotlib import pyplot as plt
+        # from blob_detector import utils
+        # print(im.shape)
+        # fig, axs = plt.subplots(1,2)
+        # axs[0].imshow(im)
+        # axs[1].imshow(gray)
+        # plt.tight_layout()
+        # plt.savefig("input.png")
+
+        # utils.show_intermediate(res)
+        # plt.tight_layout()
+        # plt.savefig("img_proc.pdf")
+
+        # utils.show_intermediate(bbox_res)
+        # plt.tight_layout()
+        # plt.savefig("bbox_est.pdf")
+        # plt.close()
 
         return bbox_res

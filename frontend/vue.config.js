@@ -4,7 +4,7 @@ module.exports = {
     config.plugin('VuetifyLoaderPlugin').tap(args => [{
       match (originalTag, { kebabTag, camelTag, path, component }) {
         let packages = [
-          "core", "dialogs"
+          "core", "dialogs", "utils"
         ];
         for (let package of packages){
           if (kebabTag.startsWith(`${package}-`)) {

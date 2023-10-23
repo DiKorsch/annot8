@@ -1,5 +1,7 @@
 <template>
     <div align="center">
+      <utils-KeypressHandler @pressed="handleKeyPress($event)"/>
+
       <dialogs-BoundingBoxDelete
         :box="boxToDelete"
         @close="boxToDelete = undefined"
@@ -9,8 +11,9 @@
       <v-row>
         <v-col cols="auto">
           <core-ImageAnnotatorOptionBar
+            :interaction="interaction"
             @action="setInteraction($event)"
-            @showInfo="showInfo=!showInfo"
+            @toggleInfoBox="showInfo=!showInfo"
           />
         </v-col>
 
@@ -47,6 +50,7 @@
           />
         </v-col>
       </v-row>
+
     </div>
 </template>
 
@@ -72,6 +76,33 @@ export default {
 
     showInfo: false,
     bboxes: [],
+
+    keyActions: {
+
+      Delete: function(that){
+        that.boxToDelete = that.selectedBBox;
+      },
+
+      Escape: function(that){
+        if (that.state === "dialog")
+          that.closeDialog()
+        else
+          that.interaction = "select"
+      },
+
+      Enter: function(that) {
+        if (that.state === "dialog")
+          that.confirmDialog()
+      },
+
+      v(that){
+        that.toggle(that.selectedBBox);
+      },
+
+      i(that){
+        that.showInfo = !that.showInfo;
+      }
+    },
   }),
 
   created: function () {
@@ -90,10 +121,35 @@ export default {
       return this.file.id;
     },
 
+    state: function() {
+      if (this.isDialogOpen)
+        return "dialog";
+      else
+        return this.interaction;
+    },
+
+    isDialogOpen: function () {
+      return this.boxToDelete !== undefined;
+    }
   },
 
 
   methods: {
+
+    closeDialog(){
+      this.boxToDelete = undefined;
+    },
+
+    confirmDialog(){
+      if (this.boxToDelete !== undefined)
+        return this.removeBBox(this.boxToDelete)
+    },
+
+    handleKeyPress(event){
+      for (let key in this.keyActions)
+        if (event.key == key)
+          this.keyActions[key](this)
+    },
 
     setInteraction(interaction) {
 
@@ -196,7 +252,8 @@ export default {
 
     toggle(bbox){
       let hidden = this.$refs.imageAnnotations.toggleVisibility(bbox?.id)
-      this.$refs.infoBox.markHidden(bbox?.id, hidden)
+      if(this.$refs.infoBox !== undefined)
+        this.$refs.infoBox.markHidden(bbox?.id, hidden)
     },
 
     select(bbox){
