@@ -1,56 +1,58 @@
 <template>
-  <div id="info-box">
-    <h4>Info</h4>
+  <v-card
+    dense
+    elevation="2"
+    id="info-box"
+    :max-height="maxHeight">
+    <v-card-title>File info</v-card-title>
+    <v-card-text>
+      <v-simple-table class="info-table">
+        <template v-slot:default>
+          <thead>
+          </thead>
+          <tbody>
+            <tr>
+              <th width="50%" class="text-left">File name</th>
+              <td class="text-right">{{file.name}}</td>
+            </tr>
+            <tr>
+              <th class="text-left">Bounding boxes</th>
+              <td class="text-right">{{bboxes.length}}</td>
+            </tr>
+            <tr v-if="file.label">
+              <th class="text-left">File label</th>
+              <td class="text-right">{{file.label || "Not annotated"}}</td>
+            </tr>
+          </tbody>
+        </template>
+      </v-simple-table>
+    </v-card-text>
 
-    <v-simple-table height="120px" class="info-table">
-      <template v-slot:default>
-        <thead>
-        </thead>
-        <tbody>
-          <tr>
-            <th class="text-left">File name</th>
-            <td class="text-right">{{file.name}}</td>
-          </tr>
-          <tr>
-            <th class="text-left">Bounding boxes</th>
-            <td class="text-right">{{bboxes.length}}</td>
-          </tr>
-          <tr>
-            <th class="text-left">File label</th>
-            <td class="text-right">{{file.label || "Not annotated"}}</td>
-          </tr>
-        </tbody>
-      </template>
-    </v-simple-table>
+    <v-card-title>Annotations</v-card-title>
 
-    <h4>Annotations</h4>
-    <v-virtual-scroll
-      class="box-list"
-      height="500"
-      item-height="75"
-      bench="100"
-      :items="bboxes"
-      >
+    <v-card-text>
+      <v-virtual-scroll
+        class="box-list"
+        height="350"
+        item-height="75"
+        bench="100"
+        :items="bboxes"
+        >
 
-      <template v-slot:default="{ item }">
-        <core-BoundingBoxInfo
-          :bbox="item"
-          :ref="`box-info-${item.id}`"
-          @mouseenter.native="$emit('highlight', item.id)"
-          @mouseleave.native="$emit('highlight', undefined)"
-          @toggle="$emit('toggle', item)"
-          @select="$emit('select', item)"
-          @remove="$emit('remove', item)"
-        />
-      </template>
-    </v-virtual-scroll>
-    <div v-if="this.selectedBBox === 'asdasd'">
-      Bounding box: #{{ this.selectedBBox.id }} <br>
-      Label: {{ this.selectedBBox.label }} <br>
-      Predicted Label: {{ this.selectedBBox.predicted_label }} (by: {{ this.selectedBBox.prediction_model }}) <br>
-      Confirmators: {{ this.selectedBBox.confirmators }}
-    </div>
-  </div>
+        <template v-slot:default="{ item }">
+          <core-BoundingBoxInfo
+            :bbox="item"
+            :ref="`box-info-${item.id}`"
+            @mouseenter.native="$emit('highlight', item.id)"
+            @mouseleave.native="$emit('highlight', undefined)"
+            @toggle="$emit('toggle', item)"
+            @select="$emit('select', item)"
+            @remove="$emit('remove', item)"
+          />
+        </template>
+      </v-virtual-scroll>
+    </v-card-text>
+  </v-card>
 </template>
 
 <script>
@@ -109,13 +111,3 @@ export default {
   },
 }
 </script>
-
-<style scoped>
-.info-table {
-  margin-bottom: 15px;
-}
-.box-list {
-  background-color: whitesmoke;
-}
-
-</style>
