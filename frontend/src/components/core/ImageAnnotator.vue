@@ -79,18 +79,25 @@ export default {
 
     keyActions: {
 
-      Delete: function(that){
-        that.boxToDelete = that.selectedBBox;
+      ArrowRight(that){
+        that.$emit("next")
       },
 
-      Escape: function(that){
+      ArrowLeft(that){
+        that.$emit("previous")
+      },
+
+      Delete(that){
+      },
+
+      Escape(that){
         if (that.state === "dialog")
           that.closeDialog()
         else
           that.interaction = "select"
       },
 
-      Enter: function(that) {
+      Enter(that) {
         if (that.state === "dialog")
           that.confirmDialog()
       },

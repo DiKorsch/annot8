@@ -17,6 +17,8 @@
     <v-card v-if="files.length != 0">
       <core-ImageAnnotator
         :file="selectedFile"
+        @next="$refs.selector.next()"
+        @previous="$refs.selector.previous()"
       />
       <v-footer :padless="true">
 

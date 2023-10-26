@@ -94,7 +94,23 @@ export default {
         return
 
       this.page = Math.ceil(idx / this.elementsPerPage);
-    }
+    },
+
+    next() {
+      let newIdx = this.indexOfSelected + 1
+      if (newIdx >= this.images.length)
+        newIdx = 0; // wrap around and select the first again
+
+      this.$emit("selected", this.images[newIdx])
+    },
+
+    previous() {
+      let newIdx = this.indexOfSelected - 1
+      if (newIdx <= 0)
+        newIdx = this.images.length - 1; // wrap around and select the last again
+
+      this.$emit("selected", this.images[newIdx])
+    },
   }
 }
 
