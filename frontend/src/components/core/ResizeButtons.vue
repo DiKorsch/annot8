@@ -27,8 +27,8 @@
       buttons: [
         new Button("left", "horizontal", false),
         new Button("right", "horizontal", true),
-        new Button("up", "vertical", true),
-        new Button("down", "vertical", false),
+        new Button("up", "vertical", false),
+        new Button("down", "vertical", true),
       ]
     })
   }

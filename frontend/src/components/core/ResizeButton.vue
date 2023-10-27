@@ -1,19 +1,39 @@
 <template>
   <div v-if="inverse" class="resize-button-container">
-      <div class="resize-button" @click="$emit('increase')">
-        <v-icon>mdi-{{incIcon}}</v-icon>
-      </div>
-      <div class="resize-button" @click="$emit('decrease')">
-        <v-icon>mdi-{{decIcon}}</v-icon>
-      </div>
+    <v-tooltip bottom>
+      <template v-slot:activator="{ on, attrs }">
+        <div v-bind="attrs" v-on="on" class="resize-button" @click="$emit('decrease')">
+          <v-icon>mdi-chevron-{{decIcon}}</v-icon>
+        </div>
+      </template>
+      <span>Shrink</span>
+    </v-tooltip>
+    <v-tooltip bottom>
+      <template v-slot:activator="{ on, attrs }">
+        <div v-bind="attrs" v-on="on" class="resize-button" @click="$emit('increase')">
+      <v-icon>mdi-chevron-{{incIcon}}</v-icon>
+    </div>
+      </template>
+      <span>Enlarge</span>
+    </v-tooltip>
   </div>
   <div v-else class="resize-button-container">
-      <div class="resize-button" @click="$emit('decrease')">
-        <v-icon>mdi-{{decIcon}}</v-icon>
-      </div>
-      <div class="resize-button" @click="$emit('increase')">
-        <v-icon>mdi-{{incIcon}}</v-icon>
-      </div>
+    <v-tooltip bottom>
+      <template v-slot:activator="{ on, attrs }">
+        <div v-bind="attrs" v-on="on" class="resize-button" @click="$emit('increase')">
+      <v-icon>mdi-chevron-{{incIcon}}</v-icon>
+    </div>
+      </template>
+      <span>Enlarge</span>
+    </v-tooltip>
+    <v-tooltip bottom>
+      <template v-slot:activator="{ on, attrs }">
+        <div v-bind="attrs" v-on="on" class="resize-button" @click="$emit('decrease')">
+          <v-icon>mdi-chevron-{{decIcon}}</v-icon>
+        </div>
+      </template>
+      <span>Shrink</span>
+    </v-tooltip>
   </div>
 </template>
 
@@ -36,15 +56,15 @@
     computed: {
       incIcon(){
         if (this.orientation == "vertical")
-          return this.inverse ? "chevron-up" : "chevron-down"
+          return this.inverse ? "down" : "up"
         else
-          return this.inverse ? "chevron-right" : "chevron-left"
+          return this.inverse ? "right" : "left"
       },
       decIcon(){
         if (this.orientation == "vertical")
-          return this.inverse ? "chevron-down" : "chevron-up"
+          return this.inverse ? "up" : "down"
         else
-          return this.inverse ? "chevron-left" : "chevron-right"
+          return this.inverse ? "left" : "right"
       },
     }
   }
@@ -66,8 +86,9 @@
     justify-content: inherit;
     align-items: inherit;
 
+    background-color: rgba(255, 255, 255, .2);
   }
   .resize-button:hover {
-    background-color: rgba(255, 255, 255, .3);
+    background-color: rgba(255, 255, 255, .4);
   }
 </style>
