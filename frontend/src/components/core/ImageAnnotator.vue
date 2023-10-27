@@ -1,62 +1,94 @@
 <template>
-    <div align="center">
-      <utils-KeypressHandler @pressed="handleKeyPress($event)"/>
+  <div align="center">
+    <utils-KeypressHandler @pressed="handleKeyPress($event)"/>
 
-      <dialogs-BoundingBoxDelete
-        :box="boxToDelete"
-        @close="boxToDelete = undefined"
-        @confirm="removeBBox($event)"
-      />
+    <dialogs-BoundingBoxDelete
+      :box="boxSelection.toDelete"
+      :file="file"
+      @close="boxSelection.toDelete = undefined"
+      @confirm="removeBBox($event)"
+    />
 
-      <v-row>
-        <v-col cols="auto">
-          <core-ImageAnnotatorOptionBar
+    <dialogs-BoundingBoxEdit
+      :box="boxSelection.toEdit"
+      :file="file"
+      @close="boxSelection.toEdit = undefined"
+      @confirm="updateBBox($event)"
+    />
+
+    <v-row>
+      <v-col cols="auto">
+        <core-ImageAnnotatorOptionBar
+          :interaction="interaction"
+          @action="setInteraction($event)"
+          @toggleInfoBox="showInfo=!showInfo"
+        />
+      </v-col>
+
+      <v-col>
+
+        <core-LazyImage
+          :file="file"
+          thumbSize="large"
+          :maxHeight="maxHeight"
+        >
+
+          <core-ImageAnnotations
+            ref="imageAnnotations"
             :interaction="interaction"
-            @action="setInteraction($event)"
-            @toggleInfoBox="showInfo=!showInfo"
-          />
-        </v-col>
-
-        <v-col>
-
-          <core-LazyImage
-            :file="file"
-            thumbSize="large"
-            :maxHeight="maxHeight"
-          >
-
-            <core-ImageAnnotations
-              ref="imageAnnotations"
-              :interaction="interaction"
-              :fileLabel="file.label"
-              :bboxes="bboxes"
-              @addBBox="addBBox($event)"
-              @selectedBBox="bboxClicked($event)"
-            />
-          </core-LazyImage>
-        </v-col>
-
-        <v-col cols="3">
-          <core-InfoBox v-if="showInfo"
-            ref="infoBox"
-            :selectedBBox="selectedBBox"
+            :fileLabel="file.label"
             :bboxes="bboxes"
-            :file="file"
-            :maxHeight="maxHeight"
-            @highlight="$refs.imageAnnotations.highlight($event)"
-            @toggle="toggle($event)"
-            @select="select($event)"
-            @remove="boxToDelete = $event"
+            @addBBox="addBBox($event)"
+            @selectedBBox="bboxClicked($event)"
           />
-        </v-col>
-      </v-row>
+        </core-LazyImage>
+      </v-col>
 
-    </div>
+      <v-col cols="3">
+        <core-InfoBox v-if="showInfo"
+          ref="infoBox"
+          :selectedBBox="boxSelection.selected"
+          :bboxes="bboxes"
+          :file="file"
+          :maxHeight="maxHeight"
+          @highlight="$refs.imageAnnotations.highlight($event)"
+          @toggle="toggle($event)"
+          @select="select($event)"
+          @remove="boxSelection.toDelete = $event"
+        />
+      </v-col>
+    </v-row>
+
+  </div>
 </template>
 
 <script>
 
 import DataService from '@/services/data.service';
+
+class BoxSelection{
+  selected = undefined;
+  toDelete = undefined;
+  toEdit = undefined;
+
+  reset(){
+    this.selected = undefined;
+    this.toDelete = undefined;
+    this.toEdit = undefined;
+  }
+
+  delete(){
+    this.toDelete = this.selected;
+  }
+
+  edit(){
+    this.toEdit = this.selected;
+  }
+
+  select(box){
+    this.selected = box;
+  }
+}
 
 export default {
   name: "ImageAnnotator",
@@ -71,8 +103,7 @@ export default {
 
   data: () => ({
     interaction: 'select',
-    selectedBBox: undefined,
-    boxToDelete: undefined,
+    boxSelection: new BoxSelection(),
 
     showInfo: false,
     bboxes: [],
@@ -88,6 +119,7 @@ export default {
       },
 
       Delete(that){
+        that.boxSelection.delete();
       },
 
       Escape(that){
@@ -103,12 +135,16 @@ export default {
       },
 
       v(that){
-        that.toggle(that.selectedBBox);
+        that.toggle(that.boxSelection.selected);
       },
 
       i(that){
         that.showInfo = !that.showInfo;
-      }
+      },
+
+      e(that){
+        that.boxSelection.edit();
+      },
     },
   }),
 
@@ -119,7 +155,7 @@ export default {
   watch: {
     file: function(){
       this.getBBoxes();
-      this.selectedBBox = undefined;
+      this.boxSelection.reset();
     }
   },
 
@@ -136,7 +172,7 @@ export default {
     },
 
     isDialogOpen: function () {
-      return this.boxToDelete !== undefined;
+      return this.boxSelection.toDelete !== undefined || this.boxSelection.toEdit !== undefined;
     }
   },
 
@@ -144,12 +180,15 @@ export default {
   methods: {
 
     closeDialog(){
-      this.boxToDelete = undefined;
+      this.boxSelection.toDelete = undefined;
+      this.boxSelection.toEdit = undefined;
     },
 
     confirmDialog(){
-      if (this.boxToDelete !== undefined)
-        return this.removeBBox(this.boxToDelete)
+      if (this.boxSelection.toDelete !== undefined)
+        return this.removeBBox(this.boxSelection.toDelete)
+      if (this.boxSelection.toEdit !== undefined)
+        return this.updateBBox(this.boxSelection.toEdit)
     },
 
     handleKeyPress(event){
@@ -166,7 +205,7 @@ export default {
       }
 
       else if (interaction === "delete"){
-        this.boxToDelete = this.selectedBBox;
+        this.boxSelection.delete()
         // because we do not want to change the interaction mode
         interaction = this.interaction;
       }
@@ -238,7 +277,18 @@ export default {
             console.log("Failed to remove bounding box.");
           }
           this.getBBoxes();
-          this.boxToDelete = undefined;
+          this.boxSelection.toDelete = undefined;
+        });
+    },
+
+    updateBBox(bbox){
+      DataService.bboxes.update(bbox)
+        .then((ok) => {
+          if (!ok){
+            console.log("Failed to update bounding box.");
+          }
+          this.getBBoxes();
+          this.boxSelection.toEdit = undefined;
         });
     },
 
@@ -265,9 +315,9 @@ export default {
 
     select(bbox){
       if(this.$refs.imageAnnotations.toggleSelect(bbox?.id))
-        this.selectedBBox = bbox;
+        this.boxSelection.select(bbox);
       else
-        this.selectedBBox = undefined;
+        this.boxSelection.reset();
     },
 
     getBBoxes() {

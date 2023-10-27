@@ -77,21 +77,20 @@ class FileViewSet(BaseViewSet):
 
     @action(detail=True, methods=["post"], url_path="bbox")
     def bbox_add(self, request, pk=None):
-        if not set(["x", "y", "width", "height"]).issubset(request.POST):
+        x, y, width, height, label = [request.data.get(key) for key in ["x", "y", "width", "height", "label"]]
+
+        if None in [y, x, width, height]:
             return Response({"status": "Argument for bbox missing"},
                 status=status.HTTP_400_BAD_REQUEST)
+
         file = self.get_object()
         user = self.request.user
 
         try:
-            bbox = BoundingBox.create(file, request.POST.get("x"),
-                        request.POST.get("y"), request.POST.get("width"),
-                        request.POST.get("height"), False, user
-                )
+            bbox = BoundingBox.create(file, x, y, width, height, False, user)
+            if label is not None:
+                Annotation.create(described_object=bbox, label=label, annotator=user)
 
-            if "label" in request.POST:
-                Annotation.create(described_object=bbox,
-                            label=request.POST.get("label"), annotator=user)
         except Exception as e:
             print(e)
             return Response({"status": str(e)},
@@ -100,12 +99,13 @@ class FileViewSet(BaseViewSet):
         else:
             return Response({'status': 'BBox added'})
 
-    @action(detail=True, methods=["post"], url_path="label")
+    @action(detail=True, methods=["put"], url_path="label")
     def label_set(self, request, pk=None):
-        if "label" not in request.POST:
+        label = request.data.get("label")
+        if label is None:
             return Response({"status": "Label missing"},
                 status=status.HTTP_400_BAD_REQUEST)
-        label = request.POST.get("label")
+
         user = self.request.user
         file = self.get_object()
 

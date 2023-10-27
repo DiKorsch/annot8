@@ -8,26 +8,32 @@
         Do you really want to delete this box?
       </v-card-title>
       <v-card-text>
-        {{ box }}
+        <core-CroppedImage
+          :file="file"
+          :box="box"
+        />
       </v-card-text>
       <v-card-actions>
-        <v-btn
-          color="red"
-          align="left"
-          text
-          @click="$emit('confirm', box)"
-        >
-          Yes, delete it.
-        </v-btn>
+        <v-col class="text-left">
+          <v-btn
+            color="primary"
+            text
+            @click="$emit('close')"
+          >
+            No, close this window
+          </v-btn>
+        </v-col>
 
-        <v-btn
-          color="primary"
-          text
-          @click="$emit('close')"
-        >
-          No, close this window
-        </v-btn>
-
+        <v-col class="text-right">
+          <v-btn
+            color="red"
+            align="left"
+            text
+            @click="$emit('confirm', box)"
+          >
+            Yes, delete it.
+          </v-btn>
+        </v-col>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -38,7 +44,8 @@ export default {
   name: "BoundingBoxDeleteDialog",
 
   props: {
-    box: undefined
+    file: undefined,
+    box: undefined,
   },
 
   computed: {

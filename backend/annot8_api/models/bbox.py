@@ -42,6 +42,21 @@ class BoundingBox(base.DescribableObject):
         "height",
     ]
 
+    def update(self, x: float, y: float, width: float, height: float, user: User, label=None):
+
+        if user is not None:
+            self.pipeline_generated = False
+            self.creator = user
+
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+
+        # if label
+
+        self.save()
+
     def as_numpy(self):
         path = Path(self.described_file.path.path)
         with Image.open(path) as im:
@@ -68,8 +83,8 @@ class BoundingBox(base.DescribableObject):
         return prediction_obj
 
     @classmethod
-    def create(cls, described_file: file.File, x: int, y: int, width: int,
-            height: int, pipeline_generated: bool = False, user: User = None):
+    def create(cls, described_file: file.File, x: float, y: float, width: float,
+            height: float, pipeline_generated: bool = False, user: User = None):
 
         if pipeline_generated:
             if user is not None:

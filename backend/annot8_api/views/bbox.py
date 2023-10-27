@@ -18,6 +18,23 @@ class BBoxViewSet(BaseViewSet):
             Q(described_file__project__collaborators__in=[user])
         ).distinct()
 
+    def update(self, request, pk=None, *args, **kwargs):
+        bbox = self.get_object()
+        data = [request.data.get(arg) for arg in ["x", "y", "width", "height"]]
+        print(bbox.x, bbox.y, bbox.width, bbox.height)
+
+        if None in data:
+            return Response({"status": "Argument for bbox update missing"},
+                status=status.HTTP_400_BAD_REQUEST)
+        try:
+            bbox.update(*data, user=request.user, label=request.data.get("label"))
+        except Exception as e:
+            print(e)
+            return Response({"status": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        print(data, bbox.x, bbox.y, bbox.width, bbox.height)
+        return Response({'status': 'foo'})
+
     @action(detail=True, methods=["post"], url_path="predict")
     def predict(self, request, pk=None):
         bbox = self.get_object()
@@ -37,12 +54,13 @@ class BBoxViewSet(BaseViewSet):
 
         return Response({'status': 'Prediction added to bounding box'})
 
-    @action(detail=True, methods=["post"], url_path="label")
-    def label_set(self, request, pk=None):
-        if "label" not in request.POST:
+    @action(detail=True, methods=["put"], url_path="label")
+    def set_label(self, request, pk=None):
+        label = request.data.get("label")
+        if label is None:
             return Response({"status": "Label missing"},
                 status=status.HTTP_400_BAD_REQUEST)
-        label = request.POST.get("label")
+
         user = self.request.user
         bbox = self.get_object()
 
@@ -56,7 +74,7 @@ class BBoxViewSet(BaseViewSet):
         except Exception as e:
             print(e)
             return Response({"status": str(e)},
-                status=status.HTTP_400_BAD_REQUEST)
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         else:
             return Response({'status': 'Label added to bounding box'})

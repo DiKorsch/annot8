@@ -111,21 +111,9 @@ class DataService {
     },
 
     add_bbox: function(fileId, x, y, width, height, label) {
-      let data = new FormData();
+      let data = {x, y, width, height, label};
 
-      data.append('x', x);
-      data.append('y', y);
-      data.append('width', width);
-      data.append('height', height);
-      if (!(typeof label === "undefined")) {
-          data.append('label', label);
-      }
-
-      let config = {
-        headers: {'content-type': 'multipart/form-data'},
-      }
-
-      return api.post(`file/${fileId}/bbox/`, data, config)
+      return api.post(`file/${fileId}/bbox/`, data)
         .then(() => {
           return true;
         }).catch((error) => {
@@ -138,15 +126,7 @@ class DataService {
       if (fileId === undefined || label === undefined)
         return false;
 
-      let data = new FormData();
-
-      data.append('label', label);
-
-      let config = {
-        headers: {'content-type': 'multipart/form-data'},
-      }
-
-      return api.post(`bbox/${fileId}/label/`, data, config)
+      return api.put(`bbox/${fileId}/label/`, {label})
         .then(() => {
           return true;
         }).catch((error) => {
@@ -223,15 +203,7 @@ class DataService {
         if (bboxId === undefined || label === undefined)
           return false;
 
-        let data = new FormData();
-
-        data.append('label', label);
-
-        let config = {
-          headers: {'content-type': 'multipart/form-data'},
-        }
-
-        return api.post(`bbox/${bboxId}/label/`, data, config)
+        return api.put(`bbox/${bboxId}/label/`, {label})
           .then(() => {
             return true;
           }).catch((error) => {
@@ -248,8 +220,20 @@ class DataService {
             console.log("Error while predicting bounding box:", error)
             return false;
           });
+      },
+
+      update: function(bbox){
+        let data = {x: bbox.x, y: bbox.y, width: bbox.width, height: bbox.height};
+
+        return api.put(`bbox/${bbox.id}/`, data)
+          .then(() => {
+            return true;
+          }).catch((error) => {
+            console.log("Error while updating bounding box:", error)
+            return false;
+          });
       }
-    }
+  }
 
   confirmator = {
     add: function(annotationId) {
