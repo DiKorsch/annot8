@@ -45,8 +45,8 @@
         </core-LazyImage>
       </v-col>
 
-      <v-col cols="3">
-        <core-InfoBox v-if="showInfo"
+      <v-col v-if="showInfo" cols="3">
+        <core-InfoBox
           ref="infoBox"
           :selectedBBox="boxSelection.selected"
           :bboxes="bboxes"
