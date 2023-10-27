@@ -75,15 +75,11 @@ export default {
   },
 
   data: () => ({
-    keyActions: [
-      // key, action2send
-      ["Delete", "delete"],
-    ],
 
     buttons: [
       new Button("select", "Select bounding box", "button-pointer", "Escape"),
       new Button("add", "Add bounding box", "shape-square-plus", "a"),
-      new Button("edit", "Edit bounding box", "lead-pencil", "e"),
+      new Button("edit", "Edit", "lead-pencil", "e"),
       new Button("pipeline", "Open Pipeline", "brain", "p"),
     ],
 
@@ -95,12 +91,8 @@ export default {
         new Button("copy", "Copy from previous image", "content-copy", "c"),
       ],
       edit: [
-        new Button("resize", "Resize bounding box", "resize", "r"),
-        new Button("move", "Move bounding box", "move-resize-variant", "m"),
-        new Button("delete", "Delete bounding box", "trash-can", "Delete"),
-        new Button("confirm", "Cofirm bounding box", "check", "c"),
         new Button("confirm-all", "Cofirm all bounding boxes", "check-all", "a"),
-        new Button("label", "Label bounding box", "label-outline", "l"),
+        new Button("label", "Label image", "label-outline", "l"),
       ],
       pipeline: [
         new Button("detect", "Detect insects", "view-grid-plus-outline", "d", true),
@@ -116,15 +108,6 @@ export default {
     active_options: [],
   }),
 
-  // created: function () {
-  //   // subscribe to keypress events
-  //   window.addEventListener('keydown', this.keypressEvent);
-  // },
-
-  // destroyed: function () {
-  //   window.removeEventListener('keydown', this.keypressEvent)
-  // },
-
   methods: {
 
     setAction: function(action){
@@ -139,30 +122,13 @@ export default {
       this.$emit("action", action)
     },
 
-    keypressEvent: function (event) {
-      console.log("Keyboard press:", event.key);
-      for (let action of this.keyActions)
-        if (action[0] == event.key)
-          return this.$emit("action", action[1])
+    toggleOption: function(value, add){
+      if (add)
+        this.active_options.push(value)
+      else
+        this.active_options.pop(value)
+    }
 
-      for (let btn of this.current_mode_buttons)
-        if (btn.key == event.key)
-          return this.setModeAction(btn.action)
-
-      for (let btn of this.buttons)
-        if (btn.key == event.key)
-          return this.setAction(btn.action)
-
-      for (let btn of this.options){
-        if (btn.key == event.key){
-          if (this.active_options.includes(btn.action))
-            this.active_options.pop(btn.action)
-          else
-            this.active_options.push(btn.action)
-          return this.$emit(btn.action)
-        }
-      }
-    },
   },
 
   computed: {

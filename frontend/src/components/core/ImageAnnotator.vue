@@ -19,6 +19,7 @@
     <v-row>
       <v-col cols="auto">
         <core-ImageAnnotatorOptionBar
+          ref="optionBar"
           :interaction="interaction"
           @action="setInteraction($event)"
           @toggleInfoBox="showInfo=!showInfo"
@@ -140,10 +141,15 @@ export default {
 
       i(that){
         that.showInfo = !that.showInfo;
+        that.$refs.optionBar.toggleOption("toggleInfoBox", that.showInfo)
       },
 
       e(that){
         that.boxSelection.edit();
+        that.interaction = "edit"
+      },
+      a(that){
+        that.interaction = "add"
       },
     },
   }),
@@ -329,12 +335,16 @@ export default {
     },
 
     bboxClicked(bbox) {
-      console.log("Clicked on", bbox?.id, this.interaction)
+      console.log("Clicked on", bbox?.id, "current mode:", this.interaction)
 
       // // Manage corresponding interactions.
       if (bbox === undefined || this.interaction === "add")
         return;
       this.select(bbox);
+
+      if (this.interaction === "edit")
+        return this.boxSelection.edit()
+
       // } else if (this.interaction === "select" || this.interaction === "edit") {
       // } else if (this.interaction === "remove-box") {
       //   this.removeBBox(bbox);
