@@ -120,6 +120,7 @@ export default {
       },
 
       Delete(that){
+        that.closeDialog()
         that.boxSelection.delete();
       },
 
@@ -145,6 +146,7 @@ export default {
       },
 
       e(that){
+        that.closeDialog()
         that.boxSelection.edit();
         that.interaction = "edit"
       },
