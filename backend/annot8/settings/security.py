@@ -1,4 +1,5 @@
 import os
+import socket
 
 from annot8.settings.base import BASE_DIR
 from corsheaders.defaults import default_headers
@@ -20,10 +21,15 @@ if not SECRET_KEY_FILE.exists():
 
 SECRET_KEY = open(SECRET_KEY_FILE).read()
 
+s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+s.connect(("8.8.8.8", 80))
+CURRENT_IP = s.getsockname()[0]
+s.close()
 
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
+    CURRENT_IP,
     'hemera4.inf-cv.uni-jena.de',
     'api.inf-cv.uni-jena.de',
 ]
@@ -33,6 +39,7 @@ FRONTEND_PORT = os.environ.get("FRONTEND_PORT", 8080)
 CORS_ORIGIN_WHITELIST = (
     f'http://localhost:{FRONTEND_PORT}',
     f'http://127.0.0.1:{FRONTEND_PORT}',
+    f'http://{CURRENT_IP}:{FRONTEND_PORT}',
     f'http://hemera4.inf-cv.uni-jena.de:{FRONTEND_PORT}',
 )
 
