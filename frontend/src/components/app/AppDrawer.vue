@@ -79,6 +79,7 @@
         </div>
       </div>
     </v-list>
+    <app-AppFooter/>
   </v-navigation-drawer>
 </template>
 

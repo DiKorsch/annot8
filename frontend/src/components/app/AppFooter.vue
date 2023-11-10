@@ -1,10 +1,8 @@
 <template>
 
   <v-footer
-    app
     padless
     fixed
-    inset
   >
 
     <v-card

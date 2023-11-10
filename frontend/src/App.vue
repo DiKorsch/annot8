@@ -1,6 +1,6 @@
 <template>
   <v-app id="pycs2">
-    <core-AppDrawer/>
+    <app-AppDrawer/>
 
     <v-main>
       <v-container fluid>
@@ -8,7 +8,7 @@
       </v-container>
     </v-main>
 
-    <core-AppFooter/>
+    <!-- <app-AppFooter/> -->
   </v-app>
 </template>
 
