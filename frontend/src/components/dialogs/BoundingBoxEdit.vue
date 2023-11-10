@@ -107,6 +107,24 @@ export default {
         change = this.change;
 
       console.log(direction, change);
+
+      switch(direction){
+      case "left":
+        this.localBox.x -= change;
+        break;
+      case "right":
+        this.localBox.x += change;
+        break;
+      case "up":
+        this.localBox.y -= change;
+        break;
+      case "down":
+        this.localBox.y += change;
+        break;
+      default:
+        console.error("Unknown move direction:", direction)
+        break;
+      }
     },
 
     resize(action, direction, change) {

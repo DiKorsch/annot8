@@ -111,6 +111,12 @@ export default {
 <style scoped>
 .cropped-img {
   position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+
 }
 
 .cropped-img img {
