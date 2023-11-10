@@ -61,6 +61,7 @@ class FileViewSet(BaseViewSet):
             if not bbox.is_valid or w <= 0 or h <= 0:
                 continue
             boxes.append(BoundingBox.create(file, bbox.x0, bbox.y0, w, h, True))
+        return Response({'status': 'BBoxes generated'})
 
         logging.info(f"Estimating species for {len(boxes)} valid boxes")
         for bbox in tqdm(boxes):

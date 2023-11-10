@@ -17,6 +17,9 @@
             @increase="resize('increase', $event)"
             @decrease="resize('decrease', $event)"
           />
+          <core-MoveButtons
+            @move="move($event)"
+          />
         </core-CroppedImage>
       </v-card-text>
       <v-card-actions>
@@ -97,6 +100,13 @@ export default {
       this.localBox.y = y;
       this.localBox.width = width;
       this.localBox.height = height;
+    },
+
+    move(direction, change) {
+      if (change === undefined)
+        change = this.change;
+
+      console.log(direction, change);
     },
 
     resize(action, direction, change) {
