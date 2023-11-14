@@ -51,6 +51,7 @@
 import DataService from '@/services/data.service';
 
 export default {
+  name: "AnnotationsView",
   computed: {
     projectId() {
       return this.$route.params.id;

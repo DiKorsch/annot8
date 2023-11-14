@@ -136,31 +136,32 @@ export default {
         'mdi-book-multiple',
         'projects'),
 
-      new MenuItem(
-        'Options',
-        'mdi-cog',
-        'project',
-        true
-        ),
 
       new MenuItem(
         'Data',
-        'mdi-image-multiple',
+        'mdi-image-multiple-outline',
         'data',
         true
         ),
 
       new MenuItem(
-        'Labels',
+        'Annotate images',
+        'mdi-image-multiple',
+        'annotations',
+        true
+        ),
+
+      new MenuItem(
+        'Show labels',
         'mdi-label-multiple',
         'labels',
         true
         ),
 
       new MenuItem(
-        'Annotations',
-        'mdi-pencil',
-        'annotations',
+        'Options',
+        'mdi-cog',
+        'project',
         true
         ),
     ],
