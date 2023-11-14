@@ -1,10 +1,42 @@
 import api from "./api";
 
 import File from "@/store/models/file"
+import Label from "@/store/models/label"
 import BBox from "@/store/models/bbox"
 import Project from "@/store/models/project"
 
+// credits to https://stackoverflow.com/a/53829223/1360842
+// returns a promise once it gets ALL pages from API
+function paginated(url) {
+  return function paginatedFetcher(next, obj_list = []) {
+    return api.get(next ? next : url)
+      .then(({data}) => {
+        obj_list.push(...data.results)
+        if (!data.next)
+          return obj_list
+        return paginatedFetcher(data.next, obj_list)
+      })
+  }
+}
+
+function parse_taxonomy(labels){
+  let lookup = labels.reduce(function(res, lab){res[lab.id] = lab; return res}, {})
+  for (let label of labels){
+    if (label.parent_id !== null){
+      let parent = lookup[label.parent_id];
+
+      parent.add_child(label.name);
+      label.set_parent(parent.name);
+    }
+  }
+
+  return labels
+}
+
 class DataService {
+  helper = {
+  }
+
   project = {
     get: function(projectId){
       if (projectId === undefined)
@@ -294,6 +326,16 @@ class DataService {
           console.log("ERROR:", error)
           return false;
         });
+    }
+  }
+
+  labels = {
+    get: function() {
+      return paginated("/label/?page_size=1000")().then((results) => {
+        return parse_taxonomy(results.map((data) => {
+          return new Label(data);
+        }))
+      })
     }
   }
 
