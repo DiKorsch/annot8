@@ -7,13 +7,11 @@ from django.db import models
 from pathlib import Path
 
 from annot8_api.models import base
-from annot8_api.models import file
-from annot8_api.models import logit
-from annot8_api.models import prediction
+from annot8_api import models as api_models
 
 class BoundingBox(base.DescribableObject):
     described_file = models.ForeignKey(
-        file.File,
+        api_models.File,
         on_delete=models.CASCADE,
         related_name="bboxes",
         related_query_name="bbox",
@@ -41,6 +39,14 @@ class BoundingBox(base.DescribableObject):
         "width",
         "height",
     ]
+
+    @property
+    def area(self) -> float:
+        return self.width * self.height
+
+    @property
+    def center(self) -> (float, float):
+        return self.x + self.width/2, self.y + self.height/2
 
     def update(self, x: float, y: float, width: float, height: float, user: User, label=None):
 
@@ -71,19 +77,19 @@ class BoundingBox(base.DescribableObject):
         return crop
 
     def prediction_add(self, label, logits, classifier_name):
-        prediction.Prediction.objects.filter(described_object=self).delete()
-        prediction_obj = prediction.Prediction.create(described_object=self,
+        api_models.Prediction.objects.filter(described_object=self).delete()
+        prediction_obj = api_models.Prediction.create(described_object=self,
                                         top_1_label=label,
                                         model=classifier_name)
         for (label_id, lgt) in logits:
-            logit.Logit.create(prediction = prediction_obj,
+            api_models.Logit.create(prediction = prediction_obj,
                             label = label_id,
                             logit = lgt)
 
         return prediction_obj
 
     @classmethod
-    def create(cls, described_file: file.File, x: float, y: float, width: float,
+    def create(cls, described_file: api_models.File, x: float, y: float, width: float,
             height: float, pipeline_generated: bool = False, user: User = None):
 
         if pipeline_generated:

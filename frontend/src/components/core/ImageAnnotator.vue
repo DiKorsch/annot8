@@ -40,6 +40,7 @@
             :fileLabel="file.label"
             :bboxes="bboxes"
             @addBBox="addBBox($event)"
+            :selectedBBox="boxSelection.selected"
             @selectedBBox="bboxClicked($event)"
           />
         </core-LazyImage>
@@ -322,16 +323,24 @@ export default {
     },
 
     select(bbox){
-      if(this.$refs.imageAnnotations.toggleSelect(bbox?.id))
-        this.boxSelection.select(bbox);
+      if(this.boxSelection.selected?.id == bbox.id)
+        this.boxSelection.reset()
       else
-        this.boxSelection.reset();
+        this.boxSelection.select(bbox)
     },
 
     getBBoxes() {
       DataService.bboxes.get(this.fileId)
         .then((bboxes) => {
           this.bboxes = bboxes;
+
+          let showInfo = this.$route.query?.showInfo;
+          if (showInfo !== undefined){
+            let box = this.bboxes.find((box) => box.id == showInfo);
+
+            this.boxSelection.select(box);
+            this.showInfo = true;
+          }
         });
       // this.toggleBBoxUpdate=!this.toggleBBoxUpdates; // toggle to change key and trigger update
     },

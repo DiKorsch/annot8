@@ -80,6 +80,21 @@ class DataService {
           return response.data;
         });
     },
+
+    crops: function(projectId, grouped){
+      let url = `/project/${projectId}/crops/`;
+      if (grouped)
+        url = `${url}?group_tracks=true`
+      return api.get(url)
+        .then((response) => {
+          let data = response.data;
+          console.log(data)
+          return {
+            "files": new Map(data.files.map((file) => [file.id, new File(file)])),
+            "tracks": data.tracks,
+            "boxes": new Map(data.boxes.map((box) => [box.id, new BBox(box)]))};
+        });
+    }
   }
 
   files = {

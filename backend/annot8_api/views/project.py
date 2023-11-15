@@ -6,19 +6,18 @@ from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from annot8_api.models import File
-from annot8_api.models import Project
-from annot8_api.serializers import FileSerializer
-from annot8_api.serializers import ProjectSerializer
-from annot8_api.views.base import BaseViewSet
+from annot8_api import models as api_models
+from annot8_api import serializers
+from annot8_api.views import base
+from annot8_api.pipeline.tracks import group_tracks
 
 
-class ProjectViewSet(BaseViewSet):
+class ProjectViewSet(base.BaseViewSet):
 
-    serializer_class = ProjectSerializer
+    serializer_class = serializers.ProjectSerializer
 
     def get_queryset(self):
-        return Project.objects.filter(
+        return api_models.Project.objects.filter(
             Q(user=self.request.user) |
             Q(collaborators__in=[self.request.user])
         ).distinct()
@@ -35,6 +34,23 @@ class ProjectViewSet(BaseViewSet):
                 status=status.HTTP_400_BAD_REQUEST)
         return super().destroy(request, *args, **kwargs)
 
+    @action(detail=True)
+    def crops(self, request, pk=None):
+        project = self.get_object()
+
+        boxes = api_models.BoundingBox.objects.filter(
+            described_file__project=project.id
+        )
+        files = project.files
+
+        boxes_ser = serializers.BoundingBoxSerializer(boxes, many=True)
+        files_ser = serializers.FileSerializer(files, many=True)
+        data = dict(boxes=boxes_ser.data, files=files_ser.data)
+
+        if request.GET.get("group_tracks") == "true":
+            data["tracks"] = group_tracks(boxes.all(), files.all())
+        return Response(data)
+
     @action(detail=True, methods=['post'])
     def file(self, request, pk=None):
         if "file" not in request.FILES:
@@ -43,7 +59,7 @@ class ProjectViewSet(BaseViewSet):
         project = self.get_object()
 
         try:
-            File.create(request.FILES['file'], project)
+            api_models.File.create(request.FILES['file'], project)
         except Exception as e:
             print(e)
             return Response({"status": str(e)},
@@ -57,7 +73,7 @@ class ProjectViewSet(BaseViewSet):
 
         files = project.files
 
-        serializer = FileSerializer(files, many=True)
+        serializer = serializers.FileSerializer(files, many=True)
         return Response(serializer.data)
 
     @action(detail=True, methods=["post"], url_path="classifier")
@@ -86,7 +102,7 @@ class ProjectViewSet(BaseViewSet):
         if detector is None:
             return Response({"status": "Detector missing"},
                 status=status.HTTP_400_BAD_REQUEST)
-        if detector not in Project.detectors():
+        if detector not in api_models.Project.detectors():
             return Response({"status": "Detector name is invalid"},
                 status=status.HTTP_400_BAD_REQUEST)
 

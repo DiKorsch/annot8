@@ -25,10 +25,13 @@ export default {
 
   props: {
     bbox: undefined,
+    selected: {
+      type: Boolean,
+      default: false
+    },
   },
 
   data: () => ({
-    selected: false,
     highlight: false,
     hidden: false,
   }),

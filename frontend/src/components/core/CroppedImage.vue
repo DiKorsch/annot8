@@ -42,19 +42,29 @@ export default {
   props: {
     file: undefined,
     box: undefined,
+    initialThumbSize: {
+      type: String,
+      default: "large"
+    }
   },
 
   data: () => ({
     pad: 0.00,
     // imgSize: undefined,
-    thumbSize: "medium",
+    thumbSize: undefined,
     thumbSizes: [
       {key: "small", text: "Low"},
       {key: "medium", text: "Medium"},
       {key: "large", text: "High"},
-      {key: undefined, text: "Original"},
+      {key: "original", text: "Original"},
     ],
   }),
+
+  created() {
+
+    this.thumbSize = this.initialThumbSize;
+  },
+
   computed: {
     ...mapGetters(['getMediaUrl']),
 
@@ -63,6 +73,7 @@ export default {
       let thumbs = this.file?.thumbs;
       if (thumbs !== undefined && thumbs[this.thumbSize] !== undefined )
         return thumbs[this.thumbSize]
+
 
       return this.file.url;
     },

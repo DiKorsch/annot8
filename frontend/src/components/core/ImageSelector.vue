@@ -106,7 +106,7 @@ export default {
 
     previous() {
       let newIdx = this.indexOfSelected - 1
-      if (newIdx <= 0)
+      if (newIdx < 0)
         newIdx = this.images.length - 1; // wrap around and select the last again
 
       this.$emit("selected", this.images[newIdx])

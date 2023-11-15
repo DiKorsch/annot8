@@ -317,7 +317,7 @@ def show_tracks(result, *, predictor = None, by_tracks: bool = True):
             max_tracks = 25
             for track in tracks:
 
-                show_track(track if max_tracks is None else track[:25], predictor=predictor)
+                show_track(track if max_tracks is None else track[:max_tracks], predictor=predictor)
 
                 plt.show()
                 plt.close()

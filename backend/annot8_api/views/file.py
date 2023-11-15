@@ -1,7 +1,5 @@
-import logging
-
 from django.db.models import Q
-from tqdm.auto import tqdm
+from django_q.tasks import async_task
 
 from rest_framework import status
 from rest_framework.decorators import action
@@ -36,45 +34,9 @@ class FileViewSet(BaseViewSet):
     @action(detail=True, methods=["post"], url_path="bbox_generate")
     def bbox_generate(self, request, pk=None):
         file = self.get_object()
-        project = file.project
+        async_task(file.detect_boxes)
+        return Response({'status': 'BBoxes generation scheduled'})
 
-        # Get detector.
-        detector = project.get_detector()
-        if detector is None:
-            return Response({"status": "Project does not have a detector"},
-                status=status.HTTP_400_BAD_REQUEST)
-
-        # Get classifier.
-        classifier = project.get_classifier()
-
-        # Remove all prior pipeline-generated bounding boxes.
-        BoundingBox.objects.filter(described_file=file, pipeline_generated=True).delete()
-
-        # Perform detection.
-        generated_bboxes = detector(file.as_numpy())
-        logging.info(f"Estimated {len(generated_bboxes)} detections")
-        boxes = []
-        for bbox in generated_bboxes:
-            # Generate bounding boxes.
-            w = bbox.x1 - bbox.x0
-            h = bbox.y1 - bbox.y0
-            if not bbox.is_valid or w <= 0 or h <= 0:
-                continue
-            boxes.append(BoundingBox.create(file, bbox.x0, bbox.y0, w, h, True))
-        return Response({'status': 'BBoxes generated'})
-
-        logging.info(f"Estimating species for {len(boxes)} valid boxes")
-        for bbox in tqdm(boxes):
-            # If possible, generate predictions.
-            if classifier is not None:
-                try:
-                    label, logits = classifier(bbox.as_numpy())
-                    bbox.prediction_add(label, logits, project.classifier)
-                except Exception as e:
-                    print("Generating prediction for bounding box failed due to: " + str(e))
-
-
-        return Response({'status': 'BBoxes generated'})
 
     @action(detail=True, methods=["post"], url_path="bbox")
     def bbox_add(self, request, pk=None):

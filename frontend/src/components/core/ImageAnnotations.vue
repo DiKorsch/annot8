@@ -15,6 +15,7 @@
       :bbox="box"
       :key="box.id"
       :ref="`box-${box.id}`"
+      :selected="isSelected(box.id)"
       @selectedBBox="$emit('selectedBBox', $event)"
     />
 
@@ -40,6 +41,7 @@ export default {
     fileLabel: undefined,
     bboxes: undefined,
     interaction: undefined,
+    selectedBBox: undefined,
   },
 
   watch: {
@@ -61,7 +63,12 @@ export default {
     newBox: undefined,
   }),
 
+
   methods: {
+
+    isSelected(boxId){
+      return this.selectedBBox !== undefined && this.selectedBBox.id === boxId;
+    },
 
     getCoordinates(event) {
       var bounds = event.currentTarget.getBoundingClientRect();
@@ -80,19 +87,6 @@ export default {
 
       comp.hidden = !comp.hidden;
       return comp.hidden;
-    },
-
-    toggleSelect(boxId) {
-      if (boxId === undefined)
-        return false;
-      let comp = this.$refs[`box-${boxId}`][0];
-      if (comp === undefined)
-        return false;
-      let wasSelected = comp.selected;
-      for (let _box of this.bboxes)
-        this.$refs[`box-${_box.id}`][0].selected = false;
-      comp.selected = !wasSelected;
-      return comp.selected;
     },
 
     highlight(boxId) {

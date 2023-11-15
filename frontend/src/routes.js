@@ -11,6 +11,7 @@ import ShowProject from './views/project/DetailView'
 import Data from './views/project/DataView'
 import Labels from './views/project/LabelsView'
 import Annotations from './views/project/AnnotationsView'
+import Crops from './views/project/CropsView'
 import Login from './views/LoginView'
 import Logout from './views/LogoutView'
 
@@ -102,6 +103,11 @@ export default new VueRouter({
                 path: 'annotate/:fileId',
                 name: 'annotate',
                 component: Annotations
+              },
+              {
+                path: 'crops',
+                name: 'crops',
+                component: Crops
               },
             ]
         },

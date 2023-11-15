@@ -1,17 +1,19 @@
 import enum
+import logging
+import numpy as np
 
 from django.conf import settings
 from django.core.files.uploadedfile import UploadedFile
 from django.db import models
 from django.dispatch import receiver
 from django_q.tasks import async_task
+from tqdm.auto import tqdm
 
-import numpy as np
 from PIL import Image
 from pathlib import Path
 
+from annot8_api import models as api_models
 from annot8_api.models import base
-from annot8_api.models.project import Project
 
 
 class Extensions(enum.Enum):
@@ -47,7 +49,7 @@ class File(base.DescribableObject):
         ]
 
     project = models.ForeignKey(
-        Project,
+        api_models.Project,
         on_delete=models.CASCADE,
         related_name="files",
         related_query_name="file",
@@ -85,7 +87,7 @@ class File(base.DescribableObject):
         return thumbs
 
     @classmethod
-    def create(cls, uploaded_file: UploadedFile, project: Project):
+    def create(cls, uploaded_file: UploadedFile, project: api_models.Project):
 
         file = cls.objects.create(
             project=project,
@@ -114,6 +116,52 @@ class File(base.DescribableObject):
                 thumb = im.resize((newW, newH))
                 dest.parent.mkdir(exist_ok=True, parents=True)
                 thumb.save(dest)
+
+    def detect_boxes(self):
+
+        project = self.project
+
+        # Get detector.
+        detector = project.get_detector()
+        if detector is None:
+            logging.error(f"Project {project.id} does not have a detector")
+            return
+            # return Response({"status": "Project does not have a detector"},
+            #     status=status.HTTP_400_BAD_REQUEST)
+
+        # Remove all prior pipeline-generated bounding boxes.
+        api_models.BoundingBox.objects.filter(described_file=self, pipeline_generated=True).delete()
+
+        # Perform detection.
+        generated_bboxes = detector(self.as_numpy())
+        logging.info(f"Estimated {len(generated_bboxes)} detections")
+
+        for bbox in generated_bboxes:
+            # Generate bounding boxes.
+            w = bbox.x1 - bbox.x0
+            h = bbox.y1 - bbox.y0
+            if not bbox.is_valid or w <= 0 or h <= 0:
+                continue
+            api_models.BoundingBox.create(self, bbox.x0, bbox.y0, w, h, True)
+
+    def classify_boxes(self):
+        project = self.project
+        boxes = self.bboxes
+
+        # Get classifier.
+        classifier = project.get_classifier()
+        if classifier is None:
+            logging.error(f"Project {project.id} does not have a classifier")
+            return
+
+        logging.info(f"Estimating species for {len(boxes)} valid boxes")
+        for bbox in tqdm(boxes):
+            # If possible, generate predictions.
+            try:
+                label, logits = classifier(bbox.as_numpy())
+                bbox.prediction_add(label, logits, project.classifier)
+            except Exception as e:
+                logging.error("Generating prediction for bounding box failed due to: " + str(e))
 
 @receiver(models.signals.post_save, sender=File)
 def create_thumbnails(sender, instance, created, raw, **kwargs):

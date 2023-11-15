@@ -74,6 +74,8 @@
     </v-dialog>
     <!-- End Image deletion Dialog -->
 
+
+    <utils-KeypressHandler @pressed="handleKeyPress($event)"/>
   </v-container>
 </template>
 
@@ -127,12 +129,6 @@ export default {
 
   created() {
     this.getFiles();
-    window.addEventListener("keydown", this.handleKeys);
-  },
-
-  destroyed() {
-
-    window.removeEventListener("keydown", this.handleKeys);
   },
 
   watch: {
@@ -152,7 +148,7 @@ export default {
 
   methods: {
 
-    handleKeys(event){
+    handleKeyPress(event){
       switch (event.key){
         case "ArrowLeft":
           event.preventDefault();

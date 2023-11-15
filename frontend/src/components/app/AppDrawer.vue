@@ -152,6 +152,13 @@ export default {
         ),
 
       new MenuItem(
+        'Annotate crops',
+        'mdi-checkbox-multiple-blank-outline',
+        'crops',
+        true
+        ),
+
+      new MenuItem(
         'Show labels',
         'mdi-label-multiple',
         'labels',
