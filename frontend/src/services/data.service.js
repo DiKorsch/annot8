@@ -201,6 +201,14 @@ class DataService {
   }
 
   detector = {
+    run: function(projectId){
+      return api.post(`project/${projectId}/run_detector/`).then(
+        (response) => {
+          return response.data;
+        }
+      );
+    },
+
     select: function(projectId, detector) {
       let data = new FormData();
 

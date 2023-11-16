@@ -4,6 +4,7 @@ export default class Project {
       data = {}
     this.id = data.id;
     this.name = data.name;
+    this.stats = data.stats;
     this.description = data.description;
     this.user = data.user;
     this.created = data.created;

@@ -9,6 +9,7 @@ from django.utils.functional import classproperty
 
 from pathlib import Path
 
+from annot8_api import models as api_models
 from annot8_api.models import base
 from annot8_api.pipeline.classifier.base import BaseClassifier
 from annot8_api.pipeline.detector.base import BaseDetector
@@ -17,6 +18,7 @@ def new_root_folder():
     return f"{settings.PROJECTS_DIR}/{uuid.uuid4()}"
 
 class Project(base.BaseModel):
+    __name__ = "Project"
 
     name = models.CharField(max_length=255)
     user = models.ForeignKey(
@@ -55,7 +57,8 @@ class Project(base.BaseModel):
         "data_folder",
         "root_folder",
         "classifiers",
-        "detectors"
+        "detectors",
+        "stats",
     ]
 
     read_only_fields = base.BaseModel.read_only_fields + [
@@ -63,7 +66,21 @@ class Project(base.BaseModel):
         "root_folder",
         "classifiers",
         "detectors",
+        "stats",
     ]
+
+    @property
+    def stats(self):
+        return dict(
+            nFiles=self.files.count(),
+            nBoxes=self.boxes.count(),
+        )
+
+    @property
+    def boxes(self):
+        return api_models.BoundingBox.objects.filter(
+            described_file__project=self.id
+        )
 
     def reload_detector(self):
         if self.detector is None:

@@ -64,13 +64,13 @@
         <v-card-text>
 
           <v-row>
-            <v-col class="col-6">Description</v-col>
-            <v-col class="col-6">{{ project.description }}</v-col>
+            <v-col cols="6">Description</v-col>
+            <v-col cols="6">{{ project.description }}</v-col>
           </v-row>
 
           <v-row>
-            <v-col class="col-6">Owner</v-col>
-            <v-col class="col-6">
+            <v-col cols="6">Owner</v-col>
+            <v-col cols="6">
               <v-row>
 
                 <v-chip outlined cols=12>
@@ -85,53 +85,70 @@
           </v-row>
 
           <v-row>
-            <v-col class="col-6">Collaborators</v-col>
-            <v-col class="col-6"><core-ProjectCollaborators :project="project"/></v-col>
-          </v-row>
-
-          <v-row>
-            <v-col class="col-6">Detector</v-col>
-            <v-col class="col-6">
-              Current detector: {{project.detector}} <br>
-
-              Select detector:
-              <select v-model="selectedDetector" @change="selectDetector(selectedDetector)">
-                <option :value="detector" v-for="(detector, index) in project.detectors" :key="index">
-                  {{detector}}
-                </option>
-              </select>
+            <v-col cols="6">Collaborators</v-col>
+            <v-col cols="6">
+              <core-ProjectCollaborators :project="project"/>
             </v-col>
-          </v-row>
-
-          <v-row>
-            <v-col class="col-6">Classifier</v-col>
-            <v-col class="col-6">
-              Current classifier: {{project.classifier}} <br>
-
-              Select classifier:
-              <select v-model="selectedClassifier" @change="selectClassifier(selectedClassifier)">
-                <option :value="classifier" v-for="(classifier, index) in project.classifiers" :key="index">
-                  {{classifier}}
-                </option>
-              </select>
-            </v-col>
-          </v-row>
-
-          <v-row v-if="project.label_provider">
-            <v-col class="col-6">Label Provider</v-col>
-            <v-col class="col-6">{{ project.labelProvider }}</v-col>
           </v-row>
 
           <v-divider class="my-4"></v-divider>
+          <!--<v-row>
+            <v-col cols="6">Root Folder</v-col>
+            <v-col cols="6">{{ project.rootFolder }}</v-col>
+          </v-row> -->
+          <v-row>
+            <v-col cols="auto">Data Folder</v-col>
+            <v-col cols="auto">
+              <v-chip label small>{{ project.dataFolder }}</v-chip>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="3">Uploaded files:</v-col>
+            <v-col cols="3"><v-chip>{{ project.stats.nFiles }}</v-chip></v-col>
+            <v-col cols="3">Annotated boxes:</v-col>
+            <v-col cols="3"><v-chip>{{ project.stats.nBoxes }}</v-chip></v-col>
+          </v-row>
 
+          <v-divider class="my-4"></v-divider>
+          <h4>Pipeline</h4>
           <v-row>
-            <v-col class="col-6">Root Folder</v-col>
-            <v-col class="col-6">{{ project.rootFolder }}</v-col>
+            <v-col cols="6">
+              <v-select
+                v-model="selectedDetector"
+                :items="project.detectors"
+                label="Detector"
+                @change="selectDetector(selectedDetector)"
+
+              ></v-select>
+            </v-col>
+            <v-col cols="6">
+              <v-select
+                v-model="selectedClassifier"
+                :items="project.classifiers"
+                label="Classifier"
+                @change="selectClassifier(selectedClassifier)"
+              ></v-select>
+            </v-col>
           </v-row>
-          <v-row>
-            <v-col class="col-6">Data Folder</v-col>
-            <v-col class="col-6">{{ project.dataFolder }}</v-col>
+          <h4>Actions on all files</h4>
+
+          <v-row align="center">
+            <v-col cols="6">
+              <v-btn color="teal lighten-2" block @click="runDetector">Run Detector</v-btn>
+            </v-col>
+            <v-col cols="6">
+              <v-btn color="teal lighten-2" block>Run Classifier</v-btn>
+            </v-col>
+            <!-- <v-col cols="4">
+              <v-btn color="teal lighten-2" block>Run Detector and classifier</v-btn>
+            </v-col> -->
           </v-row>
+
+          <v-row v-if="project.label_provider">
+            <v-col cols="6">Label Provider</v-col>
+            <v-col cols="6">{{ project.labelProvider }}</v-col>
+          </v-row>
+
         </v-card-text>
       </div>
 
@@ -158,14 +175,12 @@
   export default {
     name: 'ShowProject',
 
-    data (){
-      return {
-        proj_delete_dialog: false,
-        project: null,
-        selectedClassifier: '',
-        selectedDetector: '',
-      }
-    },
+    data: () => ({
+      proj_delete_dialog: false,
+      project: undefined,
+      selectedClassifier: '',
+      selectedDetector: '',
+    }),
 
     computed: {
 
@@ -186,10 +201,19 @@
       DataService.project.get(this.projectId)
         .then((project) => {
           this.project = project;
+          this.selectedClassifier = project.classifier
+          this.selectedDetector = project.detector
         })
     },
 
     methods: {
+      runDetector() {
+        DataService.detector.run(this.projectId)
+          .then((ok) => {
+            if(!ok)
+              console.error("COULD NOT RUN DETECTOR!")
+          })
+      },
       deleteProj () {
         DataService.project.delete(this.projectId)
           .then((ok) => {
@@ -202,7 +226,7 @@
         DataService.classifier.select(this.projectId, classifier)
           .then((ok) => {
             if (ok){
-              this.$router.push({name: "projects"})
+              this.$router.push({name: "project", params: { id: this.projectId}})
             }
           });
       },
@@ -210,7 +234,7 @@
         DataService.detector.select(this.projectId, detector)
           .then((ok) => {
             if (ok){
-              this.$router.push({name: "projects"})
+              this.$router.push({name: "project", params: { id: this.projectId}})
             }
           });
       },

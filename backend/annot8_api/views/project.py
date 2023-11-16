@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
+from django_q.tasks import async_task
 
 from rest_framework import status
 from rest_framework.decorators import action
@@ -38,9 +39,7 @@ class ProjectViewSet(base.BaseViewSet):
     def crops(self, request, pk=None):
         project = self.get_object()
 
-        boxes = api_models.BoundingBox.objects.filter(
-            described_file__project=project.id
-        )
+        boxes = project.boxes
         files = project.files
 
         boxes_ser = serializers.BoundingBoxSerializer(boxes, many=True)
@@ -111,6 +110,17 @@ class ProjectViewSet(base.BaseViewSet):
         project.reload_detector()
         print("Selected detector " + project.detector)
         return Response({'status': 'Detector selected'})
+
+    @action(detail=True, methods=["post"], url_path="run_detector")
+    def run_detector(self, request, pk=None):
+        project = self.get_object()
+
+        files = project.files.all()
+        # n_files = project.files.count()
+        for n, file in enumerate(files, 1):
+            async_task(file.detect_boxes)
+
+        return Response({'status': 'Pipeline started'})
 
 
     @action(detail=True, methods=["post"], url_path="collaborator")
