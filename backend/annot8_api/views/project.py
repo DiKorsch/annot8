@@ -84,7 +84,7 @@ class ProjectViewSet(base.BaseViewSet):
         if classifier is None:
             return Response({"status": "Classifier missing"},
                 status=status.HTTP_400_BAD_REQUEST)
-        if classifier not in project.classifiers():
+        if classifier not in api_models.Project.classifiers:
             return Response({"status": "Classifier name is invalid"},
                 status=status.HTTP_400_BAD_REQUEST)
 
@@ -102,7 +102,7 @@ class ProjectViewSet(base.BaseViewSet):
         if detector is None:
             return Response({"status": "Detector missing"},
                 status=status.HTTP_400_BAD_REQUEST)
-        if detector not in api_models.Project.detectors():
+        if detector not in api_models.Project.detectors:
             return Response({"status": "Detector name is invalid"},
                 status=status.HTTP_400_BAD_REQUEST)
 
