@@ -21,7 +21,6 @@ class BBoxViewSet(BaseViewSet):
     def update(self, request, pk=None, *args, **kwargs):
         bbox = self.get_object()
         data = [request.data.get(arg) for arg in ["x", "y", "width", "height"]]
-        print(bbox.x, bbox.y, bbox.width, bbox.height)
 
         if None in data:
             return Response({"status": "Argument for bbox update missing"},
@@ -32,8 +31,7 @@ class BBoxViewSet(BaseViewSet):
             print(e)
             return Response({"status": str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        print(data, bbox.x, bbox.y, bbox.width, bbox.height)
-        return Response({'status': 'foo'})
+        return Response({'status': 'BoundingBox updated'})
 
     @action(detail=True, methods=["post"], url_path="predict")
     def predict(self, request, pk=None):

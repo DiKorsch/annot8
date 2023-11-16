@@ -1,7 +1,9 @@
+import logging
 import numpy as np
 
 
 from PIL import Image
+from django.dispatch import receiver
 from django.contrib.auth.models import User
 from django.db import models
 from pathlib import Path
@@ -10,6 +12,8 @@ from annot8_api.models import base
 from annot8_api import models as api_models
 
 class BoundingBox(base.DescribableObject):
+    __name__ = "BoundingBox"
+
     described_file = models.ForeignKey(
         api_models.File,
         on_delete=models.CASCADE,
@@ -38,6 +42,7 @@ class BoundingBox(base.DescribableObject):
         "y",
         "width",
         "height",
+        "crops"
     ]
 
     @property
@@ -47,6 +52,78 @@ class BoundingBox(base.DescribableObject):
     @property
     def center(self) -> (float, float):
         return self.x + self.width/2, self.y + self.height/2
+
+    @property
+    def crops(self):
+        crops = {}
+
+        try:
+            folder = self.crop_folder
+            url = self.crop_url
+            name = self.crop_fname
+
+            if (folder / name).exists():
+                crops["original"] = str(url / name)
+
+            for th_name, _ in api_models.File.THUMBNAILS:
+
+                crop = folder / th_name / name
+                if crop.exists():
+                    crops[th_name] = str(url / th_name / name)
+        except Exception as e:
+            logging.error(str(e))
+        return crops
+
+    @property
+    def crop_folder(self):
+        fobj = self.described_file
+        path = Path(fobj.path.path)
+        return path.parent / "crops" / path.stem
+
+    @property
+    def crop_url(self):
+        fobj = self.described_file
+        path = Path(fobj.path.url)
+        return path.parent / "crops" / path.stem
+
+    @property
+    def crop_fname(self):
+        fobj = self.described_file
+        path = Path(fobj.path.path)
+        return f"{path.stem}_{self.id:08d}{path.suffix}"
+
+    def remove_crops(self):
+
+        folder = self.crop_folder
+        name = self.crop_fname
+        (folder / name).unlink(missing_ok=True)
+        for th_name, size in api_models.File.THUMBNAILS:
+            (folder / th_name / name).unlink(missing_ok=True)
+
+
+    def create_crops(self):
+
+        folder = self.crop_folder
+        name = self.crop_fname
+
+        with self.described_file.load_image() as im:
+            W, H = im.size
+            x0, y0 = self.x * W, self.y * H
+            x1, y1 = x0 + self.width * W, y0 + self.height * H
+
+            crop = im.crop(box=(x0, y0, x1, y1))
+            folder.mkdir(exist_ok=True, parents=True)
+            crop.save(folder / name)
+
+            w, h = crop.size
+            for th_name, size in api_models.File.THUMBNAILS:
+                ratio = size / W
+                new_size = int(ratio * w), int(ratio * h)
+                thumb = crop.resize(new_size)
+
+                dest = folder / th_name / name
+                dest.parent.mkdir(exist_ok=True, parents=True)
+                thumb.save(dest)
 
     def update(self, x: float, y: float, width: float, height: float, user: User, label=None):
 
@@ -58,8 +135,6 @@ class BoundingBox(base.DescribableObject):
         self.y = y
         self.width = width
         self.height = height
-
-        # if label
 
         self.save()
 
@@ -112,3 +187,13 @@ class BoundingBox(base.DescribableObject):
         )
 
         return bbox
+
+
+@receiver(models.signals.post_save, sender=BoundingBox)
+def create_crops(sender, instance, created, raw, update_fields, **kwargs):
+    if not raw:
+        instance.create_crops()
+
+@receiver(models.signals.pre_delete, sender=BoundingBox)
+def remove_crops(sender, instance, **kwargs):
+    instance.remove_crops()

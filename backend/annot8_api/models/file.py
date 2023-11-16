@@ -7,6 +7,7 @@ from django.core.files.uploadedfile import UploadedFile
 from django.db import models
 from django.dispatch import receiver
 from django_q.tasks import async_task
+from contextlib import contextmanager
 from tqdm.auto import tqdm
 
 from PIL import Image
@@ -96,16 +97,20 @@ class File(base.DescribableObject):
 
         return file
 
+    @contextmanager
+    def load_image(self):
+        with Image.open(Path(self.path.path)) as im:
+            yield im
+
     def as_numpy(self):
-        path = Path(self.path.path)
-        with Image.open(path) as im:
+        with self.load_image() as im:
             return np.asarray(im)
 
     def create_thumbnails(self):
         path = Path(self.path.path)
         folder = path.parent / "thumbs"
         name = path.name
-        with Image.open(path) as im:
+        with self.load_image() as im:
             for th_name, size in self.THUMBNAILS:
                 dest = folder / th_name / name
 
@@ -126,8 +131,6 @@ class File(base.DescribableObject):
         if detector is None:
             logging.error(f"Project {project.id} does not have a detector")
             return
-            # return Response({"status": "Project does not have a detector"},
-            #     status=status.HTTP_400_BAD_REQUEST)
 
         # Remove all prior pipeline-generated bounding boxes.
         api_models.BoundingBox.objects.filter(described_file=self, pipeline_generated=True).delete()

@@ -66,20 +66,21 @@ class Project(base.BaseModel):
     ]
 
     def reload_detector(self):
-        if not self.detector is None:
-            for det in BaseDetector.__subclasses__():
-                if det.name == self.detector:
-                    self.det = det()
-                    return
+        if self.detector is None:
+            return
+
+        for det in BaseDetector.__subclasses__():
+            if det.name == self.detector:
+                return det()
         self.det = None
 
     def get_detector(self):
         if not hasattr(self, "det"):
-            self.reload_detector()
+            return self.reload_detector()
         return self.det
 
     def reload_classifier(self):
-        if not self.classifier is None:
+        if self.classifier is not None:
             for cls in BaseClassifier.__subclasses__():
                 if cls.name == self.classifier:
                     self.cls = cls()
