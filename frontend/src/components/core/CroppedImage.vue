@@ -1,15 +1,15 @@
 <template>
   <div>
-  <v-row>
-    <v-col>Quality:</v-col>
-    <v-col class="text-right">
-      <v-btn-toggle
-          v-model="thumbSize"
-          color="deep-purple accent-3"
-          group
-          dense
-          mandatory
-        >
+    <v-row v-if="qualitySelector">
+      <v-col>Quality:</v-col>
+      <v-col class="text-right">
+        <v-btn-toggle
+            v-model="thumbSize"
+            color="deep-purple accent-3"
+            group
+            dense
+            mandatory
+          >
           <v-btn
             v-for="size in thumbSizes"
             :key="size.key"
@@ -45,6 +45,10 @@ export default {
     initialThumbSize: {
       type: String,
       default: "large"
+    },
+    qualitySelector: {
+      type: Boolean,
+      default: true
     }
   },
 

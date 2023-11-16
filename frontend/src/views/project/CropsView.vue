@@ -26,15 +26,17 @@
                 :file="file(boxId)"
                 :box="box(boxId)"
                 initialThumbSize="original"
+                :qualitySelector="false"
               >
-              <v-chip label small
-              :to="{
-                name: 'annotate',
-                params: {fileId: file(boxId).id},
-                query: {showInfo: boxId}}"  >
-                Go to {{file(boxId).name}}
-              </v-chip>
-                          </core-CroppedImage>
+                <v-chip label small
+                  :to="{
+                    name: 'annotate',
+                    params: {fileId: file(boxId).id},
+                    query: {showInfo: boxId}}"
+                  >
+                  Go to {{file(boxId).name}}
+                </v-chip>
+              </core-CroppedImage>
           </v-col>
         </v-row>
         <core-CustomPaginator v-model="selectedTrack" :length="tracks.length"/>
