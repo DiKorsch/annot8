@@ -72,11 +72,21 @@ export default {
   computed: {
     ...mapGetters(['getMediaUrl']),
 
-    thumb: function() {
+    hasCrops: function() {
+      let boxThumbs = this.box?.crops;
+      return boxThumbs !== undefined && boxThumbs[this.thumbSize] !== undefined
+    },
 
-      let thumbs = this.file?.thumbs;
-      if (thumbs !== undefined && thumbs[this.thumbSize] !== undefined )
-        return thumbs[this.thumbSize]
+    thumb: function() {
+      console.log(this.box?.crops)
+      let boxThumbs = this.box?.crops;
+      if (boxThumbs !== undefined && boxThumbs[this.thumbSize] !== undefined )
+        return boxThumbs[this.thumbSize]
+
+
+      let fileThumbs = this.file?.thumbs;
+      if (fileThumbs !== undefined && fileThumbs[this.thumbSize] !== undefined )
+        return fileThumbs[this.thumbSize]
 
 
       return this.file.url;
@@ -90,12 +100,19 @@ export default {
       if (this.box === undefined)
         return {}
 
-      let coords = this.coordinates();
+      if (!this.hasCrops){
+        let coords = this.coordinates();
+
+        return {
+          "object-view-box": `inset(${coords.y0}% ${coords.x1}% ${coords.y1}% ${coords.x0}%)`,
+          "background-image": `url(${this.src})`,
+        }
+      }
 
       return {
-        "object-view-box": `inset(${coords.y0}% ${coords.x1}% ${coords.y1}% ${coords.x0}%)`,
         "background-image": `url(${this.src})`,
       }
+
     },
 
   },

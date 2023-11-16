@@ -28,5 +28,7 @@ export default class BBox {
       this.predicted_label = null;
       this.prediction_model = null;
     }
+
+    this.crops = data.crops;
   }
 }
