@@ -15,8 +15,9 @@
     </v-row>
 
     <v-card align="center" v-if="boxes.length != 0">
-      <v-container >
-        <!-- <core-CustomPaginator v-model="selectedTrack" :length="tracks.length"/> -->
+      <v-container>
+        <core-CustomPaginator v-model="selectedTrack" :length="tracks.length"/>
+        <h4 v-if="currentTrack !== undefined">{{ currentTrack.length }} Crops</h4>
         <v-row>
           <v-col
             v-for="(boxId, k) in currentTrack"
