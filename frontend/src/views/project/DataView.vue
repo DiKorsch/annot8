@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid>
+  <v-container fluid v-if="project !== undefined">
     <v-row>
       <v-col :cols=10>
         <h1>Data</h1>
@@ -14,7 +14,7 @@
     <v-card>
       <v-card-title
         id="uploader-header"
-        @click="showUploader = !showUploader"
+        @click="localShowUploader = !localShowUploader"
         >
         Data Upload
         <v-spacer/>
@@ -81,16 +81,16 @@
 
 <script>
 import DataService from '@/services/data.service';
+import { mapGetters } from 'vuex';
 
 export default {
 
   data: () => ({
-    files: [],
     page: 1,
     deleteDialog: false,
     fileToDelete: undefined,
 
-    showUploader: true,
+    localShowUploader: false,
   }),
 
   props: {
@@ -101,12 +101,22 @@ export default {
   },
 
   computed: {
+    ...mapGetters({
+      project: 'getCurrentProject',
+      files: 'getProjectFiles',
+    }),
+
+    showUploader:{
+      set(value){this.localShowUploader = value },
+      get() {return this.files?.length===0 || this.localShowUploader}
+    },
+
     projectId() {
-      return this.$route.params.id;
+      return this.project?.id;
     },
 
     nPages: function() {
-      return Math.ceil(this.files.length / this.elementsPerPage)
+      return Math.ceil((this.files?.length || 0) / this.elementsPerPage)
     },
 
     queryPage: function (){
@@ -126,11 +136,6 @@ export default {
     }
   },
 
-
-  created() {
-    this.getFiles();
-  },
-
   watch: {
 
     page: function(newVal){
@@ -138,7 +143,7 @@ export default {
       if (this.queryPage === newVal)
         return;
 
-      this.$router.replace({
+      this.$router.push({
         name: 'data',
         params: {id: this.projectId},
         query: {page: newVal}
@@ -159,15 +164,6 @@ export default {
           this.page = Math.min(this.nPages, this.page+1);
           break;
       }
-    },
-
-    getFiles(){
-      DataService.files.get(this.projectId)
-        .then((files) => {
-          this.files = files;
-          this.page = Math.min(this.queryPage, this.nPages) ;
-          this.showUploader = files.length === 0;
-        })
     },
 
     deleteFile(file){

@@ -2,38 +2,54 @@
   <v-col :cols="cols">
     <v-card
       outlined
-      :elevation="selected ? 10 : 2"
+      elevation="2"
       class="mx-auto"
-      @click="select"
       >
-      <v-card-title>Name: {{project.name}}</v-card-title>
+      <v-card-title>{{project.name}}</v-card-title>
+      <v-card-subtitle>{{project.description}}</v-card-subtitle>
       <v-card-text>
-          <p>Desc: {{project.description}}</p>
-          <!-- <p>Root: {{projec.rootFolder}}</p> -->
-          <p>UUID: {{project.uuid}}</p>
-      </v-card-text>
-      <v-card-actions v-if="selected" class="justify-center">
-        <v-btn-toggle>
-          <v-tooltip
-            v-for="(action, index) in actions"
-            :key="index"
-            top
-          >
-            <template v-slot:activator="{ on, attrs }">
-              <v-btn
-                :to="{name: action.dest, params: {id: project.id}}"
-                v-bind="attrs"
-                v-on="on"
+        <v-row dense>
+          <v-col cols=6>
+            <v-row>
+              <v-col>
+                 Uploaded Files
+              </v-col>
+              <v-col align="right">
+                <v-chip small>{{project.stats.nFiles}}</v-chip>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col>
+                 Annotated boxes
+              </v-col>
+              <v-col align="right">
+                <v-chip small>{{project.stats.nBoxes}}</v-chip>
+              </v-col>
+            </v-row>
+          </v-col>
+          <v-col cols=6 align="right">
+            <v-btn-toggle>
+              <v-tooltip
+                v-for="(action, index) in actions"
+                :key="index"
+                top
               >
-                 <v-icon center>{{action.icon}}</v-icon>
-              </v-btn>
-            </template>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    :to="{name: action.dest, params: {id: project.id}}"
+                    v-bind="attrs"
+                    v-on="on"
+                  >
+                     <v-icon center>{{action.icon}}</v-icon>
+                  </v-btn>
+                </template>
 
-            <span>{{action.text}}</span>
-          </v-tooltip>
-
-        </v-btn-toggle>
-      </v-card-actions>
+                <span>{{action.text}}</span>
+              </v-tooltip>
+            </v-btn-toggle>
+          </v-col>
+        </v-row>
+      </v-card-text>
     </v-card>
   </v-col>
 </template>
@@ -67,8 +83,6 @@ export default {
       new Action(
         "Annotate Crops", "mdi-checkbox-multiple-blank-outline", "crops"),
       new Action(
-        "Show Labels", "mdi-label-multiple", "labels"),
-      new Action(
         "Settings", "mdi-cog", "project"),
     ])
   },
@@ -83,15 +97,6 @@ export default {
       default: 12,
     },
   },
-
-  methods: {
-    select: function(){
-      // this way, we can toggle between selected and unselected
-      var arg = this.selected ? undefined : this.project.id;
-      this.$emit('selected', arg);
-
-    }
-  }
 }
 </script>
 

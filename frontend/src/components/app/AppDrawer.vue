@@ -44,12 +44,10 @@
     <v-divider></v-divider>
 
     <v-list v-if="loggedIn" >
-      <div
-        v-for="link in getActiveLinks"
-        :key="link.id"
-      >
+      <div>
         <v-list-item
-          v-if="project!==undefined"
+          v-for="link in nonProjectLinks"
+          :key="link.id"
           :to="link.url(project)"
           link
         >
@@ -63,11 +61,8 @@
 
 
         </v-list-item>
-
-        <div v-if="project !== undefined && !link.projectMenu && isProjectViewActive">
-
+        <div v-if="project !== undefined && isProjectViewActive">
           <v-divider></v-divider>
-
           <v-list-item>
             <v-list-item-content>
               <v-select
@@ -77,11 +72,26 @@
                 item-value="id"
                 label="Select project"
                 prepend-icon="mdi-book"
-                @change="selectProject"
               ></v-select>
             </v-list-item-content>
           </v-list-item>
           <v-divider></v-divider>
+          <v-list-item
+            v-for="link in projectLinks"
+            :key="link.id"
+            :to="link.url(project)"
+            link
+          >
+            <v-list-item-icon>
+              <v-icon>{{ link.icon }}</v-icon>
+            </v-list-item-icon>
+
+            <v-list-item-content>
+              <v-list-item-title>{{ link.text }}</v-list-item-title>
+            </v-list-item-content>
+
+
+          </v-list-item>
         </div>
       </div>
     </v-list>
@@ -93,21 +103,20 @@
 import { mapGetters } from 'vuex'
 import { v4 as uuidv4 } from 'uuid';
 import DataService from '@/services/data.service';
-import store from '@/store'
+// import store from '@/store'
 
 class MenuItem {
-  constructor(text, icon, dest, projectMenu=false, requiresReload=false, route_name=null){
+  constructor(text, icon, dest, projectMenu=false, route_name=null){
     this.id = uuidv4();
     this.text = text;
     this.icon = icon;
     this.dest = dest;
     this.projectMenu = projectMenu;
-    this.requiresReload = requiresReload;
     this.route_name = route_name || dest;
   }
 
   url(project){
-    if (this.projectMenu){
+    if (this.projectMenu && project !== undefined){
 
         return {name: this.dest, params: {id: project.id}}
 
@@ -132,9 +141,22 @@ export default {
       'getCurrentProject',
     ]),
 
-    getActiveLinks () {
-      return this.links.filter(this.isActive);
+    project: {
+      get: function() {
+        return this.getCurrentProject
+      },
+      set: function(projectID){
+        this.selectProject(projectID)
+      }
     },
+
+    nonProjectLinks(){
+      return this.links.filter((link) => !link.projectMenu)
+    },
+
+    projectLinks(){
+      return this.links.filter((link) => link.projectMenu)
+    }
 
   },
 
@@ -145,12 +167,16 @@ export default {
         'mdi-book-multiple',
         'projects'),
 
+      new MenuItem(
+        'Show labels',
+        'mdi-label-multiple',
+        'labels',
+      ),
 
       new MenuItem(
         'Data',
         'mdi-image-multiple-outline',
         'data',
-        true,
         true,
         ),
 
@@ -158,7 +184,6 @@ export default {
         'Annotate images',
         'mdi-image-multiple',
         'annotations',
-        true,
         true,
         'annotate'
         ),
@@ -168,15 +193,8 @@ export default {
         'mdi-checkbox-multiple-blank-outline',
         'crops',
         true,
-        true
         ),
 
-      new MenuItem(
-        'Show labels',
-        'mdi-label-multiple',
-        'labels',
-        true
-        ),
 
       new MenuItem(
         'Settings',
@@ -186,7 +204,6 @@ export default {
         ),
     ],
 
-    project: undefined,
     projects: [],
   }),
 
@@ -197,25 +214,27 @@ export default {
     },
 
     selectProject(projectID){
-      this.project = this.projects.find((proj) => proj.id == projectID);
-      store.commit('setCurrentProject', this.project);
+      let project = this.projects.find((proj) => proj.id == projectID);
+      // if (project !== undefined)
+      //   store.commit('setCurrentProject', project);
 
       let name = this.$route.name;
       let link = this.links.find((l) => l.route_name === name || l.dest === name)
 
       if(link !== undefined){
-        this.$router.push(link.url(this.project))
-        if (link.requiresReload)
-          this.$router.go()
+        this.$router.push(link.url(project))
+      //   if (link.requiresReload)
+      //     this.$router.go()
       }
     }
   },
 
-  mounted: function(){
+  created: function(){
+    console.log("ID:", this.$route.params.id)
     DataService.project.get().then(
       (projects) => {
         this.projects = projects;
-        this.project = projects.find((proj) => proj.id == this.$route.params.id);
+        // this.project = projects.find((proj) => proj.id == this.$route.params.id);
       });
   }
 }

@@ -48,7 +48,7 @@
 
 
 <script>
-import DataService from '@/services/data.service';
+import { mapGetters } from 'vuex';
 
 export default {
   name: "AnnotationsView",
@@ -61,28 +61,30 @@ export default {
       return this.$route.params.fileId;
     },
 
+    ...mapGetters({
+      project: 'getCurrentProject',
+      files: 'getProjectFiles',
+    }),
+
     selectedFile() {
       if (this.selected === undefined && this.fileId === undefined)
         return this.files[0];
-      return this.files.find(file => { return file.id == this.selected })
+      return this.files.find(file => { return file.id == this.selected }) || this.files[0]
     }
   },
 
   data: () => ({
-    files: [],
     selected: undefined,
   }),
 
-  methods: {
+  watch: {
+    files: function(newVal) {
+      if (newVal.length != 0)
+        this.select(this.selectedFile)
+    }
+  },
 
-    getFiles(){
-      DataService.files.get(this.projectId)
-        .then((files) => {
-          this.files = files;
-          if (files.length != 0)
-            this.select(this.selectedFile)
-        })
-    },
+  methods: {
 
     select(image) {
       if (image === undefined){
@@ -104,7 +106,6 @@ export default {
   },
 
   created() {
-    this.getFiles();
     if (this.fileId != undefined)
       this.selected = Number(this.fileId);
   },

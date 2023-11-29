@@ -229,7 +229,6 @@ class DataService {
       get: function(fileId) {
         return api.get(`/file/${fileId}/bboxes/`)
           .then((response) => {
-            console.log(response);
             return response.data.map((data) => {
               return new BBox(data);
             })

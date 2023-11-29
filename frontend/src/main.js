@@ -20,11 +20,21 @@ router.beforeEach((to, from, next) => {
 
   let isProjectView = to.matched.some(record => record.meta.projectView);
 
-  if (isProjectView)
-      DataService.project.get(to.params.id).then(
+  if (isProjectView){
+
+    let projectID = to.params.id;
+    if (store.state.currentProject?.id != projectID)
+      DataService.project.get(projectID).then(
         (project) => {
           store.commit('setCurrentProject', project);
+
+          DataService.files.get(project.id).then(
+            (files) => {
+              store.commit('setProjectFiles', files)
+            }
+          )
         })
+  }
   else
     store.commit('setCurrentProject', undefined);
 

@@ -22,7 +22,7 @@
           <v-col
             v-for="(boxId, k) in currentTrack"
             :key="k"
-            class="col-3 d-flex child-flex">
+            class="col-2 d-flex child-flex">
               <core-CroppedImage
                 :file="file(boxId)"
                 :box="box(boxId)"

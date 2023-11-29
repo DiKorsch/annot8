@@ -72,6 +72,11 @@ export default new VueRouter({
             component: CreateProject,
         },
         {
+          path: '/labels',
+          name: 'labels',
+          component: Labels
+        },
+        {
             path: '/project/:id',
             component: BaseProject,
             meta: {
@@ -83,11 +88,6 @@ export default new VueRouter({
                 path: 'info',
                 name: 'project',
                 component: ShowProject
-              },
-              {
-                path: 'labels',
-                name: 'labels',
-                component: Labels
               },
               {
                 path: 'data',
