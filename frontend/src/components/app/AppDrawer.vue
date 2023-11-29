@@ -49,7 +49,8 @@
         :key="link.id"
       >
         <v-list-item
-          :to="link.url(getCurrentProject)"
+          v-if="project!==undefined"
+          :to="link.url(project)"
           link
         >
           <v-list-item-icon>
@@ -63,19 +64,24 @@
 
         </v-list-item>
 
-        <div v-if="!link.projectMenu && isProjectViewActive">
+        <div v-if="project !== undefined && !link.projectMenu && isProjectViewActive">
 
-        <v-divider></v-divider>
+          <v-divider></v-divider>
 
-        <v-list-item>
-          <v-list-item-content>
-            <v-chip outlined pill>
-              <v-icon left>mdi-book</v-icon>
-              {{ getCurrentProject.name }}
-            </v-chip>
-          </v-list-item-content>
-        </v-list-item>
-        <v-divider></v-divider>
+          <v-list-item>
+            <v-list-item-content>
+              <v-select
+                v-model="project"
+                :items="projects"
+                item-text="name"
+                item-value="id"
+                label="Select project"
+                prepend-icon="mdi-book"
+                @change="selectProject"
+              ></v-select>
+            </v-list-item-content>
+          </v-list-item>
+          <v-divider></v-divider>
         </div>
       </div>
     </v-list>
@@ -86,14 +92,18 @@
 <script>
 import { mapGetters } from 'vuex'
 import { v4 as uuidv4 } from 'uuid';
+import DataService from '@/services/data.service';
+import store from '@/store'
 
 class MenuItem {
-  constructor(text, icon, dest, projectMenu=false){
+  constructor(text, icon, dest, projectMenu=false, requiresReload=false, route_name=null){
     this.id = uuidv4();
     this.text = text;
     this.icon = icon;
     this.dest = dest;
     this.projectMenu = projectMenu;
+    this.requiresReload = requiresReload;
+    this.route_name = route_name || dest;
   }
 
   url(project){
@@ -120,7 +130,6 @@ export default {
     ...mapGetters([
       'isProjectViewActive',
       'getCurrentProject',
-
     ]),
 
     getActiveLinks () {
@@ -132,7 +141,7 @@ export default {
   data: () => ({
     links: [
       new MenuItem(
-        'My Projects',
+        'Projects',
         'mdi-book-multiple',
         'projects'),
 
@@ -141,20 +150,24 @@ export default {
         'Data',
         'mdi-image-multiple-outline',
         'data',
-        true
+        true,
+        true,
         ),
 
       new MenuItem(
         'Annotate images',
         'mdi-image-multiple',
         'annotations',
-        true
+        true,
+        true,
+        'annotate'
         ),
 
       new MenuItem(
         'Annotate crops',
         'mdi-checkbox-multiple-blank-outline',
         'crops',
+        true,
         true
         ),
 
@@ -166,21 +179,45 @@ export default {
         ),
 
       new MenuItem(
-        'Options',
+        'Settings',
         'mdi-cog',
         'project',
         true
         ),
     ],
+
+    project: undefined,
+    projects: [],
   }),
 
 
   methods: {
     isActive(link) {
       return !link.projectMenu || (this.isProjectViewActive && link.projectMenu)
-    }
-  }
+    },
 
+    selectProject(projectID){
+      this.project = this.projects.find((proj) => proj.id == projectID);
+      store.commit('setCurrentProject', this.project);
+
+      let name = this.$route.name;
+      let link = this.links.find((l) => l.route_name === name || l.dest === name)
+
+      if(link !== undefined){
+        this.$router.push(link.url(this.project))
+        if (link.requiresReload)
+          this.$router.go()
+      }
+    }
+  },
+
+  mounted: function(){
+    DataService.project.get().then(
+      (projects) => {
+        this.projects = projects;
+        this.project = projects.find((proj) => proj.id == this.$route.params.id);
+      });
+  }
 }
 
 </script>

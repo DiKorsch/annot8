@@ -12,19 +12,27 @@
           <!-- <p>Root: {{projec.rootFolder}}</p> -->
           <p>UUID: {{project.uuid}}</p>
       </v-card-text>
-      <v-card-actions v-if="selected" align="right">
-        <v-list-item class="grow">
-          <v-row align="center" justify="end">
-            <v-btn text
-              v-for="(action, index) in actions" :key="index"
-              color="primary"
-              :to="{name: action.dest, params: {id: project.id}}"
-            >
-               <v-icon left>{{action.icon}}</v-icon>
-               {{action.text}}
-            </v-btn>
-          </v-row>
-        </v-list-item>
+      <v-card-actions v-if="selected" class="justify-center">
+        <v-btn-toggle>
+          <v-tooltip
+            v-for="(action, index) in actions"
+            :key="index"
+            top
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                :to="{name: action.dest, params: {id: project.id}}"
+                v-bind="attrs"
+                v-on="on"
+              >
+                 <v-icon center>{{action.icon}}</v-icon>
+              </v-btn>
+            </template>
+
+            <span>{{action.text}}</span>
+          </v-tooltip>
+
+        </v-btn-toggle>
       </v-card-actions>
     </v-card>
   </v-col>
@@ -53,13 +61,15 @@ export default {
 
     actions: () => ([
       new Action(
-        "Options", "mdi-cog", "project"),
+        "Manage Data", "mdi-image-multiple-outline", "data"),
       new Action(
-        "Data", "mdi-image-multiple", "data"),
+        "Annotate Images", "mdi-image-multiple", "annotations"),
       new Action(
-        "Labels", "mdi-label-multiple", "labels"),
+        "Annotate Crops", "mdi-checkbox-multiple-blank-outline", "crops"),
       new Action(
-        "Annotate", "mdi-pencil", "annotations"),
+        "Show Labels", "mdi-label-multiple", "labels"),
+      new Action(
+        "Settings", "mdi-cog", "project"),
     ])
   },
 

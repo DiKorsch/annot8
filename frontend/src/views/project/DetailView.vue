@@ -2,7 +2,7 @@
   <v-container fluid>
     <v-row>
       <v-col :cols=8>
-        <h1>Project Information</h1>
+        <h1>Project Settings</h1>
       </v-col>
       <v-col :cols=4 align="right">
         <v-btn :to = "{ name: 'projects' }" color="accent">
