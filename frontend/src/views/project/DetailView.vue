@@ -208,10 +208,11 @@
 
     methods: {
       runDetector() {
+        this.$store.dispatch("messages/info", {msg: "Detector started"})
         DataService.detector.run(this.projectId)
           .then((ok) => {
             if(!ok)
-              console.error("COULD NOT RUN DETECTOR!")
+              this.$store.dispatch("messages/error", {msg: "Detector failed"})
           })
       },
       deleteProj () {
