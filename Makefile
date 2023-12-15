@@ -40,3 +40,6 @@ backend_coverage:
 backend_pylint:
 	@echo "BACKEND PYLINT MISSING!"
 
+start_screen:
+	screen -dmS annot8 -c scripts/screen/rc
+

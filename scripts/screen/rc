@@ -1,0 +1,11 @@
+
+chdir backend
+screen -t backend ../scripts/screen/backend.sh runserver
+screen -t qcluster ../scripts/screen/backend.sh qcluster
+
+chdir ../frontend
+screen -t frondend npm run serve
+
+# Statuszeile
+caption always "%{= wk} %-w%{= KW} [%n %t] %{-}%+w %= | @%H | %l | %Y-%m-%d %c "
+

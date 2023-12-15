@@ -10,6 +10,7 @@ django_polymorphic
 
 Pillow~=9.1
 opencv-python-headless
+scipy
 
 django-labeltree
 
