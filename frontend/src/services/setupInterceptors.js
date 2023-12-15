@@ -48,7 +48,7 @@ const setup = (store) => {
         }
       } else if (originalConfig.url === "/api-token-refresh/"){
         console.log("[API Interceptor response] Error during token refersh:", err)
-        store.dispatch("messages/error", `Error occured during token refresh: ${err}`)
+        store.dispatch("messages/error", {msg: `Error occured during token refresh: ${err}`})
       }
 
       return Promise.reject(err);

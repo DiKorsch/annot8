@@ -1,9 +1,8 @@
 class Message {
-  constructor(content, level, timeout = 5000){
-    console.log("[Messages] New message created:", level, content)
+  constructor(content, level, timeout){
     this.content = content
     this.level = level
-    this.timeout = timeout
+    this.timeout = timeout === undefined ? 3000 : timeout;
   }
 }
 
@@ -18,16 +17,16 @@ export const messages = {
   },
 
   actions: {
-    info({commit}, content){
-      commit("newMessage", new Message(content, "info"))
+    info({commit}, {msg, timeout}){
+      commit("newMessage", new Message(msg, "info", timeout))
     },
 
-    alert({commit}, content){
-      commit("newMessage", new Message(content, "alert"))
+    alert({commit}, {msg, timeout}){
+      commit("newMessage", new Message(msg, "alert", timeout))
     },
 
-    error({commit}, content){
-      commit("newMessage", new Message(content, "error"))
+    error({commit}, {msg, timeout}){
+      commit("newMessage", new Message(msg, "error", timeout))
     },
 
 
