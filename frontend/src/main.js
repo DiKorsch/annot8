@@ -23,10 +23,10 @@ router.beforeEach((to, from, next) => {
   if (isProjectView){
 
     let projectID = to.params.id;
-    if (store.state.currentProject?.id != projectID)
+    if (isLoggedIn && store.state.currentProject?.id != projectID){
       console.log("[main.js] current project changed; changing currentProject from",
         store.state.currentProject?.id, "to", projectID
-        )
+      )
       DataService.project.get(projectID).then(
         (project) => {
           store.commit('setCurrentProject', project);
@@ -37,8 +37,8 @@ router.beforeEach((to, from, next) => {
             }
           )
         })
-  }
-  else {
+    }
+  } else {
     console.log("[main.js] not in a project view; unsetting currentProject")
     store.commit('setCurrentProject', undefined);
   }

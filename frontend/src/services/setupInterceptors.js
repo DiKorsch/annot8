@@ -7,6 +7,7 @@ const setup = (store) => {
     (config) => {
       // This adds to each request an access token
       const token = TokenService.getLocalAccessToken();
+
       if (token)
         config.headers["Authorization"] = `Bearer ${token}`
 
@@ -47,6 +48,7 @@ const setup = (store) => {
         }
       } else if (originalConfig.url === "/api-token-refresh/"){
         console.log("[API Interceptor response] Error during token refersh:", err)
+        store.dispatch("messages/error", `Error occured during token refresh: ${err}`)
       }
 
       return Promise.reject(err);

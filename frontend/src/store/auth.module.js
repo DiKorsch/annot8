@@ -46,16 +46,19 @@ export const auth = {
       console.log("[Store Auth] login success:", tokens)
       state.loggedIn = true;
       state.tokens = tokens;
+      this.dispatch("messages/info", `Logged in as ${tokens.username}`)
     },
     loginFailure(state) {
       console.log("[Store Auth] login failure!")
       state.loggedIn = false;
       state.tokens = null;
+      this.dispatch("messages/alert", "Logged failed!")
     },
     logout(state) {
       console.log("[Store Auth] logged out!")
       state.loggedIn = false;
       state.tokens = null;
+      this.dispatch("messages/info", "Logged out")
     },
     refreshToken(state, access) {
       console.log("[Store Auth] refreshing access token:", access)

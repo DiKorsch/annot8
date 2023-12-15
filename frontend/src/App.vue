@@ -8,7 +8,7 @@
       </v-container>
     </v-main>
 
-    <!-- <app-AppFooter/> -->
+    <app-SnackBar/>
   </v-app>
 </template>
 

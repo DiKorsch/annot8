@@ -100,10 +100,9 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 import { v4 as uuidv4 } from 'uuid';
 import DataService from '@/services/data.service';
-import store from '@/store'
 
 class MenuItem {
   constructor(text, icon, dest, projectMenu=false, route_name=null){
@@ -209,6 +208,8 @@ export default {
 
 
   methods: {
+    ...mapActions("messages", ["info", "alert", "error"]),
+
     isActive(link) {
       return !link.projectMenu || (this.isProjectViewActive && link.projectMenu)
     },
@@ -230,7 +231,8 @@ export default {
   },
 
   created: function(){
-    if(!store.state.auth.loggedIn)
+
+    if(!this.loggedIn)
       return;
     console.log("[AppDrawer] project ID:", this.$route.params.id)
     DataService.project.get().then(

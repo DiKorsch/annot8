@@ -3,6 +3,7 @@ import Vuex from 'vuex';
 
 import { auth } from './auth.module';
 import { data } from './data.module';
+import { messages } from './messages.module';
 
 Vue.use(Vuex);
 
@@ -51,5 +52,6 @@ export default new Vuex.Store({
   modules: {
     auth,
     data,
+    messages,
   }
 });
