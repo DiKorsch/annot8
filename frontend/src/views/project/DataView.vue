@@ -1,5 +1,11 @@
 <template>
   <v-container fluid v-if="project !== undefined">
+    <dialogs-ImageDelete
+      :file="fileToDelete"
+      @close="fileToDelete = undefined"
+      @confirm="confirmFileDelete($event)"
+    />
+
     <v-row>
       <v-col :cols=10>
         <h1>Data</h1>
@@ -25,7 +31,7 @@
         <core-ImageUploader
           v-if="showUploader"
           :multiple="true"
-          @uploaded="$router.go()"
+          @uploaded="$store.commit('fileUploaded', $event)"
         />
 
       </v-card-text>
@@ -39,11 +45,11 @@
           <v-col
             v-for="file in currentFiles"
             :key="file.id"
-            class="col-6 col-lg-4 d-flex child-flex"
+            class="col-auto col-lg-3 d-flex child-flex"
           >
             <core-FileInfo
               :file="file"
-              @delete="deleteFile"
+              @delete="fileToDelete = file"
             />
           </v-col>
 
@@ -52,28 +58,6 @@
 
       </v-card-text>
     </v-card>
-
-
-
-    <!-- Image deletion Dialog -->
-    <v-dialog v-model="deleteDialog" width="600">
-      <v-card>
-        <core-LazyImage :file="fileToDelete" />
-        <v-card-title class="grey lighten-2">
-          Do you wish to delete file
-          <span class="mx-1" v-if="fileToDelete !== undefined">
-            <b>{{ fileToDelete.name }}</b>
-          </span>?
-        </v-card-title>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn @click="deleteDialog = false">No</v-btn>
-          <v-btn color="error" @click="deleteFileConfirmed">Yes</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-    <!-- End Image deletion Dialog -->
-
 
     <utils-KeypressHandler @pressed="handleKeyPress($event)"/>
   </v-container>
@@ -96,7 +80,7 @@ export default {
   props: {
     elementsPerPage: {
       type: Number,
-      default: 6
+      default: 8
     },
   },
 
@@ -166,17 +150,16 @@ export default {
       }
     },
 
-    deleteFile(file){
-      this.deleteDialog = true;
-      this.fileToDelete = file;
-    },
-
-    deleteFileConfirmed(){
-      this.deleteDialog = false;
-      DataService.files.delete(this.fileToDelete?.id);
+    confirmFileDelete(file){
+      DataService.files.delete(file?.id)
+        .then((ok) => {
+          if(!ok)
+            this.$store.dispatch("messages/error",
+              {msg: `Could not delete ${file.name}!`})
+          else
+            this.$store.commit("fileDeleted", file)
+        });
       this.fileToDelete = undefined;
-      this.$router.go(); // reload current view
-
     },
   }
 };

@@ -58,13 +58,14 @@ class ProjectViewSet(base.BaseViewSet):
         project = self.get_object()
 
         try:
-            api_models.File.create(request.FILES['file'], project)
+            file = api_models.File.create(request.FILES['file'], project)
         except Exception as e:
             print(e)
             return Response({"status": str(e)},
                 status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response({'status': 'File uploaded'})
+            serializer = serializers.FileSerializer(file)
+            return Response(serializer.data)
 
     @action(detail=True)
     def files(self, request, pk=None):

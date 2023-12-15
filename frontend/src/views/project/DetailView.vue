@@ -177,7 +177,6 @@
 
     data: () => ({
       proj_delete_dialog: false,
-      project: undefined,
       selectedClassifier: '',
       selectedDetector: '',
     }),
@@ -188,6 +187,10 @@
         'username',
       ]),
 
+      ...mapGetters({
+        project: 'getCurrentProject',
+      }),
+
       isOwner(){
         return this.username == this.project.user;
       },
@@ -195,15 +198,6 @@
       projectId() {
         return this.$route.params.id;
       },
-    },
-
-    created () {
-      DataService.project.get(this.projectId)
-        .then((project) => {
-          this.project = project;
-          this.selectedClassifier = project.classifier
-          this.selectedDetector = project.detector
-        })
     },
 
     methods: {

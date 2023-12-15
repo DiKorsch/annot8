@@ -24,6 +24,25 @@ export default new Vuex.Store({
       console.log("[Store] current project:", project)
       state.currentProject = project;
     },
+
+    fileDeleted(state, file){
+      if (!state.projectFiles)
+        return
+      console.log("[Store] removing file from store:", file)
+      let i = state.projectFiles.findIndex(f => f.id == file.id);
+      if (i === undefined)
+        return
+      state.projectFiles.splice(i, 1);
+      this.dispatch("messages/info", {
+            msg: `File ${file.name} deleted`})
+    },
+
+    fileUploaded(state, file){
+      console.log("[Store] added file to store:", file)
+      state.projectFiles.push(file)
+      this.dispatch("messages/info", {
+            msg: `File ${file.name} uploaded`})
+    }
   },
 
   getters: {

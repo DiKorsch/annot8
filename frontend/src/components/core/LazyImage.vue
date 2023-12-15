@@ -3,7 +3,7 @@
       v-if="file !== undefined"
       ref="vImg"
       :src="`${getMediaUrl}${thumb}`"
-      :lazy-src="`https://via.placeholder.com/150x100/?text=Image`"
+      :lazy-src="`${getMediaUrl}${lazySrc}`"
       class="grey lighten-2"
       :max-height="maxHeight"
       :max-width="maxWidth"
@@ -55,6 +55,15 @@ export default {
         return thumbs[this.thumbSize]
 
       return this.file.url;
+    },
+
+    lazySrc: function(){
+
+      let thumbs = this.file?.thumbs;
+      if (thumbs !== undefined && thumbs["small"] !== undefined )
+        return thumbs["small"]
+
+      return "https://via.placeholder.com/150x100/?text=Image";
     },
 
     maxWidth: function() {

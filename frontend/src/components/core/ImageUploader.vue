@@ -71,6 +71,7 @@
 <script>
 const prettyBytes = require('pretty-bytes');
 import DataService from '@/services/data.service';
+import File from "@/store/models/file"
 
 export default {
   name: "UploadComponent",
@@ -164,11 +165,13 @@ export default {
 
       let i = this.uploadedFiles.indexOf(file);
 
-      if (i != -1)
+      if (i != -1){
         this.uploadedFiles.splice(i, 1)
+        this.$emit("uploaded", new File(content.data))
+      }
 
       if (this.uploadedFiles.length == 0)
-        this.$emit("uploaded")
+        this.$emit("ready")
     },
   }
 };
