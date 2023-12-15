@@ -78,7 +78,6 @@ export default {
     },
 
     thumb: function() {
-      console.log(this.box?.crops)
       let boxThumbs = this.box?.crops;
       if (boxThumbs !== undefined && boxThumbs[this.thumbSize] !== undefined )
         return boxThumbs[this.thumbSize]

@@ -88,7 +88,6 @@ class DataService {
       return api.get(url)
         .then((response) => {
           let data = response.data;
-          console.log(data)
           return {
             "files": new Map(data.files.map((file) => [file.id, new File(file)])),
             "tracks": data.tracks,

@@ -75,7 +75,8 @@
     computed: {
       loginErrors () {
         const errors = []
-        this.incorrectAuth && errors.push('Username or password are incorrect.')
+        if (this.incorrectAuth)
+          errors.push('Username or password are incorrect.')
         return errors
       },
       loggedIn() {

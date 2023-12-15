@@ -43,18 +43,22 @@ export const auth = {
   },
   mutations: {
     loginSuccess(state, tokens) {
+      console.log("[Store Auth] login success:", tokens)
       state.loggedIn = true;
       state.tokens = tokens;
     },
     loginFailure(state) {
+      console.log("[Store Auth] login failure!")
       state.loggedIn = false;
       state.tokens = null;
     },
     logout(state) {
+      console.log("[Store Auth] logged out!")
       state.loggedIn = false;
       state.tokens = null;
     },
     refreshToken(state, access) {
+      console.log("[Store Auth] refreshing access token:", access)
       state.loggedIn = true;
       state.tokens = { ...state.tokens, access: access };
     }

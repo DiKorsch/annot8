@@ -103,7 +103,7 @@
 import { mapGetters } from 'vuex'
 import { v4 as uuidv4 } from 'uuid';
 import DataService from '@/services/data.service';
-// import store from '@/store'
+import store from '@/store'
 
 class MenuItem {
   constructor(text, icon, dest, projectMenu=false, route_name=null){
@@ -230,7 +230,9 @@ export default {
   },
 
   created: function(){
-    console.log("ID:", this.$route.params.id)
+    if(!store.state.auth.loggedIn)
+      return;
+    console.log("[AppDrawer] project ID:", this.$route.params.id)
     DataService.project.get().then(
       (projects) => {
         this.projects = projects;

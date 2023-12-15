@@ -6,11 +6,12 @@ class TokenService {
 
   setTokens(tokens) {
     let tokens_str = JSON.stringify(tokens)
-    console.log("Setting token info: ", tokens_str);
+    console.log("[Token service] Setting token info in localStorage: ", tokens);
     localStorage.setItem("tokens", tokens_str);
   }
 
   removeTokens() {
+    console.log("[Token service] Removing token info from localStorage");
     localStorage.removeItem("tokens");
   }
 

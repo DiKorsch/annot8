@@ -3,8 +3,7 @@ import TokenService from "./token.service";
 
 class AuthService {
   login ({ username, password }) {
-    return api
-      .post("/api-token/", {username, password})
+    return api.post("/api-token/", {username, password})
       .then((response) => {
         if (response.data.access)
           TokenService.setTokens(response.data);
