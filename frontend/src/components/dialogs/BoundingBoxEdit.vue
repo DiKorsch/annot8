@@ -12,7 +12,9 @@
         <core-CroppedImage
           :file="file"
           :box="box"
+          :use_crops="false"
         >
+
           <core-ResizeButtons
             @increase="resize('increase', $event)"
             @decrease="resize('decrease', $event)"

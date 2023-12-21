@@ -42,6 +42,10 @@ export default {
   props: {
     file: undefined,
     box: undefined,
+    use_crops: {
+      type: Boolean,
+      default: true,
+    },
     initialThumbSize: {
       type: String,
       default: "large"
@@ -74,12 +78,12 @@ export default {
 
     hasCrops: function() {
       let boxThumbs = this.box?.crops;
-      return boxThumbs !== undefined && boxThumbs[this.thumbSize] !== undefined
+      return this.use_crops && boxThumbs !== undefined && boxThumbs[this.thumbSize] !== undefined
     },
 
     thumb: function() {
       let boxThumbs = this.box?.crops;
-      if (boxThumbs !== undefined && boxThumbs[this.thumbSize] !== undefined )
+      if (this.use_crops && boxThumbs !== undefined && boxThumbs[this.thumbSize] !== undefined )
         return boxThumbs[this.thumbSize]
 
 
