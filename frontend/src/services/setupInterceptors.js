@@ -27,7 +27,9 @@ const setup = (store) => {
       const originalConfig = err.config;
 
       // Access Token was expired
+      console.log("[API Interceptor] error for URL:", originalConfig.url)
       if (originalConfig.url !== "/api-token/"
+        && originalConfig.url !== "/api-token-refresh/"
         && err.response?.status === 401
         && !originalConfig._retry) {
 
@@ -46,9 +48,18 @@ const setup = (store) => {
 
           return Promise.reject(_error);
         }
-      } else if (originalConfig.url === "/api-token-refresh/"){
+      } else if (originalConfig.url === "/api-token-refresh/"
+        && err.response?.status === 401){
+        let data = err.response.data;
+        if (data.code === "token_not_valid"){
+          console.log("[API Interceptor response] Refresh token was invalid! Clearing all tokens.", err)
+          store.dispatch('auth/logout');
+          return Promise.resolve(err);
+        }
+
+        store.dispatch("messages/error", {msg: `Error occured during token refresh: ${data.detail}`})
         console.log("[API Interceptor response] Error during token refersh:", err)
-        store.dispatch("messages/error", {msg: `Error occured during token refresh: ${err}`})
+        return Promise.reject(err);
       }
 
       return Promise.reject(err);
