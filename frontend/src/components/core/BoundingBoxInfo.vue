@@ -4,7 +4,12 @@
     @click="$emit('select', bbox.id)"
   >
     <v-list-item-content class="label" >
-      <v-list-item-title>#{{this.bbox.id}}</v-list-item-title>
+      <v-img
+        max-height="60"
+        contain
+        :src="thumb"
+        position="center left"
+      >#{{this.bbox.id}}</v-img>
       <div v-if="this.has_label">Label: {{this.label}}</div>
       <div v-if="selected">MORE INFO</div>
     </v-list-item-content>
@@ -28,6 +33,8 @@
 
 
 <script>
+import { mapGetters } from 'vuex';
+
 export default {
   name: "BoundingBoxInfo",
   model: {prop: "bbox", event: "input"},
@@ -39,9 +46,11 @@ export default {
   data: () => ({
     selected: false,
     hidden: false,
+    thumbSize: "original"
   }),
 
   computed: {
+    ...mapGetters(['getMediaUrl']),
     localValue: {
       get: function(){ return this.bbox },
       set: function(bbox){ this.$emit('input', bbox) },
@@ -53,6 +62,15 @@ export default {
     has_label: function(){
       let lab = this.label;
       return lab !== undefined && lab !== null ;
+    },
+    thumb: function() {
+
+      let boxThumbs = this.bbox?.crops;
+      let url = ""
+      if (boxThumbs !== undefined && boxThumbs[this.thumbSize] !== undefined )
+        url = boxThumbs[this.thumbSize]
+
+      return `${this.getMediaUrl}${url}`
     }
   }
 }
@@ -74,5 +92,7 @@ export default {
 }
 .bbox-info .label {
   font-size: smaller;
+  flex-wrap: nowrap;
+  padding: 0px 0px;
 }
 </style>
