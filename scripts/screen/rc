@@ -1,6 +1,6 @@
 
 chdir backend
-screen -t backend ../scripts/screen/backend.sh runserver
+screen -t backend ../scripts/screen/backend.sh runserver 0.0.0.0:8000
 screen -t qcluster ../scripts/screen/backend.sh qcluster
 
 chdir ../frontend
