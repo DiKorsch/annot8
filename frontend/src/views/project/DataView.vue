@@ -17,7 +17,10 @@
       </v-col>
     </v-row>
 
-    <v-card>
+    <v-card
+      @dragover.prevent="localShowUploader = true"
+      @dragenter.prevent="localShowUploader = true"
+    >
       <v-card-title
         class="clickable"
         @click="localShowUploader = !localShowUploader"
@@ -29,7 +32,7 @@
       </v-card-title>
       <v-card-text>
         <core-ImageUploader
-          v-if="showUploader"
+          :class="{hidden: !showUploader}"
           :multiple="true"
           @uploaded="$store.commit('fileUploaded', $event)"
         />
@@ -135,6 +138,7 @@ export default {
       if (this.queryPage === newVal)
         return;
 
+      console.log("Going to new page", newVal)
       this.$router.push({
         name: 'data',
         params: {id: this.projectId},
@@ -176,5 +180,9 @@ export default {
 <style scoped>
   .clickable {
     cursor: pointer;
+  }
+
+  .hidden {
+    display: none;
   }
 </style>

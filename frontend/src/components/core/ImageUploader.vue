@@ -127,6 +127,8 @@ export default {
     return {
       dragover: false,
       queuedFiles: [],
+
+      state: undefined
     };
   },
 
@@ -175,6 +177,7 @@ export default {
       if (!this.queuedFiles.length > 0)
         return this.$store.dispatch("messages/error", {msg: "There are no files to upload"})
 
+      this.state = "uploading"
       this.upload(this.queuedFiles);
     },
 
@@ -219,9 +222,26 @@ export default {
       if (this.queuedFiles.every((f) => f.ready)){
         this.$store.dispatch("messages/info", {msg: "All files have been uploaded!"})
         this.$emit("ready")
-        this.queuedFiles.splice(0, this.queuedFiles.length)
+        this.state = "ready";
+        setTimeout(function(that){
+          that.state = undefined;
+          that.queuedFiles.splice(0, that.queuedFiles.length)
+        }, 2000, this);
+
       }
     },
+  },
+
+  watch: {
+    state: function(newValue, oldValue){
+      if (oldValue === newValue)
+        return
+
+      if (newValue === "uploading")
+        window.onbeforeunload = () => "Upload in progress";
+        else
+          window.onbeforeunload = null;
+    }
   }
 };
 </script>
