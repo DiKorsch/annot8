@@ -111,25 +111,32 @@ class DataService {
         });
     },
 
-    upload: function(projectId, file, callback, progress,){
+    upload: async function(projectId, queuedFile, callback, progress,){
       let data = new FormData();
+      let file = queuedFile.file;
 
       data.append('file', file);
+      // setTimeout(callback, 2000, file, false, "TESTING")
 
       let config = {
+        timeout: 0,
         headers: {'content-type': 'multipart/form-data'},
         onUploadProgress: function (progressEvent) {
           if (progress !== undefined)
-            progress(file, progressEvent);
+            progress(queuedFile, progressEvent);
         },
       }
 
-      return api.post(`project/${projectId}/file/`, data, config)
+      // console.log(data, config)
+
+      return api.post(`project/${projectId}/file/`, data, config,)
         .then((response) => {
-          callback(file, true, response);
+          callback(queuedFile, true, response);
+          return response
         })
         .catch((error) =>{
-          callback(file, false, error);
+          callback(queuedFile, false, error);
+          return error
         })
     },
 

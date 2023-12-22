@@ -26,21 +26,41 @@
           </p>
         </v-row>
         <v-virtual-scroll
-          v-if="uploadedFiles.length > 0"
-          :items="uploadedFiles"
-          height="200"
-          item-height="50"
+          v-if="queuedFiles.length > 0"
+          :items="queuedFiles"
+          height="300"
+          item-height="75"
         >
           <template v-slot:default="{ item }">
             <v-list-item :key="item.name">
               <v-list-item-content>
                 <v-list-item-title>
                   <v-row>
-                    <v-col cols=6>{{ item.name }}</v-col>
-                    <v-col cols=6>
-                      <span class="ml-3 text--secondary">
-                        {{ prettyBytes(item.size) }}
-                      </span>
+                    <v-col cols="auto">{{ item.name }}</v-col>
+                    <v-col cols="6">
+                      <v-progress-linear
+                        v-if="item.progress !== 0"
+                        :value="item.progress"
+                        height="25"
+                        color="green"
+                        background-color="green lighten-3"
+                        rounded
+                      >
+                        <v-row dense class="text-center">
+                          <v-col cols=6>{{item.loaded}} of {{item.size}} uploaded ({{ Math.ceil(item.progress) }}%) </v-col>
+                          <v-col cols=6 v-if="item.rate !== undefined">{{item.rate}} ({{item.eta}})</v-col>
+                        </v-row>
+                      </v-progress-linear>
+                    </v-col>
+                    <v-col cols="3">
+                      <v-alert
+                        v-if="item.error !== undefined"
+                        color="error"
+                        icon="mdi-alert-circle-outline"
+                        dense
+                      >
+                        {{item.error}}
+                      </v-alert>
                     </v-col>
                   </v-row>
 
@@ -60,7 +80,10 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn plain @click.stop="submit">
+        <v-btn
+          color="primary"
+          @click.stop="submit"
+          >
           Upload
           <v-icon id="upload-button">mdi-upload</v-icon>
         </v-btn>
@@ -70,8 +93,27 @@
 
 <script>
 const prettyBytes = require('pretty-bytes');
+// import axios from 'axios'
 import DataService from '@/services/data.service';
 import File from "@/store/models/file"
+
+class QueuedFile{
+  constructor(file){
+    this.name = file.name;
+    this.size = prettyBytes(file.size)
+    this.file = file;
+    this.reset();
+  }
+
+  reset(){
+    this.error = undefined;
+    this.progress = 0;
+    this.loaded = 0;
+
+    this.rate = undefined;
+    this.eta = undefined;
+  }
+}
 
 export default {
   name: "UploadComponent",
@@ -84,7 +126,7 @@ export default {
   data() {
     return {
       dragover: false,
-      uploadedFiles: [],
+      queuedFiles: [],
     };
   },
 
@@ -99,79 +141,86 @@ export default {
 
     removeFile(fileName) {
       // Find the index of the
-      const index = this.uploadedFiles.findIndex(
+      const index = this.queuedFiles.findIndex(
         file => file.name === fileName
       );
       // If file is in uploaded files remove it
-      if (index > -1) this.uploadedFiles.splice(index, 1);
+      if (index > -1)
+        this.queuedFiles.splice(index, 1);
     },
 
     onClick(e) {
-      this.handleFiles(e.target.files);
+      this.queueFiles(e.target.files);
 
     },
 
     onDrop(e) {
-      this.handleFiles(e.dataTransfer.files);
+      this.queueFiles(e.dataTransfer.files);
     },
 
-    handleFiles(files) {
+    queueFiles(files) {
 
       this.dragover = false;
 
-      if (!this.multiple && files.length > 1){
-        let message = "Only one file can be uploaded at a time";
-        console.log(message)
-
-      } else {
-        for (const file of files) {
-          this.uploadedFiles.push(file)
-        }
-      }
+      if (!this.multiple && files.length > 1)
+        this.$store.dispatch("messages/error", {msg: "Only one file can be uploaded at a time"})
+      else
+        for (const file of files)
+          this.queuedFiles.push(new QueuedFile(file))
     },
 
 
     submit() {
       // If there aren't any files to be uploaded throw error
-      if (!this.uploadedFiles.length > 0) {
-        let message = "There are no files to upload";
-        console.log(message)
-      } else {
-        // Send uploaded files to parent component
-        // this.$emit("upload", );
+      if (!this.queuedFiles.length > 0)
+        return this.$store.dispatch("messages/error", {msg: "There are no files to upload"})
 
-        this.upload(this.uploadedFiles);
-      }
+      this.upload(this.queuedFiles);
     },
 
-    upload(files) {
-      for (const file of files){
-        DataService.files.upload(
-          this.projectId, file,
-          this.uploadReady,
-          this.progress
+    async upload(files) {
+      files.map((f) => f.reset());
+      for (let file of files){
+        await DataService.files.upload(
+            this.projectId, file,
+            this.uploadReady,
+            this.progress
         )
       }
     },
 
-    progress(file, event) {
+    progress(queuedFile, event) {
       let percent = event.loaded / event.total * 100;
-      console.log(`Upload Progress ${file.name}: ${percent}%`)
-    },
-
-    uploadReady(file, ok, content){
-      if(!ok)
-        return console.warn(file, content);
-
-      let i = this.uploadedFiles.indexOf(file);
-
-      if (i != -1){
-        this.uploadedFiles.splice(i, 1)
-        this.$emit("uploaded", new File(content.data))
+      let i = this.queuedFiles.indexOf(queuedFile);
+      let f = this.queuedFiles[i];
+      f.loaded = prettyBytes(event.loaded);
+      f.progress = percent;
+      if (event.rate !== undefined) {
+        f.rate = `${prettyBytes(event.rate)}/s`;
+        f.eta = `ETA: ${Math.round(Math.max(event.total - event.loaded, 0) / event.rate)} sec`;
       }
 
-      if (this.uploadedFiles.length == 0)
+      // console.log(`[ImageUploader] Upload Progress ${file.name}: ${percent}%`)
+    },
+
+    uploadReady(queuedFile, ok, content){
+      let i = this.queuedFiles.indexOf(queuedFile);
+      if (i === -1)
+        return console.error(`[ImageUploader] Upload file ${queuedFile.name} not found!`);
+
+      if(!ok){
+        this.queuedFiles[i].error = content.message;
+        return console.warn(`[ImageUploader] Upload for file ${queuedFile.name} failed! Reason: ${content.message} | Code: ${content.code}`);
+      }
+
+      this.queuedFiles[i].ready = true;
+      this.$emit("uploaded", new File(content.data))
+
+      if (this.queuedFiles.every((f) => f.ready)){
+        this.$store.dispatch("messages/info", {msg: "All files have been uploaded!"})
         this.$emit("ready")
+        this.queuedFiles.splice(0, this.queuedFiles.length)
+      }
     },
   }
 };
