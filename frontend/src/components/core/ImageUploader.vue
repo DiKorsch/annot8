@@ -27,7 +27,7 @@
         </v-row>
         <v-virtual-scroll
           v-if="queuedFiles.length > 0"
-          :items="queuedFiles"
+          :items="notReadyFiles"
           height="300"
           item-height="75"
         >
@@ -51,6 +51,7 @@
                           <v-col cols=6 v-if="item.rate !== undefined">{{item.rate}} ({{item.eta}})</v-col>
                         </v-row>
                       </v-progress-linear>
+                      <v-chip v-else>{{item.size}}</v-chip>
                     </v-col>
                     <v-col cols="3">
                       <v-alert
@@ -68,7 +69,7 @@
               </v-list-item-content>
 
               <v-list-item-action>
-                <v-btn @click.stop="removeFile(item.name)" icon>
+                <v-btn v-if="item.progress === 0 || item.progress === 100" @click.stop="removeFile(item.name)" icon>
                   <v-icon> mdi-close-circle </v-icon>
                 </v-btn>
               </v-list-item-action>
@@ -109,6 +110,7 @@ class QueuedFile{
     this.error = undefined;
     this.progress = 0;
     this.loaded = 0;
+    this.ready = false;
 
     this.rate = undefined;
     this.eta = undefined;
@@ -136,6 +138,10 @@ export default {
     projectId() {
       return this.$route.params.id;
     },
+
+    notReadyFiles() {
+      return this.queuedFiles.filter((f) => !f.ready || f.error !== undefined)
+    }
   },
 
   methods: {
@@ -193,8 +199,11 @@ export default {
     },
 
     progress(queuedFile, event) {
-      let percent = event.loaded / event.total * 100;
       let i = this.queuedFiles.indexOf(queuedFile);
+      if (i === -1)
+        return;
+
+      let percent = event.loaded / event.total * 100;
       let f = this.queuedFiles[i];
       f.loaded = prettyBytes(event.loaded);
       f.progress = percent;
@@ -211,12 +220,13 @@ export default {
       if (i === -1)
         return console.error(`[ImageUploader] Upload file ${queuedFile.name} not found!`);
 
+      this.queuedFiles[i].ready = true;
+
       if(!ok){
         this.queuedFiles[i].error = content.message;
         return console.warn(`[ImageUploader] Upload for file ${queuedFile.name} failed! Reason: ${content.message} | Code: ${content.code}`);
       }
 
-      this.queuedFiles[i].ready = true;
       this.$emit("uploaded", new File(content.data))
 
       if (this.queuedFiles.every((f) => f.ready)){
@@ -225,7 +235,8 @@ export default {
         this.state = "ready";
         setTimeout(function(that){
           that.state = undefined;
-          that.queuedFiles.splice(0, that.queuedFiles.length)
+          // retain all failed files for a reupload
+          that.queuedFiles = that.queuedFiles.filter((f) => f.error !== undefined)
         }, 2000, this);
 
       }
@@ -239,8 +250,8 @@ export default {
 
       if (newValue === "uploading")
         window.onbeforeunload = () => "Upload in progress";
-        else
-          window.onbeforeunload = null;
+      else
+        window.onbeforeunload = null;
     }
   }
 };
