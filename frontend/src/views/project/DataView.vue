@@ -19,7 +19,7 @@
 
     <v-card>
       <v-card-title
-        id="uploader-header"
+        class="clickable"
         @click="localShowUploader = !localShowUploader"
         >
         Data Upload
@@ -36,10 +36,17 @@
 
       </v-card-text>
       <v-divider/>
-      <v-card-title v-if="files.length !== 0">
+      <v-card-title
+        class="clickable"
+        v-if="files.length !== 0"
+        @click="showData = !showData"
+      >
         Images {{this.start+1}} - {{this.end}} out of {{files.length}}
+        <v-spacer/>
+        <v-icon v-if="showData">mdi-chevron-down</v-icon>
+        <v-icon v-else>mdi-chevron-left</v-icon>
       </v-card-title>
-      <v-card-text v-if="files.length !== 0">
+      <v-card-text v-if="showData && files.length !== 0">
         <core-CustomPaginator v-model="page" :length="nPages"/>
         <v-row dense>
           <v-col
@@ -75,6 +82,7 @@ export default {
     fileToDelete: undefined,
 
     localShowUploader: false,
+    showData: true,
   }),
 
   props: {
@@ -166,7 +174,7 @@ export default {
 </script>
 
 <style scoped>
-  #uploader-header {
+  .clickable {
     cursor: pointer;
   }
 </style>
