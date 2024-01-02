@@ -5,7 +5,8 @@
   <v-container fluid>
 
     <app-ViewHeader title="Crop annotations">
-      FOO
+      <core-ProjectSelector
+      />
     </app-ViewHeader>
 
     <v-card align="center" v-if="boxes.length != 0">

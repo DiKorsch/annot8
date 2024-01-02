@@ -30,12 +30,6 @@ router.beforeEach((to, from, next) => {
       DataService.project.get(projectID).then(
         (project) => {
           store.commit('setCurrentProject', project);
-
-          DataService.files.get(project.id).then(
-            (files) => {
-              store.commit('setProjectFiles', files)
-            }
-          )
         })
     }
   } else {

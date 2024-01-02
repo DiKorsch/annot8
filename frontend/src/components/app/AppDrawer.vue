@@ -63,19 +63,6 @@
         </v-list-item>
         <div v-if="project !== undefined && isProjectViewActive">
           <v-divider></v-divider>
-          <v-list-item>
-            <v-list-item-content>
-              <v-select
-                v-model="project"
-                :items="projects"
-                item-text="name"
-                item-value="id"
-                label="Select project"
-                prepend-icon="mdi-book"
-              ></v-select>
-            </v-list-item-content>
-          </v-list-item>
-          <v-divider></v-divider>
           <v-list-item
             v-for="link in projectLinks"
             :key="link.id"
@@ -215,9 +202,9 @@ export default {
     },
 
     selectProject(projectID){
-      let project = this.projects.find((proj) => proj.id == projectID);
-      if (project?.id == this.$route.params.id)
+      if (projectID == this.$route.params.id)
         return;
+      let project = this.projects.find((proj) => proj.id == projectID);
 
       let name = this.$route.name;
       let link = this.links.find((l) => l.route_name === name || l.dest === name)

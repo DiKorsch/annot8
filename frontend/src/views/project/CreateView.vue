@@ -1,9 +1,7 @@
 <template>
   <v-container fluid>
 
-    <app-ViewHeader title="New Project">
-      FOO
-    </app-ViewHeader>
+    <app-ViewHeader title="New Project"/>
     <v-card  outlined elevation="2" max-width=80% class="mx-auto">
       <v-card-text>
 

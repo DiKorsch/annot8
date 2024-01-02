@@ -5,7 +5,7 @@
   <v-container fluid>
 
     <app-ViewHeader title="Image annotations">
-      FOO
+      <core-ProjectSelector/>
     </app-ViewHeader>
 
     <v-card v-if="files.length != 0">

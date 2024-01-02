@@ -7,7 +7,9 @@
     />
 
     <app-ViewHeader title="Data">
-      FOO
+      <core-ProjectSelector
+        @selected="page=1"
+      />
     </app-ViewHeader>
     <v-card
       @dragover.prevent="localShowUploader = true"

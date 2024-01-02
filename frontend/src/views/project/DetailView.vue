@@ -2,7 +2,7 @@
   <v-container fluid>
 
     <app-ViewHeader title="Settings">
-      FOO
+      <core-ProjectSelector/>
     </app-ViewHeader>
 
     <v-card outlined elevation="2" max-width=80% class="mx-auto">

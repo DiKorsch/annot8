@@ -5,6 +5,8 @@ import { auth } from './auth.module';
 import { data } from './data.module';
 import { messages } from './messages.module';
 
+import DataService from '@/services/data.service';
+
 Vue.use(Vuex);
 
 export default new Vuex.Store({
@@ -21,7 +23,20 @@ export default new Vuex.Store({
     },
 
     setCurrentProject(state, project) {
-      console.log("[Store] current project:", project)
+
+      if (project !== undefined){
+        if (state.currentProject?.id === project.id)
+          return
+        console.log("[Store] setting project:", project)
+        if (state.currentProject?.id !== project.id)
+          DataService.files.get(project.id).then(
+            (files) => {
+              this.commit("setProjectFiles", files)
+            }
+          )
+      } else
+        console.log("[Store] unsetting project")
+
       state.currentProject = project;
     },
 

@@ -1,11 +1,11 @@
 <template>
   <v-row class="view-header">
-    <v-col cols=6>
+    <v-col cols=4>
       <h1>{{title}}</h1>
     </v-col>
-    <v-col cols=4><slot></slot></v-col>
-    <v-col cols=2 >
-      <v-btn v-if="dest !== undefined" :to = "{ name: dest }" block :color="color">
+    <v-col cols=6><slot></slot></v-col>
+    <v-col v-if="dest !== undefined" cols=2 >
+      <v-btn :to = "{ name: dest }" block :color="color">
         <v-icon>{{icon}}</v-icon> {{text}}
       </v-btn>
     </v-col>
