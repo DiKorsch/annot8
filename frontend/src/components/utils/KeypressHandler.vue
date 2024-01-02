@@ -18,7 +18,7 @@ export default {
   methods: {
 
     keypressEvent: function (event) {
-      console.log("Keyboard press:", event.key);
+      console.log("[KeypressHandler] Keyboard press:", event.key);
       this.$emit("pressed", event)
     }
   }
