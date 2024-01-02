@@ -1,15 +1,10 @@
 <template>
   <v-container fluid>
-    <v-row>
-      <v-col :cols=8>
-        <h1>Project Settings</h1>
-      </v-col>
-      <v-col :cols=4 align="right">
-        <v-btn :to = "{ name: 'projects' }" color="accent">
-          <v-icon>mdi-reply</v-icon> Back
-        </v-btn>
-      </v-col>
-    </v-row>
+
+    <app-ViewHeader title="Settings">
+      FOO
+    </app-ViewHeader>
+
     <v-card outlined elevation="2" max-width=80% class="mx-auto">
       <div v-if="project != null">
         <v-card-title>

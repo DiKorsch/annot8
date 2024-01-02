@@ -1,18 +1,12 @@
 <template>
   <v-container fluid>
-    <v-row>
-      <v-col class="col-8">
-        <h1>Projects</h1>
-      </v-col>
-      <v-col class="col-4" align="right">
-        <v-btn
-          :to = "{ name: 'create_project' }"
-          color="primary">
-          Add Project
-          <v-icon>mdi-plus</v-icon>
-        </v-btn>
-      </v-col>
-    </v-row>
+    <app-ViewHeader
+      title="Settings"
+      icon="mdi-plus"
+      dest="create_project"
+      text="New Project"
+    />
+
     <v-row dense>
       <core-ProjectInfo
         v-for="project in projects"

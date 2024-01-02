@@ -6,17 +6,9 @@
       @confirm="confirmFileDelete($event)"
     />
 
-    <v-row>
-      <v-col :cols=10>
-        <h1>Data</h1>
-      </v-col>
-      <v-col :cols=2 >
-        <v-btn :to = "{ name: 'projects' }" block color="error">
-          <v-icon>mdi-reply</v-icon> Back
-        </v-btn>
-      </v-col>
-    </v-row>
-
+    <app-ViewHeader title="Data">
+      FOO
+    </app-ViewHeader>
     <v-card
       @dragover.prevent="localShowUploader = true"
       @dragenter.prevent="localShowUploader = true"

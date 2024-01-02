@@ -3,16 +3,10 @@
     <utils-KeypressHandler
       @pressed="handleKeyPress($event)"/>
   <v-container fluid>
-    <v-row>
-      <v-col :cols=10>
-        <h1>Crops</h1>
-      </v-col>
-      <v-col :cols=2 >
-        <v-btn :to = "{ name: 'projects' }" block color="error">
-          <v-icon>mdi-reply</v-icon> Back
-        </v-btn>
-      </v-col>
-    </v-row>
+
+    <app-ViewHeader title="Crop annotations">
+      FOO
+    </app-ViewHeader>
 
     <v-card align="center" v-if="boxes.length != 0">
       <v-container>
