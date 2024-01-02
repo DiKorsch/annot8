@@ -6,10 +6,24 @@
 
     <app-ViewHeader title="Crop annotations">
       <core-ProjectSelector
+        @selected="selectedTrack=1"
       />
     </app-ViewHeader>
 
-    <v-card align="center" v-if="boxes.length != 0">
+    <v-alert
+      v-if="tracks.length === 0"
+      border="top"
+      colored-border
+      type="info"
+      elevation="2"
+    >
+      <div v-if="cropsLoading">Loading crops...</div>
+      <div v-else>
+        No bounding boxes found in this project! Please <router-link :to="{name: 'annotate'}">annotate</router-link> some images!
+      </div>
+    </v-alert>
+    <v-card align="center" v-else>
+
       <v-container>
         <core-CustomPaginator v-model="selectedTrack" :length="tracks.length"/>
         <h4 v-if="currentTrack !== undefined">{{ currentTrack.length }} Crops</h4>
@@ -39,15 +53,6 @@
       </v-container>
     </v-card>
 
-    <v-alert
-      v-else
-      border="top"
-      colored-border
-      type="info"
-      elevation="2"
-    >
-      No bounding boxes found in this project! Please <router-link :to="{name: 'annotate'}">annotate</router-link> some images!
-    </v-alert>
   </v-container>
 
 
@@ -56,7 +61,7 @@
 
 
 <script>
-import DataService from '@/services/data.service';
+import { mapGetters } from 'vuex'
 
 export default {
   name: "CropsView",
@@ -69,18 +74,25 @@ export default {
       return this.tracks[this.selectedTrack-1];
     },
 
-    // selectedFile() {
-    //   if (this.selected === undefined && this.fileId === undefined)
-    //     return this.files[0];
-    //   return this.files.find(file => { return file.id == this.selected })
-    // }
+    ...mapGetters({
+      crops: 'getProjectCrops',
+      cropsLoading: 'isLoadingCrops',
+    }),
+
+    boxes() {
+      return this.crops?.boxes || {};
+    },
+
+    files() {
+      return this.crops?.files || {};
+    },
+
+    tracks() {
+      return this.crops?.tracks || [];
+    },
   },
 
   data: () => ({
-    boxes: {},
-    files: {},
-    tracks: [],
-
     selectedTrack: 1,
   }),
 
@@ -98,14 +110,6 @@ export default {
           break;
       }
     },
-    getCrops(){
-      DataService.project.crops(this.projectId, true)
-        .then((content) => {
-          this.boxes = content.boxes;
-          this.files = content.files;
-          this.tracks = content.tracks;
-        })
-    },
 
     box(boxId){
       return this.boxes.get(boxId);
@@ -115,10 +119,6 @@ export default {
       let box = this.box(boxId)
       return this.files.get(box.fileId);
     }
-  },
-
-  created() {
-    this.getCrops();
   },
 
 }

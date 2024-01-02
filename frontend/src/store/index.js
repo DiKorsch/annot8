@@ -9,10 +9,20 @@ import DataService from '@/services/data.service';
 
 Vue.use(Vuex);
 
+class Crops {
+  constructor(content){
+    this.files = content?.files;
+    this.tracks = content?.tracks;
+    this.boxes = content?.boxes;
+  }
+}
+
 export default new Vuex.Store({
   state: {
     currentProject: undefined,
     projectFiles: [],
+    projectCrops: new Crops(),
+    loadingCrops: false,
     n_retries: 0,
   },
 
@@ -22,18 +32,38 @@ export default new Vuex.Store({
       state.projectFiles = files || [];
     },
 
+    setProjectCrops(state, content) {
+      let crops = new Crops(content)
+      console.log("[Store] setting project crops:", crops)
+      state.projectCrops = crops;
+      state.loadingCrops = false;
+    },
+
     setCurrentProject(state, project) {
 
       if (project !== undefined){
         if (state.currentProject?.id === project.id)
           return
         console.log("[Store] setting project:", project)
-        if (state.currentProject?.id !== project.id)
+        if (state.currentProject?.id !== project.id){
+          state.projectFiles = [];
+          state.projectCrops = new Crops();
+          state.loadingCrops = true;
+
           DataService.files.get(project.id).then(
             (files) => {
               this.commit("setProjectFiles", files)
             }
           )
+
+          DataService.project.crops(project.id, true).then(
+            (crops) => {
+              this.commit("setProjectCrops", crops)
+            }
+          )
+
+        }
+
       } else
         console.log("[Store] unsetting project")
 
@@ -69,8 +99,17 @@ export default new Vuex.Store({
     getCurrentProject: state => {
       return state.currentProject;
     },
+
     getProjectFiles: state => {
       return state.projectFiles;
+    },
+
+    getProjectCrops: state => {
+      return state.projectCrops;
+    },
+
+    isLoadingCrops: state => {
+      return state.loadingCrops;
     },
 
     getAPIUrl: () => {
