@@ -30,6 +30,7 @@ const setup = (store) => {
       console.log("[API Interceptor] error for URL:", originalConfig.url)
       if (originalConfig.url !== "/api-token/"
         && originalConfig.url !== "/api-token-refresh/"
+        && err.response !== undefined
         && err.response?.status === 401
         && !originalConfig._retry) {
 
@@ -49,6 +50,7 @@ const setup = (store) => {
           return Promise.reject(_error);
         }
       } else if (originalConfig.url === "/api-token-refresh/"
+        && err.response !== undefined
         && err.response?.status === 401){
         let data = err.response.data;
         if (data.code === "token_not_valid"){

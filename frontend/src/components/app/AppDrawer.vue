@@ -216,16 +216,14 @@ export default {
 
     selectProject(projectID){
       let project = this.projects.find((proj) => proj.id == projectID);
-      // if (project !== undefined)
-      //   store.commit('setCurrentProject', project);
+      if (project?.id == this.$route.params.id)
+        return;
 
       let name = this.$route.name;
       let link = this.links.find((l) => l.route_name === name || l.dest === name)
 
       if(link !== undefined){
         this.$router.push(link.url(project))
-      //   if (link.requiresReload)
-      //     this.$router.go()
       }
     }
   },
