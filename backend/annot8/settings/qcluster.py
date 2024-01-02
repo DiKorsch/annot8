@@ -9,5 +9,6 @@ Q_CLUSTER = {
     'cpu_affinity': 1,
     'label': 'Queue Tasks',
     'bulk': 10,
-    'orm': 'default'
+    'orm': 'default',
+    'django_redis': 'default'
 }

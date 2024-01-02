@@ -5,6 +5,9 @@ screen -t qcluster ../scripts/screen/backend.sh qcluster
 
 chdir ../frontend
 screen -t frondend npm run serve
+screen -t redis redis-server
+
+chdir ..
 
 # Statuszeile
 caption always "%{= wk} %-w%{= KW} [%n %t] %{-}%+w %= | @%H | %l | %Y-%m-%d %c "

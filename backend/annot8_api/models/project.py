@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.dispatch import receiver
 from django.utils.functional import classproperty
+from django_q.tasks import async_iter
 
 from pathlib import Path
 
@@ -116,6 +117,15 @@ class Project(base.BaseModel):
     @classproperty
     def detectors(cls):
         return [cls.name for cls in BaseDetector.__subclasses__()]
+
+    def run_detector(self):
+        file_ids = self.files.values_list("pk", flat=True)
+        return async_iter(detect_boxes, list(file_ids)), len(file_ids)
+
+def detect_boxes(file_id):
+    res = api_models.File.objects.get(pk=file_id).detect_boxes()
+    return file_id, res
+
 
 @receiver(models.signals.pre_save, sender=Project)
 def project_pre_save(sender, instance, **kwargs):

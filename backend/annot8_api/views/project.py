@@ -1,7 +1,6 @@
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
-from django_q.tasks import async_task
 
 from rest_framework import status
 from rest_framework.decorators import action
@@ -115,13 +114,12 @@ class ProjectViewSet(base.BaseViewSet):
     @action(detail=True, methods=["post"], url_path="run_detector")
     def run_detector(self, request, pk=None):
         project = self.get_object()
+        uuid, nqueued = project.run_detector()
 
-        files = project.files.all()
-        # n_files = project.files.count()
-        for n, file in enumerate(files, 1):
-            async_task(file.detect_boxes)
-
-        return Response({'status': 'Pipeline started'})
+        task = api_models.Task.new(
+            user=request.user, task_uuid=uuid, nqueued=nqueued)
+        task_ser = serializers.TaskSerializer(task)
+        return Response(task_ser.data)
 
 
     @action(detail=True, methods=["post"], url_path="collaborator")

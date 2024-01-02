@@ -62,3 +62,4 @@ from annot8.settings.security import *
 from annot8.settings.i18n import *
 from annot8.settings.media import *
 from annot8.settings.qcluster import *
+from annot8.settings.redis import *

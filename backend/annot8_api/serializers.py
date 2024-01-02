@@ -21,6 +21,17 @@ class ProjectSerializer(BaseSerializer):
         fields = models.Project.serializer_fields
         read_only_fields = models.Project.read_only_fields
 
+class TaskSerializer(BaseSerializer):
+    # We want the collaborators and the creator to not be serialized by their id,
+    # but instead by their username.
+    # Field is read only - alternatively one could specify a queryset.
+    user = serializers.StringRelatedField()
+
+    class Meta:
+        model = models.Task
+        fields = models.Task.serializer_fields
+        read_only_fields = models.Task.read_only_fields
+
 class PredictionSerializer(BaseSerializer):
     class Meta:
         model = models.Prediction
