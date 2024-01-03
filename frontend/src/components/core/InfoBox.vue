@@ -40,7 +40,7 @@
         >
 
         <template v-slot:default="{ item }">
-          <core-BoundingBoxInfo
+          <core-BoundingBoxListItem
             :bbox="item"
             :ref="`box-info-${item.id}`"
             @mouseenter.native="$emit('highlight', item.id)"
