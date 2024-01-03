@@ -3,8 +3,8 @@ import App from './App.vue'
 import router from './routes'
 import store from './store'
 import vuetify from './plugins/vuetify'
-import setupInterceptors from './services/setupInterceptors';
 import Vuex from 'vuex';
+import setupInterceptors from '@/services/api.interceptors';
 import DataService from '@/services/data.service';
 
 Vue.config.productionTip = false
