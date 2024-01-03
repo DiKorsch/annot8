@@ -25,19 +25,21 @@ const setup = (store) => {
     },
     async (err) => {
       const originalConfig = err.config;
+      const status_code = err.response?.status;
+      const has_response = err.response !== undefined
 
       // Access Token was expired
       console.log("[API Interceptor] error for URL:", originalConfig.url)
       if (originalConfig.url !== "/api-token/"
         && originalConfig.url !== "/api-token-refresh/"
-        && err.response !== undefined
-        && err.response?.status === 401
+        && has_response
+        && status_code === 401
         && !originalConfig._retry) {
 
         console.log("[API Interceptor] Access token expired!")
         originalConfig._retry = true;
         try {
-          const { access } = await AuthService.refreshAccessToken();
+          let access = await AuthService.refreshAccessToken();
           console.log("[API Interceptor] New acces token: ", access)
 
           store.dispatch('auth/refreshToken', access);
@@ -47,23 +49,34 @@ const setup = (store) => {
 
         } catch (_error) {
 
+          console.log("[API Interceptor] Caught error: ", _error)
           return Promise.reject(_error);
         }
-      } else if (originalConfig.url === "/api-token-refresh/"
-        && err.response !== undefined
-        && err.response?.status === 401){
+
+      } else if (originalConfig.url === "/api-token-refresh/" && has_response){
+        // We have an error during token refresh!
         let data = err.response.data;
-        if (data.code === "token_not_valid"){
-          console.log("[API Interceptor response] Refresh token was invalid! Clearing all tokens.", err)
+        if ( status_code === 401 && data.code === "token_not_valid"){
+          console.log(`[API Interceptor response] (Code ${status_code}) Refresh token was invalid! Clearing all tokens.`, err)
+          store.dispatch('auth/logout');
+          return Promise.resolve(err);
+
+        } else if (status_code === 400){
+          console.log(`[API Interceptor response] (Code ${status_code}) Invalid refresh request! Clearing all tokens.`, err)
           store.dispatch('auth/logout');
           return Promise.resolve(err);
         }
 
         store.dispatch("messages/error", {msg: `Error occured during token refresh: ${data.detail}`})
         console.log("[API Interceptor response] Error during token refersh:", err)
-        return Promise.reject(err);
-      }
+        return Promise.resolve(err);
 
+      } else if (status_code === 401 && originalConfig._retry) {
+        // despite a retry we have an unauthorized error (401)
+        console.log("[API Interceptor response] Unauthorized request even after retry!", err)
+        return Promise.resolve(err);
+      }
+      console.log("[API Interceptor response] API Interceptor was not successfull!")
       return Promise.reject(err);
     }
   );

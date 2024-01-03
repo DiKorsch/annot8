@@ -27,6 +27,8 @@ class TokenService {
 
   updateLocalAccessToken(token) {
     let tokens = this.getTokens();
+    if (tokens === undefined)
+      return
     tokens.access = token;
     this.setTokens(tokens);
   }

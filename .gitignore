@@ -5,3 +5,5 @@ backend/db*
 .env.local
 
 README.html
+
+dump.rdb

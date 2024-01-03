@@ -23,10 +23,11 @@ class AuthService {
         refresh: TokenService.getLocalRefreshToken(),
       })
       .then((response) => {
-        if (response.data.access)
-          TokenService.updateLocalAccessToken(response.data.access);
+        let new_token = response.data?.access
+        if (new_token)
+          TokenService.updateLocalAccessToken(new_token);
 
-        return response.data;
+        return new_token;
       });
   }
 
