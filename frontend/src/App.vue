@@ -1,5 +1,5 @@
 <template>
-  <v-app id="pycs2">
+  <v-app id="annot8">
     <app-AppDrawer/>
 
     <v-main>

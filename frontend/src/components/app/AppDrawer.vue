@@ -82,6 +82,7 @@
         </div>
       </div>
     </v-list>
+    <v-spacer/>
     <app-AppFooter/>
   </v-navigation-drawer>
 </template>

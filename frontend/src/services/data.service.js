@@ -4,6 +4,7 @@ import File from "@/store/models/file"
 import Label from "@/store/models/label"
 import BBox from "@/store/models/bbox"
 import Project from "@/store/models/project"
+import Task from "@/store/models/task"
 
 // credits to https://stackoverflow.com/a/53829223/1360842
 // returns a promise once it gets ALL pages from API
@@ -364,6 +365,17 @@ class DataService {
           return new Label(data);
         }))
       })
+    }
+  }
+
+  tasks = {
+    get: function() {
+      return api.get("/task/")
+        .then((response) => {
+          return response.data.map((data) => {
+            return new Task(data);
+          });
+        });
     }
   }
 

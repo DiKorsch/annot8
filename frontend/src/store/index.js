@@ -24,6 +24,7 @@ export default new Vuex.Store({
     projectCrops: new Crops(),
     loadingCrops: false,
     n_retries: 0,
+    tasks: [],
   },
 
   mutations: {
@@ -70,6 +71,10 @@ export default new Vuex.Store({
       state.currentProject = project;
     },
 
+    setTasks(state, tasks) {
+      state.tasks = tasks;
+    },
+
     fileDeleted(state, file){
       if (!state.projectFiles)
         return
@@ -106,6 +111,10 @@ export default new Vuex.Store({
 
     getProjectCrops: state => {
       return state.projectCrops;
+    },
+
+    getTasks: state => {
+      return state.tasks;
     },
 
     isLoadingCrops: state => {

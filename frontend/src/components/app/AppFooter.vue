@@ -10,6 +10,11 @@
       tile
       class="primary text-center flex"
     >
+      <v-card-text>
+        <core-TaskList/>
+      </v-card-text>
+      <v-divider/>
+
       <v-card-text class="pa-1">
         <v-btn
           v-for="item in icons"
@@ -22,13 +27,12 @@
         </v-btn>
       </v-card-text>
 
-      <v-divider></v-divider>
+      <v-divider/>
 
       <v-card-text class="white--text pa-1">
         {{ new Date().getFullYear() }} — <strong>Annot8</strong>
       </v-card-text>
     </v-card>
-
   </v-footer>
 </template>
 
