@@ -5,19 +5,16 @@ from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from annot8_api.models import Annotation
-from annot8_api.models import BoundingBox
-from annot8_api.models import File
-from annot8_api.serializers import BoundingBoxSerializer
-from annot8_api.serializers import FileSerializer
+from annot8_api import models as api_models
+from annot8_api import serializers
 from annot8_api.views.base import BaseViewSet
 
 class FileViewSet(BaseViewSet):
 
-    serializer_class = FileSerializer
+    serializer_class = serializers.FileSerializer
     def get_queryset(self):
         user = self.request.user
-        return File.objects.filter(
+        return api_models.File.objects.filter(
             Q(project__user=user) |
             Q(project__collaborators__in=[user])
         ).distinct()
@@ -28,14 +25,17 @@ class FileViewSet(BaseViewSet):
 
         bboxes = file.bboxes
 
-        serializer = BoundingBoxSerializer(bboxes, many=True)
+        serializer = serializers.BoundingBoxSerializer(bboxes, many=True)
         return Response(serializer.data)
 
     @action(detail=True, methods=["post"], url_path="bbox_generate")
     def bbox_generate(self, request, pk=None):
         file = self.get_object()
-        async_task(file.detect_boxes)
-        return Response({'status': 'BBoxes generation scheduled'})
+        uuid = async_task(file.detect_boxes)
+        task = api_models.Task.new(
+            user=request.user, task_uuid=uuid, nqueued=1)
+        task_ser = serializers.TaskSerializer(task)
+        return Response(task_ser.data)
 
 
     @action(detail=True, methods=["post"], url_path="bbox")
