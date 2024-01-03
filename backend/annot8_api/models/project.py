@@ -10,10 +10,10 @@ from django_q.tasks import async_iter
 
 from pathlib import Path
 
+from annot8_ai.classifier.base import BaseClassifier
+from annot8_ai.detector.base import BaseDetector
 from annot8_api import models as api_models
 from annot8_api.models import base
-from annot8_api.pipeline.classifier.base import BaseClassifier
-from annot8_api.pipeline.detector.base import BaseDetector
 
 def new_root_folder():
     return f"{settings.PROJECTS_DIR}/{uuid.uuid4()}"

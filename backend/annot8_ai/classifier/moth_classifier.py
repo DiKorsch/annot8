@@ -1,4 +1,4 @@
-from annot8_api.pipeline.classifier.base import BaseClassifier
+from annot8_ai.classifier.base import BaseClassifier
 
 import chainer
 import numpy as np

@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from annot8_api import models as api_models
 from annot8_api import serializers
 from annot8_api.views import base
-from annot8_api.pipeline.tracks import group_tracks
+from annot8_ai.detector.tracks import group_tracks
 
 
 class ProjectViewSet(base.BaseViewSet):

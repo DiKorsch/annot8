@@ -5,7 +5,7 @@ from blob_detector.core.bbox import BBox
 from blob_detector.core.binarizers import BinarizerType
 from blob_detector.core.pipeline import Pipeline
 
-from annot8_api.pipeline.detector.base import BaseDetector
+from annot8_ai.detector.base import BaseDetector
 
 class MothDetector(BaseDetector):
     name = "Moth Detector"
