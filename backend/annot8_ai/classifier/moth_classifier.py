@@ -20,15 +20,15 @@ class MothClassifier(BaseClassifier):
 
         classifier_dir = Path(settings.BASE_DIR, "fixtures/classifier/jena_moths_aug")
 
-        with open(classifier_dir / "unq2orig_labels.yml") as f:
-            id2name = yaml.load(f)
+        with open(classifier_dir / "unq2gbif.yml") as f:
+            id2gbif = yaml.load(f)
 
         self.cls = Classifier(
             model_type="cvmodelz.InceptionV3",
             input_size=299,
             weights=classifier_dir / "weights.npz",
-            n_classes=len(id2name),
-            class_id2name=id2name
+            n_classes=len(id2gbif),
+            id2gbif=id2gbif
         )
 
     def __call__(self, im: np.ndarray) -> int:
@@ -41,13 +41,13 @@ class Classifier:
                  n_classes: int,
                  weights: str,
                  input_size: int,
-                 class_id2name: T.Dict[int, str],
+                 id2gbif: T.Dict[int, str],
                 ):
 
         weights = Path(weights)
         assert weights.exists(), \
             f"could not find classifier weights: {weights}!"
-        assert n_classes == len(class_id2name), \
+        assert n_classes == len(id2gbif), \
             "number of classes does not match the size of the mapping!"
 
         self.input_size = input_size
@@ -57,7 +57,7 @@ class Classifier:
                                       path="model/",
                                       strict=True)
 
-        self._cls_id2name = class_id2name
+        self._id2gbif = id2gbif
 
 
     def _transform(self, im: np.ndarray) -> int:
@@ -86,4 +86,7 @@ class Classifier:
         with chainer.using_config("train", False), chainer.no_backprop_mode():
             pred = chainer.as_array(self.model(X))
 
-        return [np.argmax(pred, axis=1)[0], list(enumerate(pred[0]))]
+        top1 = self._id2gbif[np.argmax(pred, axis=1)[0]]
+        logits = [(self._id2gbif[i], logit) for i, logit in enumerate(pred[0])]
+
+        return top1, logits

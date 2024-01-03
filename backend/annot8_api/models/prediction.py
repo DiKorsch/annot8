@@ -1,7 +1,7 @@
 
 from django.db import models
 from annot8_api.models import base
-# from labeltree.models import label
+from labeltree.models import Label
 
 class Prediction(base.BaseModel):
 
@@ -14,7 +14,9 @@ class Prediction(base.BaseModel):
         related_query_name = "prediction",
     )
 
-    top_1_label = models.IntegerField() # label.Label()
+    top_1_label = models.ForeignKey(Label,
+        on_delete=models.CASCADE
+    )
 
     model = models.CharField(max_length=255)
 
@@ -26,12 +28,12 @@ class Prediction(base.BaseModel):
 
     @classmethod
     def create(cls, described_object: base.DescribableObject,
-        top_1_label: int, model: str):
+        gbif_id: int, model: str):
 
         prediction = cls.objects.create(
-            described_object = described_object,
-            top_1_label = top_1_label,
-            model = model,
+            described_object=described_object,
+            top_1_label=Label.objects.get(pk=gbif_id),
+            model=model,
         )
 
         return prediction

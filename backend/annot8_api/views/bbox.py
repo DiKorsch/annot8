@@ -44,21 +44,6 @@ class BBoxViewSet(BaseViewSet):
         task_ser = serializers.TaskSerializer(task)
         return Response(task_ser.data)
 
-        # Get classifier.
-        project = bbox.described_file.project
-        classifier = project.get_classifier()
-        if classifier is None:
-            return Response({"status": "Project does not have a classifier"},
-                status=status.HTTP_400_BAD_REQUEST)
-
-        # Generate prediction.
-        label, logits = classifier(bbox.as_numpy())
-
-        # Add to database (logits and prediction).
-        bbox.prediction_add(label, logits, project.classifier)
-
-        return Response({'status': 'Prediction added to bounding box'})
-
     @action(detail=True, methods=["put"], url_path="label")
     def set_label(self, request, pk=None):
         label = request.data.get("label")

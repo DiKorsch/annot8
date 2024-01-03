@@ -151,14 +151,14 @@ class BoundingBox(base.DescribableObject):
 
         return crop
 
-    def new_prediction(self, label, logits, classifier_name):
+    def new_prediction(self, gbif_id, logits, classifier_name):
         api_models.Prediction.objects.filter(described_object=self).delete()
         prediction_obj = api_models.Prediction.create(described_object=self,
-                                        top_1_label=label,
+                                        gbif_id=gbif_id,
                                         model=classifier_name)
-        for (label_id, lgt) in logits:
+        for (_gbif_id, lgt) in logits:
             api_models.Logit.create(prediction = prediction_obj,
-                            label = label_id,
+                            gbif_id = _gbif_id,
                             logit = lgt)
 
         return prediction_obj

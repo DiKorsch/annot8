@@ -1,6 +1,7 @@
 
 from rest_framework import serializers
 from annot8_api import models
+from labeltree.models import LabelSerializer
 
 class BaseSerializer(serializers.ModelSerializer):
     pass
@@ -33,6 +34,8 @@ class TaskSerializer(BaseSerializer):
         read_only_fields = models.Task.read_only_fields
 
 class PredictionSerializer(BaseSerializer):
+    top_1_label = LabelSerializer()
+
     class Meta:
         model = models.Prediction
         fields = models.Prediction.serializer_fields
