@@ -7,7 +7,7 @@
       hide-delimiter-background
       delimiter-icon="mdi-vector-point"
       >
-      <v-carousel-item v-for="(task, i) in tasks"
+      <v-carousel-item v-for="(task, i) in tasksSorted"
         :key="i"
       >
         <v-row
@@ -98,6 +98,11 @@ export default {
     ...mapGetters({
       tasks: 'getTasks',
     }),
+
+    tasksSorted() {
+      // this will sort tasks in descending order
+      return this.tasks.toSorted((a, b) => a.id === b.id ? 0 : (a.id < b.id ? 1 : -1));
+    }
   }
 }
 </script>

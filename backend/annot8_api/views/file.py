@@ -36,6 +36,16 @@ class FileViewSet(BaseViewSet):
         task_ser = serializers.TaskSerializer(task)
         return Response(task_ser.data)
 
+    @action(detail=True, methods=["post"], url_path="bbox_predict")
+    def bbox_predict(self, request, pk=None):
+        file = self.get_object()
+        bbox_ids = file.bboxes.values_list("pk", flat=True)
+
+        task = api_models.Task.start_async(bbox_predict,
+            user=request.user, items=list(bbox_ids))
+        task_ser = serializers.TaskSerializer(task)
+        return Response(task_ser.data)
+
 
     @action(detail=True, methods=["post"], url_path="bbox")
     def bbox_add(self, request, pk=None):
@@ -85,3 +95,10 @@ class FileViewSet(BaseViewSet):
 
         else:
             return Response({'status': 'Label added to file'})
+
+
+
+
+def bbox_predict(box_id):
+    res = api_models.BoundingBox.objects.get(pk=box_id).predict()
+    return box_id, res

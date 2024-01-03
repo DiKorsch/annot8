@@ -223,10 +223,21 @@ export default {
         this.estimateBBoxes();
       }
 
-      if (interaction !== this.interaction) {
-        this.interaction = interaction;
-        console.log("new interaction:", this.interaction)
+      else if (interaction === "classify") {
+        interaction = "pipeline";
+        this.classify(this.boxSelection.selected)
       }
+
+      else if (interaction === "classify-all") {
+        interaction = "pipeline";
+        this.classify()
+      }
+
+      if (interaction === this.interaction)
+        return
+
+      console.log("[Image Annotator] setting new interaction:", this.interaction)
+      this.interaction = interaction;
     },
     resetInteraction() {
       if (this.interaction === "draw-box") {
@@ -247,11 +258,33 @@ export default {
         });
     },
 
+    classify(bbox){
+      if (bbox === undefined){
+        DataService.files.predict_bboxes(this.fileId)
+          .then((ok) => {
+            if (!ok){
+              console.error("[Image Annotator] Failed to predict bounding boxes.");
+            }
+            this.$emit('updateBboxes');
+            this.getBBoxes();
+        });
+      } else {
+        DataService.bboxes.predict(bbox?.id)
+          .then((ok) => {
+            if (!ok){
+              console.error("[Image Annotator] Failed to predict bounding box.");
+            }
+            this.$emit('updateBboxes');
+            this.getBBoxes();
+        });
+      }
+    },
+
     estimateBBoxes() {
       DataService.files.generate_bboxes(this.fileId)
         .then((ok) => {
           if (!ok){
-            console.log("Failed to add generate bounding boxes.");
+            console.error("[Image Annotator] Failed to add generate bounding boxes.");
           }
           this.getBBoxes();
         });
@@ -261,20 +294,9 @@ export default {
       DataService.bboxes.set_label(bbox.id, label)
         .then((ok) => {
           if (!ok){
-            console.log("Failed to label bounding box.");
+            console.error("[Image Annotator] Failed to label bounding box.");
           }
-          this.emit('updateBboxes');
-          this.getBBoxes();
-        });
-    },
-
-    predictBBox(bbox) {
-      DataService.bboxes.predict(bbox.id)
-        .then((ok) => {
-          if (!ok){
-            console.log("Failed to predict bounding box.");
-          }
-          this.emit('updateBboxes');
+          this.$emit('updateBboxes');
           this.getBBoxes();
         });
     },

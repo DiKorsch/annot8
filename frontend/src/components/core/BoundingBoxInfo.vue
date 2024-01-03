@@ -9,9 +9,12 @@
         contain
         :src="thumb"
         position="center left"
-      >#{{this.bbox.id}}</v-img>
-      <div v-if="this.has_label">Label: {{this.label}}</div>
-      <div v-if="selected">MORE INFO</div>
+      >
+      </v-img>
+    </v-list-item-content>
+    <v-list-item-content class="label" >
+        <div v-if="this.has_label">{{this.label.name}}</div>
+        <div v-if="selected">MORE INFO</div>
     </v-list-item-content>
     <v-list-item-action>
       <v-btn-toggle dense borderless>

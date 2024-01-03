@@ -159,9 +159,20 @@ class DataService {
         .then(() => {
           return true;
         }).catch((error) => {
-          console.log("Error while generating bounding box:", error)
+          console.warn("[API] Error while generating bounding box:", error)
           return false;
         });
+    },
+
+    predict_bboxes: function(fileId) {
+      return api.post(`file/${fileId}/bbox_predict/`)
+        .then(() => {
+          return true;
+        }).catch((error) => {
+          console.warn("[API] Error while generating bounding box:", error)
+          return false;
+        });
+
     },
 
     add_bbox: function(fileId, x, y, width, height, label) {
@@ -241,7 +252,7 @@ class DataService {
             })
           })
           .catch((error) =>{
-            console.warn(error)
+            console.warn("[API]", error)
             if (error.response?.status == 404)
               return null;
           });
@@ -255,7 +266,7 @@ class DataService {
             return true;
           })
           .catch((error) => {
-            console.warn("Error while deleting bounding box: ", error)
+            console.warn("[API] Error while deleting bounding box: ", error)
             return false;
           })
       },
@@ -268,7 +279,7 @@ class DataService {
           .then(() => {
             return true;
           }).catch((error) => {
-            console.log("Error while labeling bounding box:", error)
+            console.warn("[API] Error while labeling bounding box:", error)
             return false;
           });
       },
@@ -278,7 +289,7 @@ class DataService {
           .then(() => {
             return true;
           }).catch((error) => {
-            console.log("Error while predicting bounding box:", error)
+            console.warn("[API] Error while predicting bounding box:", error)
             return false;
           });
       },
@@ -290,7 +301,7 @@ class DataService {
           .then(() => {
             return true;
           }).catch((error) => {
-            console.log("Error while updating bounding box:", error)
+            console.warn("[API] Error while updating bounding box:", error)
             return false;
           });
       }

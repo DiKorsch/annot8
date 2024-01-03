@@ -60,7 +60,7 @@ export default {
         if (this.bbox.label !== null) {
           return this.bbox.label;
         } else {
-          return this.bbox.predicted_label;
+          return this.bbox.predicted_label.name;
         }
       } else {
         return "Unknown";
