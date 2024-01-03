@@ -17,11 +17,9 @@
 export default {
   name: 'App',
 
-  data() {
-    return {
+  data: () => ({
       windowHeight: window.innerHeight
-    }
-  },
+  }),
 
   mounted() {
     this.$nextTick(() => {
