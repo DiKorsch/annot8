@@ -286,11 +286,11 @@ class DataService {
 
       predict: function(bboxId) {
         return api.post(`bbox/${bboxId}/predict/`)
-          .then(() => {
-            return true;
+          .then((response) => {
+            return new Task(response.data);
           }).catch((error) => {
             console.warn("[API] Error while predicting bounding box:", error)
-            return false;
+            return undefined;
           });
       },
 

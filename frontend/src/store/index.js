@@ -74,6 +74,9 @@ export default new Vuex.Store({
     setTasks(state, tasks) {
       state.tasks = tasks;
     },
+    addTask(state, task) {
+      state.tasks.push(task);
+    },
 
     fileDeleted(state, file){
       if (!state.projectFiles)

@@ -4,8 +4,16 @@
     elevation="2"
     id="info-box"
     :max-height="maxHeight">
-    <v-card-title>File info</v-card-title>
-    <v-card-text>
+    <v-card-title
+      class="clickable"
+      @click="showFileInfo = !showFileInfo"
+    >
+      File info
+      <v-spacer/>
+      <v-icon v-if="showFileInfo">mdi-chevron-down</v-icon>
+      <v-icon v-else>mdi-chevron-left</v-icon>
+    </v-card-title>
+    <v-card-text v-if="showFileInfo">
       <v-simple-table class="info-table">
         <template v-slot:default>
           <thead>
@@ -27,10 +35,37 @@
         </template>
       </v-simple-table>
     </v-card-text>
+    <div v-if="selectedBBox !== undefined">
+      <v-divider/>
+      <v-card-title
+        class="clickable"
+        @click="showBox = !showBox"
+      >
+        Selected Box
+        <v-spacer/>
+        <v-icon v-if="showBox">mdi-chevron-down</v-icon>
+        <v-icon v-else>mdi-chevron-left</v-icon>
+      </v-card-title>
+      <v-card-text v-if="showBox">
+        <core-BoundingBoxInfo
+          :bbox="selectedBBox"
+          @annotate="$emit('annotate', $event)"
+          @predict="$emit('predict', $event)"
+        />
+      </v-card-text>
+    </div>
+    <v-divider/>
+    <v-card-title
+      class="clickable"
+      @click="showBoxes = !showBoxes"
+    >
+      Bounding Boxes
+      <v-spacer/>
+      <v-icon v-if="showBoxes">mdi-chevron-down</v-icon>
+      <v-icon v-else>mdi-chevron-left</v-icon>
+    </v-card-title>
 
-    <v-card-title>Annotations</v-card-title>
-
-    <v-card-text>
+    <v-card-text v-if="showBoxes">
       <v-virtual-scroll
         class="box-list"
         height="350"
@@ -65,6 +100,9 @@ export default {
     maxHeight: undefined,
   },
   data: () => ({
+    showBoxes: false,
+    showFileInfo: false,
+    showBox: false,
   }),
 
   watch: {
@@ -80,6 +118,8 @@ export default {
   mounted: function() {
     if (this.selectedBBox !== undefined)
       this.markSelected(this.selectedBBox?.id, true)
+
+    this.showBox = this.selectedBBox !== undefined;
   },
 
   methods: {
@@ -111,3 +151,9 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+  .clickable {
+    cursor: pointer;
+  }
+</style>

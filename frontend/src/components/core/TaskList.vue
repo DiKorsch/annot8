@@ -24,6 +24,7 @@
               :rotate="-90"
               :value="progress(task) * 100"
               color="white"
+              size="40"
               >
               <v-icon v-if="progress(task) >= 1.0" color="white">mdi-check</v-icon>
               <div v-else>{{Math.round(progress(task) * 100)}}%</div>

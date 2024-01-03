@@ -57,6 +57,9 @@
           @toggle="toggle($event)"
           @select="select($event)"
           @remove="boxSelection.toDelete = $event"
+
+          @annotate="annotate($event)"
+          @predict="classify($event)"
         />
       </v-col>
     </v-row>
@@ -261,22 +264,29 @@ export default {
     classify(bbox){
       if (bbox === undefined){
         DataService.files.predict_bboxes(this.fileId)
-          .then((ok) => {
-            if (!ok){
+          .then((task) => {
+            if (task === undefined){
               console.error("[Image Annotator] Failed to predict bounding boxes.");
+              return
             }
+            this.$store.commit("addTask", task);
             this.$emit('updateBboxes');
             this.getBBoxes();
         });
+
+        this.$store.dispatch("messages/info", {msg: "Classifier started"})
       } else {
         DataService.bboxes.predict(bbox?.id)
-          .then((ok) => {
-            if (!ok){
+          .then((task) => {
+            if (task === undefined){
               console.error("[Image Annotator] Failed to predict bounding box.");
+              return;
             }
+            this.$store.commit("addTask", task);
             this.$emit('updateBboxes');
             this.getBBoxes();
         });
+        this.$store.dispatch("messages/info", {msg: "Classifier started"})
       }
     },
 
@@ -288,6 +298,10 @@ export default {
           }
           this.getBBoxes();
         });
+    },
+
+    annotate(bbox){
+      console.log("[Image Annotator] labeling triggered", bbox)
     },
 
     labelBBox(bbox, label) {

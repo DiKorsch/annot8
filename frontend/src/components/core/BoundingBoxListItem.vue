@@ -39,7 +39,7 @@
 import { mapGetters } from 'vuex';
 
 export default {
-  name: "BoundingBoxInfo",
+  name: "BoundingBoxListItem",
   model: {prop: "bbox", event: "input"},
 
   props: {

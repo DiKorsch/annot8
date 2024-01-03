@@ -9,11 +9,24 @@
         hidden: hidden}"
     @click="$emit('selectedBBox', localValue)"
   >
-    <v-chip v-if="hasLabel"
-      label x-small
-    >
-      {{getLabel}}
-    </v-chip>
+    <v-tooltip top>
+
+      <template v-slot:activator="{ on, attrs }">
+        <div v-if="hasLabel"
+          v-bind="attrs"
+          v-on="on"
+          class="label lighten-1"
+          :class="{
+            blue: localValue.label !== null,
+            green: localValue.label === null,
+          }"
+          >
+          <v-icon small v-if="localValue.label !== null">mdi-tag</v-icon>
+          <v-icon small v-else>mdi-brain</v-icon>
+        </div>
+      </template>
+      <span>{{labelName}}</span>
+    </v-tooltip>
   </div>
 </template>
 
@@ -43,8 +56,6 @@ export default {
     },
 
     style: function() {
-      // let alpha = this.hovered ? 0.4 : 0.3;
-      // let color = this.hovered ? 0.4 : 0.3;
 
       return {
         top: `${this.bbox.y * 100}%`,
@@ -55,10 +66,10 @@ export default {
       }
     },
 
-    getLabel: function() {
+    labelName: function() {
       if (this.hasLabel) {
         if (this.bbox.label !== null) {
-          return this.bbox.label;
+          return this.bbox.label.name;
         } else {
           return this.bbox.predicted_label.name;
         }
@@ -88,6 +99,25 @@ export default {
 
 
 <style scoped>
+  .bounding-box .label {
+    opacity: 80%;
+    position: absolute;
+    inset: -12px -12px auto auto ;
+    height: 24px;
+    width: 24px;
+    border-radius: 24px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: black !important;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .bounding-box.selected .label, .bounding-box.highlight .label{
+    inset: -13px -13px auto auto ;
+  }
+
   .bounding-box.hidden{
     display: none;
   }
@@ -115,6 +145,10 @@ export default {
   }
 
   .bounding-box.selected.hidden, .bounding-box.highlight.hidden{
+    border-style: dotted;
+  }
+
+  .bounding-box.selected.hidden .label, .bounding-box.highlight.hidden .label{
     border-style: dotted;
   }
 
