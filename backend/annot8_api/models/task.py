@@ -1,13 +1,17 @@
 
-from django.db import models
 from django.contrib.auth.models import User
+from django.db import models
 from django.dispatch import receiver
+from django_q.models import Failure
 from django_q.models import Success
 from django_q.models import Task as QTask
-from django_q.models import Failure
-from django_q.tasks import fetch, count_group_cached
+from django_q.tasks import async_task
+from django_q.tasks import async_iter
+from django_q.tasks import count_group_cached
+from django_q.tasks import fetch
 
 from annot8_api.models import base
+
 
 class Task(base.BaseModel):
     user = models.ForeignKey(User,
@@ -75,6 +79,16 @@ class Task(base.BaseModel):
             obj.save()
 
         return obj
+
+
+    @classmethod
+    def start_async(cls, func, user, *, items = []):
+        if items:
+            nqueued, uuid = len(items), async_iter(func, items)
+        else:
+            nqueued, uuid = 1, async_task(func)
+        return cls.new(user=user, task_uuid=uuid, nqueued=nqueued)
+
 
 @receiver(models.signals.post_delete, sender=QTask)
 @receiver(models.signals.post_delete, sender=Failure)

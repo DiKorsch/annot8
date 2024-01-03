@@ -151,7 +151,7 @@ class BoundingBox(base.DescribableObject):
 
         return crop
 
-    def prediction_add(self, label, logits, classifier_name):
+    def new_prediction(self, label, logits, classifier_name):
         api_models.Prediction.objects.filter(described_object=self).delete()
         prediction_obj = api_models.Prediction.create(described_object=self,
                                         top_1_label=label,
@@ -162,6 +162,19 @@ class BoundingBox(base.DescribableObject):
                             logit = lgt)
 
         return prediction_obj
+
+    def predict(self):
+
+        project = self.described_file.project
+        classifier = project.get_classifier()
+        if classifier is None:
+            return
+
+        # Generate prediction.
+        label, logits = classifier(self.as_numpy())
+
+        # Add to database (logits and prediction).
+        self.new_prediction(label, logits, project.classifier)
 
     @classmethod
     def create(cls, described_file: api_models.File, x: float, y: float, width: float,

@@ -4,16 +4,18 @@ from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from annot8_api.models import BoundingBox
-from annot8_api.models import Annotation
-from annot8_api.serializers import BoundingBoxSerializer
+from annot8_api import models as api_models
+from annot8_api import serializers
 from annot8_api.views.base import BaseViewSet
+from annot8_api.views.pagination import DefaultPagination
 
 class BBoxViewSet(BaseViewSet):
-    serializer_class = BoundingBoxSerializer
+    serializer_class = serializers.BoundingBoxSerializer
+    pagination_class = DefaultPagination
+
     def get_queryset(self):
         user = self.request.user
-        return BoundingBox.objects.filter(
+        return api_models.BoundingBox.objects.filter(
             Q(described_file__project__user=user) |
             Q(described_file__project__collaborators__in=[user])
         ).distinct()
@@ -36,6 +38,11 @@ class BBoxViewSet(BaseViewSet):
     @action(detail=True, methods=["post"], url_path="predict")
     def predict(self, request, pk=None):
         bbox = self.get_object()
+
+        task = api_models.Task.start_async(bbox.predict,
+            user=request.user)
+        task_ser = serializers.TaskSerializer(task)
+        return Response(task_ser.data)
 
         # Get classifier.
         project = bbox.described_file.project
@@ -64,7 +71,7 @@ class BBoxViewSet(BaseViewSet):
 
         # Create a corresponding annotation / update the existing one.
         try:
-            annotation, created = Annotation.objects.get_or_create(described_object=bbox)
+            annotation, created = api_models.Annotation.objects.get_or_create(described_object=bbox)
             annotation.label = label
             annotation.annotator = user
             annotation.confirmators.clear()

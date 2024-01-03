@@ -114,10 +114,10 @@ class ProjectViewSet(base.BaseViewSet):
     @action(detail=True, methods=["post"], url_path="run_detector")
     def run_detector(self, request, pk=None):
         project = self.get_object()
-        uuid, nqueued = project.run_detector()
+        file_ids = project.files.values_list("pk", flat=True)
 
-        task = api_models.Task.new(
-            user=request.user, task_uuid=uuid, nqueued=nqueued)
+        task = api_models.Task.start_async(detect_boxes,
+            user=request.user, items=list(file_ids))
         task_ser = serializers.TaskSerializer(task)
         return Response(task_ser.data)
 
@@ -166,3 +166,7 @@ class ProjectViewSet(base.BaseViewSet):
 
         project.collaborators.remove(user)
         return Response({'status': 'Collaborator removed'})
+
+def detect_boxes(file_id):
+    res = api_models.File.objects.get(pk=file_id).detect_boxes()
+    return file_id, res

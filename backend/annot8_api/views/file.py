@@ -1,5 +1,4 @@
 from django.db.models import Q
-from django_q.tasks import async_task
 
 from rest_framework import status
 from rest_framework.decorators import action
@@ -31,9 +30,9 @@ class FileViewSet(BaseViewSet):
     @action(detail=True, methods=["post"], url_path="bbox_generate")
     def bbox_generate(self, request, pk=None):
         file = self.get_object()
-        uuid = async_task(file.detect_boxes)
-        task = api_models.Task.new(
-            user=request.user, task_uuid=uuid, nqueued=1)
+
+        task = api_models.Task.start_async(file.detect_boxes,
+            user=request.user)
         task_ser = serializers.TaskSerializer(task)
         return Response(task_ser.data)
 
