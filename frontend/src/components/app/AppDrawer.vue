@@ -90,7 +90,6 @@
 <script>
 import { mapGetters, mapActions } from 'vuex'
 import { v4 as uuidv4 } from 'uuid';
-import DataService from '@/services/data.service';
 
 class MenuItem {
   constructor(text, icon, dest, projectMenu=false, route_name=null){
@@ -123,19 +122,7 @@ export default {
       'loggedIn'
     ]),
 
-    ...mapGetters([
-      'isProjectViewActive',
-      'getCurrentProject',
-    ]),
-
-    project: {
-      get: function() {
-        return this.getCurrentProject
-      },
-      set: function(projectID){
-        this.selectProject(projectID)
-      }
-    },
+    ...mapGetters({isProjectViewActive: "isProjectViewActive", project: 'getCurrentProject'}),
 
     nonProjectLinks(){
       return this.links.filter((link) => !link.projectMenu)
@@ -191,7 +178,6 @@ export default {
         ),
     ],
 
-    projects: [],
   }),
 
 
@@ -202,31 +188,7 @@ export default {
       return !link.projectMenu || (this.isProjectViewActive && link.projectMenu)
     },
 
-    selectProject(projectID){
-      if (projectID == this.$route.params.id)
-        return;
-      let project = this.projects.find((proj) => proj.id == projectID);
-
-      let name = this.$route.name;
-      let link = this.links.find((l) => l.route_name === name || l.dest === name)
-
-      if(link !== undefined){
-        this.$router.push(link.url(project))
-      }
-    }
   },
-
-  created: function(){
-
-    if(!this.loggedIn)
-      return;
-    console.log("[AppDrawer] project ID:", this.$route.params.id)
-    DataService.project.get().then(
-      (projects) => {
-        this.projects = projects;
-        // this.project = projects.find((proj) => proj.id == this.$route.params.id);
-      });
-  }
 }
 
 </script>

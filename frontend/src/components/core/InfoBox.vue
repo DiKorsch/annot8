@@ -3,7 +3,7 @@
     <h2>Operations on ...</h2>
     <v-expansion-panels accordion hover v-model="panel">
       <v-expansion-panel>
-        <v-expansion-panel-header>Image</v-expansion-panel-header>
+        <v-expansion-panel-header><h3>Image</h3></v-expansion-panel-header>
         <v-expansion-panel-content>
           <core-FileInfo
             :file="file"
@@ -46,7 +46,7 @@
 
 
       <v-expansion-panel v-if="hasBboxes">
-        <v-expansion-panel-header>Bounding boxes</v-expansion-panel-header>
+        <v-expansion-panel-header><h3>Bounding boxes</h3></v-expansion-panel-header>
         <v-expansion-panel-content>
           <v-virtual-scroll
             class="box-list"
@@ -72,7 +72,7 @@
       </v-expansion-panel>
 
       <v-expansion-panel v-if="selectedBBox !== undefined">
-        <v-expansion-panel-header>Selected box</v-expansion-panel-header>
+        <v-expansion-panel-header><h3>Selected box</h3></v-expansion-panel-header>
         <v-expansion-panel-content>
           <core-BoundingBoxInfo
             :bbox="selectedBBox"

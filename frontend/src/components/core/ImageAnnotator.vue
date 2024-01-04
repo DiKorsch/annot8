@@ -56,7 +56,7 @@
           :selectedBBox="boxSelection.selected"
           :bboxes="bboxes"
           :file="file"
-          :maxHeight="350"
+          :maxHeight="maxHeight / 2"
           @highlight="$refs.imageAnnotations.highlight($event)"
           @toggle="toggle($event)"
           @select="select($event)"
@@ -106,7 +106,7 @@ export default {
     file: undefined,
     maxHeight: {
       type: Number,
-      default: () => 675
+      default: () => 600
     },
   },
 

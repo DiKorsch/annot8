@@ -48,7 +48,7 @@ class DataService {
             });
           });
 
-      return api.get(`/project/${projectId}`)
+      return api.get(`/project/${projectId}/`)
         .then((response) => {
           return new Project(response.data);
         })
