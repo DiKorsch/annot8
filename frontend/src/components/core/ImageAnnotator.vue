@@ -57,7 +57,7 @@
           :selectedBBox="boxSelection.selected"
           :bboxes="bboxes"
           :file="file"
-          :maxHeight="maxHeight"
+          :maxHeight="350"
           @highlight="$refs.imageAnnotations.highlight($event)"
           @toggle="toggle($event)"
           @select="select($event)"

@@ -4,7 +4,7 @@
   <v-img
     :src="thumb"
     contain
-    max-height="400"
+    :max-height="maxHeight"
     position="center center"
   />
   <v-row v-if="predicted_label">
@@ -66,6 +66,7 @@ export default {
 
   props: {
     bbox: undefined,
+    maxHeight: undefined,
   },
 
   data: () => ({

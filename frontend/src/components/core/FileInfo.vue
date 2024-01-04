@@ -32,7 +32,8 @@
 export default {
   name: "FileInfo",
   props: {
-    'file': undefined,
+    file: undefined,
+    bboxes: undefined,
   },
 
 }

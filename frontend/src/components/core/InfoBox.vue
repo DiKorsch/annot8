@@ -1,93 +1,51 @@
 <template>
-  <v-card
-    dense
-    elevation="2"
-    id="info-box"
-    :max-height="maxHeight">
-    <v-card-title
-      class="clickable"
-      @click="showFileInfo = !showFileInfo"
-    >
-      File info
-      <v-spacer/>
-      <v-icon v-if="showFileInfo">mdi-chevron-down</v-icon>
-      <v-icon v-else>mdi-chevron-left</v-icon>
-    </v-card-title>
-    <v-card-text v-if="showFileInfo">
-      <v-simple-table class="info-table">
-        <template v-slot:default>
-          <thead>
-          </thead>
-          <tbody>
-            <tr>
-              <th width="50%" class="text-left">File name</th>
-              <td class="text-right">{{file.name}}</td>
-            </tr>
-            <tr>
-              <th class="text-left">Bounding boxes</th>
-              <td class="text-right">{{bboxes.length}}</td>
-            </tr>
-            <tr v-if="file.label">
-              <th class="text-left">File label</th>
-              <td class="text-right">{{file.label || "Not annotated"}}</td>
-            </tr>
-          </tbody>
-        </template>
-      </v-simple-table>
-    </v-card-text>
-    <div v-if="selectedBBox !== undefined">
-      <v-divider/>
-      <v-card-title
-        class="clickable"
-        @click="showBox = !showBox"
-      >
-        Selected Box
-        <v-spacer/>
-        <v-icon v-if="showBox">mdi-chevron-down</v-icon>
-        <v-icon v-else>mdi-chevron-left</v-icon>
-      </v-card-title>
-      <v-card-text v-if="showBox">
+  <v-expansion-panels accordion hover v-model="panel">
+    <v-expansion-panel>
+      <v-expansion-panel-header>File</v-expansion-panel-header>
+      <v-expansion-panel-content>
+        <core-FileInfo :file="file" :bboxes="bboxes"/>
+      </v-expansion-panel-content>
+    </v-expansion-panel>
+
+
+    <v-expansion-panel>
+      <v-expansion-panel-header>Boxes</v-expansion-panel-header>
+      <v-expansion-panel-content>
+        <v-virtual-scroll
+          class="box-list"
+          :max-height="maxHeight"
+          item-height="75"
+          bench="100"
+          :items="bboxes"
+          >
+
+          <template v-slot:default="{ item }">
+            <core-BoundingBoxListItem
+              :bbox="item"
+              :ref="`box-info-${item.id}`"
+              @mouseenter.native="$emit('highlight', item.id)"
+              @mouseleave.native="$emit('highlight', undefined)"
+              @toggle="$emit('toggle', item)"
+              @select="$emit('select', item)"
+              @remove="$emit('remove', item)"
+            />
+          </template>
+        </v-virtual-scroll>
+      </v-expansion-panel-content>
+    </v-expansion-panel>
+
+    <v-expansion-panel v-if="selectedBBox !== undefined">
+      <v-expansion-panel-header>Selected Box</v-expansion-panel-header>
+      <v-expansion-panel-content>
         <core-BoundingBoxInfo
           :bbox="selectedBBox"
+          :maxHeight="maxHeight"
           @annotate="$emit('annotate', $event)"
           @predict="$emit('predict', $event)"
         />
-      </v-card-text>
-    </div>
-    <v-divider/>
-    <v-card-title
-      class="clickable"
-      @click="showBoxes = !showBoxes"
-    >
-      Bounding Boxes
-      <v-spacer/>
-      <v-icon v-if="showBoxes">mdi-chevron-down</v-icon>
-      <v-icon v-else>mdi-chevron-left</v-icon>
-    </v-card-title>
-
-    <v-card-text v-if="showBoxes">
-      <v-virtual-scroll
-        class="box-list"
-        height="350"
-        item-height="75"
-        bench="100"
-        :items="bboxes"
-        >
-
-        <template v-slot:default="{ item }">
-          <core-BoundingBoxListItem
-            :bbox="item"
-            :ref="`box-info-${item.id}`"
-            @mouseenter.native="$emit('highlight', item.id)"
-            @mouseleave.native="$emit('highlight', undefined)"
-            @toggle="$emit('toggle', item)"
-            @select="$emit('select', item)"
-            @remove="$emit('remove', item)"
-          />
-        </template>
-      </v-virtual-scroll>
-    </v-card-text>
-  </v-card>
+      </v-expansion-panel-content>
+    </v-expansion-panel>
+  </v-expansion-panels>
 </template>
 
 <script>
@@ -100,14 +58,13 @@ export default {
     maxHeight: undefined,
   },
   data: () => ({
-    showBoxes: false,
-    showFileInfo: false,
-    showBox: false,
+    panel: undefined
   }),
 
   watch: {
     selectedBBox: function(){
       this.updateSelected()
+      this.panel = 2;
     },
 
     bboxes: function() {
@@ -116,10 +73,9 @@ export default {
   },
 
   mounted: function() {
-    if (this.selectedBBox !== undefined)
+    if (this.selectedBBox !== undefined){
       this.markSelected(this.selectedBBox?.id, true)
-
-    this.showBox = this.selectedBBox !== undefined;
+    }
   },
 
   methods: {
@@ -156,4 +112,5 @@ export default {
   .clickable {
     cursor: pointer;
   }
+
 </style>
