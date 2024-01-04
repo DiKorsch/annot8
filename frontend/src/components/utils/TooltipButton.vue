@@ -21,7 +21,7 @@ export default {
   props: {
     tooltip: {
       type: String,
-      default: "Confirm"
+      default: "Tooltip"
     },
     color: {
       type: String,

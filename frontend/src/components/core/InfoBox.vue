@@ -1,68 +1,89 @@
 <template>
-  <v-expansion-panels accordion hover v-model="panel">
-    <v-expansion-panel>
-      <v-expansion-panel-header>File</v-expansion-panel-header>
-      <v-expansion-panel-content>
-        <core-FileInfo
-          :file="file"
-          :bboxes="bboxes"
-          :annotateButton="false"
-          :deleteButton="false"
-        />
-        <v-divider></v-divider>
-        <v-btn @click="$emit('detect')" small title="Run detector on this file">
-          <v-icon left>mdi-view-grid-plus-outline</v-icon> Detect
-        </v-btn>
-        <v-btn @click="$emit('predict')" small title="Run classifier on detected boxes"
-          :disabled="!hasBboxes"
-        >
-          <v-icon left>mdi-label-multiple-outline</v-icon> Classify
-        </v-btn>
-        <v-btn @click="$emit('annotate')" small title="Give this file a label">
-          <v-icon left>mdi-label</v-icon> Annotate
-        </v-btn>
-      </v-expansion-panel-content>
-    </v-expansion-panel>
+  <div>
+    <h2>Operations on ...</h2>
+    <v-expansion-panels accordion hover v-model="panel">
+      <v-expansion-panel>
+        <v-expansion-panel-header>Image</v-expansion-panel-header>
+        <v-expansion-panel-content>
+          <core-FileInfo
+            :file="file"
+            :bboxes="bboxes"
+            :annotateButton="false"
+            :deleteButton="false"
+          />
+          <v-divider></v-divider>
+          <v-btn @click="$emit('detect')" small title="Run detector on this file">
+            <v-icon left>mdi-view-grid-plus-outline</v-icon> Detect
+          </v-btn>
+          <v-menu offset-y>
+
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                small
+                v-bind="attrs"
+                v-on="on"
+                title="Run classifier on the image or detected boxes"
+              >
+                <v-icon left>mdi-label-multiple-outline</v-icon> Classify
+              </v-btn>
+            </template>
+
+            <v-list>
+              <v-list-item link @click="$emit('predictImage')">
+                <v-icon left>mdi-label-outline</v-icon> Image
+              </v-list-item>
+              <v-list-item link @click="$emit('predict')" :disabled="!hasBboxes" >
+                <v-icon left>mdi-label-multiple-outline</v-icon> All boxes
+              </v-list-item>
+            </v-list>
+          </v-menu>
+
+          <v-btn @click="$emit('annotateImage')" small title="Give this image a label">
+            <v-icon left>mdi-tag</v-icon> Annotate
+          </v-btn>
+        </v-expansion-panel-content>
+      </v-expansion-panel>
 
 
-    <v-expansion-panel v-if="hasBboxes">
-      <v-expansion-panel-header>Boxes</v-expansion-panel-header>
-      <v-expansion-panel-content>
-        <v-virtual-scroll
-          class="box-list"
-          :max-height="maxHeight"
-          item-height="75"
-          bench="100"
-          :items="bboxes"
-          >
+      <v-expansion-panel v-if="hasBboxes">
+        <v-expansion-panel-header>Bounding boxes</v-expansion-panel-header>
+        <v-expansion-panel-content>
+          <v-virtual-scroll
+            class="box-list"
+            :max-height="maxHeight"
+            item-height="75"
+            bench="100"
+            :items="bboxes"
+            >
 
-          <template v-slot:default="{ item }">
-            <core-BoundingBoxListItem
-              :bbox="item"
-              :ref="`box-info-${item.id}`"
-              @mouseenter.native="$emit('highlight', item.id)"
-              @mouseleave.native="$emit('highlight', undefined)"
-              @toggle="$emit('toggle', item)"
-              @select="$emit('select', item)"
-              @remove="$emit('remove', item)"
-            />
-          </template>
-        </v-virtual-scroll>
-      </v-expansion-panel-content>
-    </v-expansion-panel>
+            <template v-slot:default="{ item }">
+              <core-BoundingBoxListItem
+                :bbox="item"
+                :ref="`box-info-${item.id}`"
+                @mouseenter.native="$emit('highlight', item.id)"
+                @mouseleave.native="$emit('highlight', undefined)"
+                @toggle="$emit('toggle', item)"
+                @select="$emit('select', item)"
+                @remove="$emit('remove', item)"
+              />
+            </template>
+          </v-virtual-scroll>
+        </v-expansion-panel-content>
+      </v-expansion-panel>
 
-    <v-expansion-panel v-if="selectedBBox !== undefined">
-      <v-expansion-panel-header>Selected Box</v-expansion-panel-header>
-      <v-expansion-panel-content>
-        <core-BoundingBoxInfo
-          :bbox="selectedBBox"
-          :maxHeight="maxHeight"
-          @annotate="$emit('annotate', $event)"
-          @predict="$emit('predict', $event)"
-        />
-      </v-expansion-panel-content>
-    </v-expansion-panel>
-  </v-expansion-panels>
+      <v-expansion-panel v-if="selectedBBox !== undefined">
+        <v-expansion-panel-header>Selected box</v-expansion-panel-header>
+        <v-expansion-panel-content>
+          <core-BoundingBoxInfo
+            :bbox="selectedBBox"
+            :maxHeight="maxHeight"
+            @annotate="$emit('annotate', $event)"
+            @predict="$emit('predict', $event)"
+          />
+        </v-expansion-panel-content>
+      </v-expansion-panel>
+    </v-expansion-panels>
+  </div>
 </template>
 
 <script>

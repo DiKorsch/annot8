@@ -8,15 +8,23 @@
     position="center center"
   />
   <v-row v-if="predicted_label">
-    <v-col class="header" cols=4>Predicted label</v-col>
+    <v-col class="header" cols=4>Predicted</v-col>
     <v-col cols=5><a :href="gbif_link(bbox.predicted_label)" target="_new">{{predicted_label}}</a></v-col>
     <v-col cols=3>
-      <utils-ConfirmButton
+      <utils-TooltipButton
         color="green lighten-2"
+        tooltip="Confirm"
         @click="confirm(bbox, true)"
       >
         <v-icon color="white">mdi-check</v-icon>
-      </utils-ConfirmButton>
+      </utils-TooltipButton>
+      <utils-TooltipButton
+        color="deafult"
+        tooltip="Classify again"
+        @click="$emit('predict', bbox)"
+      >
+        <v-icon>mdi-label-outline</v-icon>
+      </utils-TooltipButton>
     </v-col>
   </v-row>
   <v-row v-else>
@@ -26,15 +34,16 @@
 
 
   <v-row v-if="annotated_label">
-    <v-col class="header" cols=4>Annotated label</v-col>
+    <v-col class="header" cols=4>Annotated</v-col>
     <v-col cols=5><a :href="gbif_link(bbox.label)" target="_new">{{annotated_label}}</a></v-col>
     <v-col cols=3>
-      <utils-ConfirmButton
+      <utils-TooltipButton
         color="green lighten-2"
+        tooltip="Confirm"
         @click="confirm(bbox, false)"
       >
         <v-icon color="white">mdi-check</v-icon>
-      </utils-ConfirmButton>
+      </utils-TooltipButton>
     </v-col>
   </v-row>
   <v-row v-else>
