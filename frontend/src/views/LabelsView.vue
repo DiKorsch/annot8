@@ -5,7 +5,6 @@
       :labels="labels"
       :parent="$route.query.parent"
     />
-
   </v-container>
 </template>
 
@@ -13,13 +12,15 @@
 import DataService from '@/services/data.service';
 
 export default {
+  name: "LabelsView",
+
   data: () => ({
     labels: [],
   }),
 
   methods: {
 
-    getFiles(){
+    getLabels(){
       DataService.labels.get()
         .then((labels) => {
           this.labels = labels;
@@ -27,7 +28,7 @@ export default {
     },
   },
   created() {
-    this.getFiles();
+    this.getLabels();
   },
 
 }

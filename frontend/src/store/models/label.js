@@ -5,7 +5,7 @@ let rank_orders = {
   "species": 3,
 }
 
-export default class File {
+export default class Label {
   constructor(data) {
     this.id = data.id;
     this.name = data.name;

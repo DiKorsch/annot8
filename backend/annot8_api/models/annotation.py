@@ -2,7 +2,7 @@
 from django.db import models
 from annot8_api.models import base
 from django.contrib.auth.models import User
-# from labeltree.models import label
+from labeltree.models import Label
 
 class Annotation(base.BaseModel):
 
@@ -15,7 +15,9 @@ class Annotation(base.BaseModel):
         related_query_name = "annotation",
     )
 
-    label = models.CharField(max_length=255) # label.Label()
+    label = models.ForeignKey(Label,
+        on_delete=models.CASCADE
+    )
 
     annotator = models.ForeignKey(
         User,

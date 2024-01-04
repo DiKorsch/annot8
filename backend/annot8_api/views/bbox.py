@@ -1,4 +1,5 @@
 from django.db.models import Q
+from django.shortcuts import get_object_or_404
 
 from rest_framework import status
 from rest_framework.decorators import action
@@ -8,6 +9,8 @@ from annot8_api import models as api_models
 from annot8_api import serializers
 from annot8_api.views.base import BaseViewSet
 from annot8_api.views.pagination import DefaultPagination
+
+from labeltree.models import Label
 
 class BBoxViewSet(BaseViewSet):
     serializer_class = serializers.BoundingBoxSerializer
@@ -50,6 +53,7 @@ class BBoxViewSet(BaseViewSet):
         if label is None:
             return Response({"status": "Label missing"},
                 status=status.HTTP_400_BAD_REQUEST)
+        label = get_object_or_404(Label, pk=label["id"])
 
         user = self.request.user
         bbox = self.get_object()

@@ -300,11 +300,8 @@ export default {
         });
     },
 
-    annotate(bbox){
-      console.log("[Image Annotator] labeling triggered", bbox)
-    },
-
-    labelBBox(bbox, label) {
+    annotate({bbox, label}){
+      console.log("[Image Annotator] bbox labeling triggered", bbox, label)
       DataService.bboxes.set_label(bbox.id, label)
         .then((ok) => {
           if (!ok){
@@ -314,6 +311,17 @@ export default {
           this.getBBoxes();
         });
     },
+
+    // labelBBox(bbox, label) {
+    //   DataService.bboxes.set_label(bbox.id, label)
+    //     .then((ok) => {
+    //       if (!ok){
+    //         console.error("[Image Annotator] Failed to label bounding box.");
+    //       }
+    //       this.$emit('updateBboxes');
+    //       this.getBBoxes();
+    //     });
+    // },
 
     removeBBox(bbox) {
       DataService.bboxes.delete(bbox.id)

@@ -39,7 +39,9 @@
   </v-row>
   <v-row v-else>
     <v-col cols=12>
-      <v-btn small @click="$emit('annotate', bbox)"><v-icon>mdi-tag</v-icon> Annotate</v-btn>
+      <dialogs-AnnotationDialog
+        @selected="$emit('annotate', {bbox, label: $event})"
+      />
     </v-col>
   </v-row>
 

@@ -1,101 +1,107 @@
 <template>
-
-    <v-card
-      elevation="2"
-      max-width="80%"
-      class="mx-auto"
+  <v-card
+    elevation="2"
+  >
+    <v-toolbar
+      color="indigo"
+      dark
     >
+      <v-toolbar-title v-if="labels !== undefined && labels.length !== labelList.length">
+        {{labelList.length}} out of {{ labels.length }} labels
+      </v-toolbar-title>
+      <v-toolbar-title v-else>
+        {{ labels.length }} labels
+      </v-toolbar-title>
+      <v-spacer></v-spacer>
+      <v-btn small @click="resetFilter"
+        v-if="labels !== undefined && labels.length !== labelList.length"
+      >Reset</v-btn>
 
-      <v-toolbar
-        color="indigo"
-        dark
+      <v-spacer></v-spacer>
+
+      <v-text-field
+        v-model="searchTerm"
+        placeholder="Search"
+        class="center"
+      />
+    </v-toolbar>
+    <v-container>
+      <v-row
+        class="px-6 py-3"
+        align="center"
       >
-        <v-toolbar-title v-if="labels !== undefined && labels.length !== labelList.length">
-          {{labelList.length}} out of {{ labels.length }} labels
-        </v-toolbar-title>
-        <v-toolbar-title v-else>
-          {{ labels.length }} labels
-        </v-toolbar-title>
-        <v-spacer></v-spacer>
-        <v-btn small @click="resetFilter"
-          v-if="labels !== undefined && labels.length !== labelList.length"
-        >Reset</v-btn>
-
-        <v-spacer></v-spacer>
-
-        <v-text-field
-          v-model="searchTerm"
-          placeholder="Search"
-          class="center"
-        />
-      </v-toolbar>
-      <v-container>
-        <v-row
-          class="px-6 py-3"
-          align="center"
+        <span class="mr-4">Filter</span>
+        <v-chip-group
+          v-model="selected_ranks"
+          column
+          multiple
         >
-          <span class="mr-4">Filter</span>
-          <v-chip-group
-            v-model="selected_ranks"
-            column
-            multiple
-          >
-            <v-chip v-for="rank in ranks"
-              :key="rank"
-              :value="rank"
-              filter
-              outlined
-            >{{rank}}</v-chip>
-          </v-chip-group>
+          <v-chip v-for="rank in ranks"
+            :key="rank"
+            :value="rank"
+            filter
+            outlined
+          >{{rank}}</v-chip>
+        </v-chip-group>
 
-        </v-row>
-        <v-virtual-scroll
-          :items="labelList"
-          bench="5"
-          height="600"
-          item-height="80"
-        >
-          <template v-slot:default="{ item }">
-            <v-list-item :key="item.id">
-              <v-list-item-action>
-                <v-btn
-                  fab
-                  small
-                  depressed
-                  color="primary"
-                >
-                  {{ item.id }}
-                </v-btn>
-              </v-list-item-action>
+      </v-row>
+      <v-virtual-scroll
+        :items="labelList"
+        bench="5"
+        height="600"
+        item-height="80"
+      >
+        <template v-slot:default="{ item }">
+          <v-list-item :key="item.id">
+            <v-list-item-action>
+              <v-btn
+                fab
+                small
+                depressed
+                color="primary"
+              >
+                {{ item.id }}
+              </v-btn>
+            </v-list-item-action>
 
-              <v-list-item-content>
-                <v-list-item-title>
-                  <div v-if="item.parent !== undefined"><i>{{item.parent}}</i> > {{ item.name }}</div>
-                  <div v-else>{{ item.name }}</div>
-                </v-list-item-title>
-                <v-list-item-subtitle>
-                <v-chip link @click="selected_ranks=[item.rank]" class="px-auto" small> {{ item.rank }} </v-chip>
-                <v-chip link :to="`?parent=${item.name}`" class="px-auto" small v-if="item.children.length">{{item.children.length }} children</v-chip>
-                <v-chip class="px-auto" small v-if="item.kr_nr">K&R-Nr. {{item.kr_nr }} </v-chip>
-                </v-list-item-subtitle>
-              </v-list-item-content>
+            <v-list-item-content>
+              <v-list-item-title>
+                <v-row>
+                  <v-col>
+                    <div v-if="item.parent !== undefined">
+                      <i>{{item.parent}}</i> > {{ item.name }}
+                    </div>
+                    <div v-else>{{ item.name }}</div>
+                  </v-col>
+                  <v-spacer/>
+                  <v-col align="right">
+                    <a :href="`https://gbif.org/occurrence/gallery?taxon_key=${item.id}`" target="_blank">
+                      <v-icon small >
+                        mdi-open-in-new
+                      </v-icon>
+                    </a>
 
-              <v-list-item-action>
-                <!-- <a :href="`https://api.gbif.org/v1/species/${item.id}`" target="_blank"> -->
-                <a :href="`https://gbif.org/occurrence/gallery?taxon_key=${item.id}`" target="_blank">
-                <v-icon small >
-                  mdi-open-in-new
-                </v-icon>
-                </a>
-              </v-list-item-action>
-            </v-list-item>
+                  </v-col>
+                </v-row>
+              </v-list-item-title>
+              <v-list-item-subtitle>
+              <v-chip link @click="selected_ranks=[item.rank]" class="px-auto" small> {{ item.rank }} </v-chip>
+              <v-chip link :to="`?parent=${item.name}`" class="px-auto" small v-if="item.children.length">{{item.children.length }} children</v-chip>
+              <v-chip class="px-auto" small v-if="item.kr_nr">K&R-Nr. {{item.kr_nr }} </v-chip>
+              </v-list-item-subtitle>
+            </v-list-item-content>
 
-            <v-divider></v-divider>
-          </template>
-        </v-virtual-scroll>
-      </v-container>
+            <v-list-item-action>
+              <v-btn v-if="selectable" @click="$emit('selected', item)">Select</v-btn>
+            </v-list-item-action>
+          </v-list-item>
 
-    </v-card>
+          <v-divider></v-divider>
+        </template>
+      </v-virtual-scroll>
+    </v-container>
+
+  </v-card>
 
 </template>
 
@@ -112,7 +118,11 @@ export default {
       default: () => ([
         "order", "family", "genus", "species"
       ])
-    }
+    },
+    selectable: {
+      type: Boolean,
+      default: false
+    },
   },
 
   computed: {
