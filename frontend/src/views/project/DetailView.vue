@@ -172,8 +172,6 @@
 
     data: () => ({
       proj_delete_dialog: false,
-      selectedClassifier: '',
-      selectedDetector: '',
     }),
 
     computed: {
@@ -192,6 +190,16 @@
 
       projectId() {
         return this.$route.params.id;
+      },
+
+      selectedDetector: {
+        get(){ return this.project.detector },
+        set(){ }
+      },
+
+      selectedClassifier: {
+        get(){ return this.project.classifier },
+        set(){ }
       },
     },
 
@@ -248,11 +256,6 @@
           });
       },
     },
-
-    created(){
-      this.selectedClassifier = this.project.classifier
-      this.selectedDetector = this.project.detector
-    }
 
   }
 </script>
