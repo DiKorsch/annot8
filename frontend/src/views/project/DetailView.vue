@@ -112,7 +112,7 @@
                 v-model="selectedDetector"
                 :items="project.detectors"
                 label="Detector"
-                @change="selectDetector(selectedDetector)"
+                @change="changeDetector()"
 
               ></v-select>
             </v-col>
@@ -121,7 +121,7 @@
                 v-model="selectedClassifier"
                 :items="project.classifiers"
                 label="Classifier"
-                @change="selectClassifier(selectedClassifier)"
+                @change="changeClassifier()"
               ></v-select>
             </v-col>
           </v-row>
@@ -229,22 +229,29 @@
           }
         });
       },
-      selectClassifier (classifier) {
-        DataService.classifier.select(this.projectId, classifier)
+      changeClassifier () {
+        DataService.classifier.select(this.projectId, this.selectedClassifier)
           .then((ok) => {
-            if (ok){
-              this.$router.push({name: "project", params: { id: this.projectId}})
-            }
+            if (ok)
+              this.$store.dispatch("messages/info", {msg: `Classifier changed to ${this.selectedClassifier}!`})
+            else
+              this.$store.dispatch("messages/error", {msg: "Classifier change failed!"})
           });
       },
-      selectDetector (detector) {
-        DataService.detector.select(this.projectId, detector)
+      changeDetector () {
+        DataService.detector.select(this.projectId, this.selectedDetector)
           .then((ok) => {
-            if (ok){
-              this.$router.push({name: "project", params: { id: this.projectId}})
-            }
+            if (ok)
+              this.$store.dispatch("messages/info", {msg: `Detector changed to ${this.selectedDetector}!`})
+            else
+              this.$store.dispatch("messages/error", {msg: "Detector change failed!"})
           });
       },
+    },
+
+    created(){
+      this.selectedClassifier = this.project.classifier
+      this.selectedDetector = this.project.detector
     }
 
   }

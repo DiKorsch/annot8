@@ -212,7 +212,7 @@ class DataService {
 
       return api.post(`project/${projectId}/classifier/`, data, config).then(
         (response) => {
-          response.data;
+          return response.data;
         });
     },
 

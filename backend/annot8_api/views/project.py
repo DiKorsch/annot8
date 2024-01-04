@@ -79,17 +79,21 @@ class ProjectViewSet(base.BaseViewSet):
     def classifier_select(self, request, pk=None):
         classifier = request.POST.get("classifier")
         project = self.get_object()
+        err = None
 
         if classifier is None:
-            return Response({"status": "Classifier missing"},
-                status=status.HTTP_400_BAD_REQUEST)
-        if classifier not in api_models.Project.classifiers:
-            return Response({"status": "Classifier name is invalid"},
+            err = "Classifier missing"
+
+        elif classifier not in api_models.Project.classifiers:
+            err = "Classifier name is invalid"
+
+        if err is not None:
+            return Response({"status": err},
                 status=status.HTTP_400_BAD_REQUEST)
 
         project.classifier = classifier
         project.save()
-        project.reload_classifier()
+        print(f"Selected new classifier: {project.classifier}")
         return Response({'status': 'Classifier selected'})
 
 
@@ -98,17 +102,21 @@ class ProjectViewSet(base.BaseViewSet):
         detector = request.POST.get("detector")
         project = self.get_object()
 
+        err = None
+
         if detector is None:
-            return Response({"status": "Detector missing"},
-                status=status.HTTP_400_BAD_REQUEST)
-        if detector not in api_models.Project.detectors:
-            return Response({"status": "Detector name is invalid"},
+            err = "Detector missing"
+
+        elif detector not in api_models.Project.detectors:
+            err = "Detector name is invalid"
+
+        if err is not None:
+            return Response({"status": err},
                 status=status.HTTP_400_BAD_REQUEST)
 
         project.detector = detector
         project.save()
-        project.reload_detector()
-        print("Selected detector " + project.detector)
+        print(f"Selected new detector: {project.detector}")
         return Response({'status': 'Detector selected'})
 
     @action(detail=True, methods=["post"], url_path="run_detector")

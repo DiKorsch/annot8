@@ -82,32 +82,21 @@ class Project(base.BaseModel):
             described_file__project=self.id
         )
 
-    def reload_detector(self):
+    def get_detector(self):
         if self.detector is None:
             return
 
         for det in BaseDetector.__subclasses__():
             if det.name == self.detector:
                 return det()
-        self.det = None
-
-    def get_detector(self):
-        if not hasattr(self, "det"):
-            return self.reload_detector()
-        return self.det
-
-    def reload_classifier(self):
-        if self.classifier is not None:
-            for cls in BaseClassifier.__subclasses__():
-                if cls.name == self.classifier:
-                    self.cls = cls()
-                    return
-        self.cls = None
 
     def get_classifier(self):
-        if not hasattr(self, "cls"):
-            self.reload_classifier()
-        return self.cls
+        if self.classifier is None:
+            return
+
+        for clf in BaseClassifier.__subclasses__():
+            if clf.name == self.classifier:
+                return clf()
 
     @classproperty
     def classifiers(cls):
