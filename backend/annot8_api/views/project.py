@@ -45,7 +45,7 @@ class ProjectViewSet(base.BaseViewSet):
         files_ser = serializers.FileSerializer(files, many=True)
         data = dict(boxes=boxes_ser.data, files=files_ser.data)
 
-        if request.GET.get("group_tracks") == "true":
+        if request.GET.get("group_tracks") == "true" and 0 not in [files.count(), boxes.count()]:
             data["tracks"] = group_tracks(boxes.all(), files.all())
         return Response(data)
 

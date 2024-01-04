@@ -132,7 +132,7 @@
               <v-btn color="teal lighten-2" block @click="runDetector">Run Detector</v-btn>
             </v-col>
             <v-col cols="6">
-              <v-btn color="teal lighten-2" block>Run Classifier</v-btn>
+              <v-btn color="teal lighten-2" block @click="runClassifier">Run Classifier</v-btn>
             </v-col>
             <!-- <v-col cols="4">
               <v-btn color="teal lighten-2" block>Run Detector and classifier</v-btn>
@@ -199,18 +199,35 @@
       runDetector() {
         this.$store.dispatch("messages/info", {msg: "Detector started"})
         DataService.detector.run(this.projectId)
-          .then((ok) => {
-            if(!ok)
+          .then((task) => {
+            if(task === undefined)
               this.$store.dispatch("messages/error", {msg: "Detector failed"})
+            else
+              this.$store.commit("addTask", task);
           })
       },
+
+      runClassifier(){
+        this.$store.dispatch("messages/info", {msg: "Classifier started"})
+        DataService.classifier.run(this.projectId)
+        .then((task) => {
+          if(task === undefined)
+            this.$store.dispatch("messages/error", {msg: "Classifier failed"})
+          else
+            this.$store.commit("addTask", task);
+        })
+      },
+
       deleteProj () {
         DataService.project.delete(this.projectId)
-          .then((ok) => {
-            if (ok){
-              this.$router.push({name: "projects"})
-            }
-          });
+        .then((status) => {
+          if (status === null) {
+            this.$router.push({name: "projects"})
+            this.$store.dispatch("messages/info", {msg: "Project deleted!"})
+          } else {
+            this.$store.dispatch("messages/error", {msg: `Project deletion failed! Returned status: ${status}`})
+          }
+        });
       },
       selectClassifier (classifier) {
         DataService.classifier.select(this.projectId, classifier)

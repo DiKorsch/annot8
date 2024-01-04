@@ -61,11 +61,10 @@ class DataService {
     delete: function(projectId) {
       return api.delete(`/project/${projectId}`)
         .then(() => {
-          return true;
+          return null;
         })
         .catch((error) =>{
-          if (error.response.status == 404)
-            return false;
+          return error.response.status
         });
     },
 
@@ -213,18 +212,35 @@ class DataService {
 
       return api.post(`project/${projectId}/classifier/`, data, config).then(
         (response) => {
-          return response.data;
+          response.data;
         });
-    }
+    },
+
+    run: function(projectId){
+      return api.post(`project/${projectId}/run_classifier/`)
+      .then(
+        (response) => {
+          return new Task(response.data);
+        })
+      .catch((error) => {
+          console.warn("[API] Error while classifying bounding boxes:", error)
+          return undefined;
+        });
+
+    },
   }
 
   detector = {
     run: function(projectId){
-      return api.post(`project/${projectId}/run_detector/`).then(
+      return api.post(`project/${projectId}/run_detector/`)
+      .then(
         (response) => {
-          return response.data;
-        }
-      );
+          return new Task(response.data);
+        })
+      .catch((error) => {
+          console.warn("[API] Error while detecting bounding boxes:", error)
+          return undefined;
+        });
     },
 
     select: function(projectId, detector) {
