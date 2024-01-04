@@ -64,6 +64,7 @@
 
           @annotate="showAnnotationDialog = true"
           @predict="classify($event)"
+          @detect="detect($event)"
         />
       </v-col>
     </v-row>
@@ -226,7 +227,7 @@ export default {
       }
 
       else if (interaction === "detect") {
-        this.estimateBBoxes();
+        this.detect();
       }
 
       else if (interaction === "classify") {
@@ -264,36 +265,43 @@ export default {
         });
     },
 
-    classify(bbox){
-      if (bbox === undefined){
-        DataService.files.predict_bboxes(this.fileId)
-          .then((task) => {
-            if (task === undefined){
-              console.error("[Image Annotator] Failed to predict bounding boxes.");
-              return
-            }
-            this.$store.commit("addTask", task);
-            this.$emit('updateBboxes');
-            this.getBBoxes();
-        });
+    classifyAll(){
+      DataService.files.predict_bboxes(this.fileId)
+        .then((task) => {
+          if (task === undefined){
+            console.error("[Image Annotator] Failed to predict bounding boxes.");
+            return
+          }
+          this.$store.commit("addTask", task);
+          this.$emit('updateBboxes');
+          this.getBBoxes();
+      });
 
-        this.$store.dispatch("messages/info", {msg: "Classifier started"})
-      } else {
-        DataService.bboxes.predict(bbox?.id)
-          .then((task) => {
-            if (task === undefined){
-              console.error("[Image Annotator] Failed to predict bounding box.");
-              return;
-            }
-            this.$store.commit("addTask", task);
-            this.$emit('updateBboxes');
-            this.getBBoxes();
-        });
-        this.$store.dispatch("messages/info", {msg: "Classifier started"})
-      }
+      this.$store.dispatch("messages/info", {msg: "Classifier started"})
     },
 
-    estimateBBoxes() {
+    classifyBbox(bboxId){
+      DataService.bboxes.predict(bboxId)
+        .then((task) => {
+          if (task === undefined){
+            console.error("[Image Annotator] Failed to predict bounding box.");
+            return;
+          }
+          this.$store.commit("addTask", task);
+          this.$emit('updateBboxes');
+          this.getBBoxes();
+      });
+      this.$store.dispatch("messages/info", {msg: "Classifier started"})
+    },
+
+    classify(bbox){
+      if (bbox === undefined)
+        return this.classifyAll()
+      else
+        return this.classifyBbox(bbox?.id)
+    },
+
+    detect() {
       DataService.files.generate_bboxes(this.fileId)
         .then((ok) => {
           if (!ok){

@@ -9,11 +9,23 @@
           :annotateButton="false"
           :deleteButton="false"
         />
+        <v-divider></v-divider>
+        <v-btn @click="$emit('detect')" small title="Run detector on this file">
+          <v-icon left>mdi-view-grid-plus-outline</v-icon> Detect
+        </v-btn>
+        <v-btn @click="$emit('predict')" small title="Run classifier on detected boxes"
+          :disabled="!hasBboxes"
+        >
+          <v-icon left>mdi-label-multiple-outline</v-icon> Classify
+        </v-btn>
+        <v-btn @click="$emit('annotate')" small title="Give this file a label">
+          <v-icon left>mdi-label</v-icon> Annotate
+        </v-btn>
       </v-expansion-panel-content>
     </v-expansion-panel>
 
 
-    <v-expansion-panel>
+    <v-expansion-panel v-if="hasBboxes">
       <v-expansion-panel-header>Boxes</v-expansion-panel-header>
       <v-expansion-panel-content>
         <v-virtual-scroll
@@ -108,6 +120,10 @@ export default {
   computed: {
     file_name() {
       return this.file?.name;
+    },
+
+    hasBboxes() {
+      return this.bboxes !== undefined && this.bboxes.length !== 0
     }
   },
 }
