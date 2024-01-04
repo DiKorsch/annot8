@@ -4,21 +4,44 @@
     max-width="500px"
   >
     <v-card>
-      <core-LazyImage :file="file" />
-      <v-card-title class="grey lighten-2">
-        Do you wish to delete file
-        <span class="mx-1" v-if="file !== undefined">
-          <b>{{ file.name }}</b>
-        </span>?
+      <v-card-title>
+        Do you really want to delete this file?
       </v-card-title>
+      <v-card-subtitle>
+        Attention: this cannot be undone!
+      </v-card-subtitle>
+      <v-card-text>
+        <core-FileInfo :file="file"
+          :annotateButton="false"
+          :deleteButton="false"
+        />
+      </v-card-text>
       <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn @click="$emit('close')">No</v-btn>
-        <v-btn @click="$emit('confirm', file)" color="error">Yes</v-btn>
+
+        <v-col class="text-left">
+          <v-btn
+            color="primary"
+            text
+            @click="$emit('close')"
+          >
+            No, close this window
+          </v-btn>
+        </v-col>
+
+        <v-col class="text-right">
+          <v-btn
+            color="red"
+            align="left"
+            text
+            @click="$emit('confirm', file)"
+          >
+            Yes, delete it.
+          </v-btn>
+        </v-col>
       </v-card-actions>
     </v-card>
 
-    <utils-KeypressHandler @pressed="handleKeyPress($event)"/>
+    <utils-KeypressHandler v-if="handleKeys" @pressed="handleKeyPress($event)"/>
   </v-dialog>
 </template>
 
@@ -29,6 +52,11 @@ export default {
 
   props: {
     file: undefined,
+
+    handleKeys: {
+      type: Boolean,
+      default: true,
+    }
   },
 
   methods: {

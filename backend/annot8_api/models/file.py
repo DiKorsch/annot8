@@ -1,5 +1,6 @@
 import enum
 import logging
+import humanize
 import numpy as np
 
 from django.conf import settings
@@ -61,13 +62,24 @@ class File(base.DescribableObject):
     serializer_fields = base.DescribableObject.serializer_fields + [
         "project",
         "url",
-        "thumbs"
+        "thumbs",
+        "meta",
     ]
 
 
     @property
     def url(self):
         return self.path.url
+
+    @property
+    def meta(self):
+        n_boxes = self.bboxes.count()
+
+        return [
+            ("Bounding boxes", n_boxes),
+            ("Resolution", f"{self.path.width}x{self.path.height}px"),
+            ("Size", humanize.naturalsize(self.path.size)),
+        ]
 
     @property
     def thumbs(self):

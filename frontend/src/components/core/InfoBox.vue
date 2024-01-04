@@ -3,7 +3,12 @@
     <v-expansion-panel>
       <v-expansion-panel-header>File</v-expansion-panel-header>
       <v-expansion-panel-content>
-        <core-FileInfo :file="file" :bboxes="bboxes"/>
+        <core-FileInfo
+          :file="file"
+          :bboxes="bboxes"
+          :annotateButton="false"
+          :deleteButton="false"
+        />
       </v-expansion-panel-content>
     </v-expansion-panel>
 

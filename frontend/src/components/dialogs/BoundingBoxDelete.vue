@@ -1,6 +1,6 @@
 <template>
   <v-dialog
-    v-model="hasBox"
+    v-model="model"
     max-width="500px"
   >
     <v-card>
@@ -49,7 +49,7 @@ export default {
   },
 
   computed: {
-    hasBox: {
+    model: {
       get() {
         return this.box !== undefined;
       },
