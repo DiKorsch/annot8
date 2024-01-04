@@ -27,7 +27,6 @@
           ref="optionBar"
           :interaction="interaction"
           @action="setInteraction($event)"
-          @toggleInfoBox="showInfo=!showInfo"
         />
       </v-col>
 
@@ -51,7 +50,7 @@
         </core-LazyImage>
       </v-col>
 
-      <v-col v-if="showInfo" cols="3">
+      <v-col cols="3">
         <core-InfoBox
           ref="infoBox"
           :selectedBBox="boxSelection.selected"
@@ -114,7 +113,6 @@ export default {
     interaction: 'select',
     boxSelection: new BoxSelection(),
 
-    showInfo: false,
     showAnnotationDialog: false,
 
     bboxes: [],
@@ -148,11 +146,6 @@ export default {
 
       v(that){
         that.toggle(that.boxSelection.selected);
-      },
-
-      i(that){
-        that.showInfo = !that.showInfo;
-        that.$refs.optionBar.toggleOption("toggleInfoBox", that.showInfo)
       },
 
       e(that){
@@ -400,7 +393,6 @@ export default {
             let box = this.bboxes.find((box) => box.id == showInfo);
 
             this.boxSelection.select(box);
-            this.showInfo = true;
           }
         });
       // this.toggleBBoxUpdate=!this.toggleBBoxUpdates; // toggle to change key and trigger update
