@@ -8,17 +8,20 @@
             absolute
             color="grey darken-4"
           >
-          <v-card overline>
-            <v-card-subtitle>{{file.name}}</v-card-subtitle>
-
-            <div v-if="file.meta !== undefined">
-              <v-card-text>
-                <v-row dense v-for="info, i in file.meta" :key="i">
-                  <v-col cols=6>{{info[0]}}</v-col>
-                  <v-col cols=6 >{{info[1]}}</v-col>
+          <v-card class="info-overlay" overline width="100%">
+            <v-card-subtitle>
+              <v-row dense class="text-caption">
+                <v-col cosl=12 class="text-truncate">{{file.name}}</v-col>
+              </v-row>
+            </v-card-subtitle>
+            <v-card-text>
+              <div v-if="file.meta !== undefined">
+                <v-row dense class="text-caption" v-for="info, i in file.meta" :key="i">
+                  <v-col cols=6 class="text-right">{{info[0]}}</v-col>
+                  <v-col cols=6 class="text-left">{{info[1]}}</v-col>
                 </v-row>
-              </v-card-text>
-            </div>
+              </div>
+            </v-card-text>
 
             <div v-if="hasButtons">
 
@@ -76,8 +79,8 @@ export default {
 </script>
 
 
-<style scoped>
-  .info-overlay {
-
+<style>
+  .v-overlay__content:has(.info-overlay) {
+    width: 90%;
   }
 </style>

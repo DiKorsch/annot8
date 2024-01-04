@@ -16,7 +16,7 @@ from pathlib import Path
 
 from annot8_api import models as api_models
 from annot8_api.models import base
-
+from annot8_ai.detector.tracks import creation_date
 
 class Extensions(enum.Enum):
     JPG = ".jpg"
@@ -31,6 +31,8 @@ def project_directory(instance: "File", filename: str):
 
 class File(base.DescribableObject):
     __name__ = "File"
+
+    DATE_FMT = "%d.%m.%Y %H:%M:%S"
 
     EXTENSIONS = [
         (Extensions.JPG, "JPG Image"),
@@ -75,10 +77,14 @@ class File(base.DescribableObject):
     def meta(self):
         n_boxes = self.bboxes.count()
 
+        record_date = creation_date(self)
+
         return [
             ("Bounding boxes", n_boxes),
             ("Resolution", f"{self.path.width}x{self.path.height}px"),
             ("Size", humanize.naturalsize(self.path.size)),
+            ("Recorded on", record_date.strftime(File.DATE_FMT)),
+            ("Uploaded on", self.created.strftime(File.DATE_FMT)),
         ]
 
     @property
