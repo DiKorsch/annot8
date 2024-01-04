@@ -63,7 +63,7 @@ export default {
     if (this.timer !== undefined)
       return
     console.log("[Task List] creating new task getter")
-    this.getTasks();
+    this.getTasks(true);
     setInterval(this.getTasks, this.delay)
   },
 
@@ -76,8 +76,11 @@ export default {
   },
 
   methods: {
-    getTasks(){
+    getTasks(force){
       if (!this.loggedIn)
+        return;
+
+      if (!force && this.allReady)
         return;
 
       console.log("[Task List] Checking for new tasks")
@@ -103,6 +106,10 @@ export default {
     tasksSorted() {
       // this will sort tasks in descending order
       return this.tasks.toSorted((a, b) => a.id === b.id ? 0 : (a.id < b.id ? 1 : -1));
+    },
+
+    allReady() {
+      return this.tasks.every((task) => task.nqueued == task.nready)
     }
   }
 }
