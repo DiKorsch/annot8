@@ -39,9 +39,9 @@
   </v-row>
   <v-row v-else>
     <v-col cols=12>
-      <dialogs-AnnotationDialog
-        @selected="$emit('annotate', {bbox, label: $event})"
-      />
+      <v-btn small @click="$emit('annotate')">
+        <v-icon>mdi-tag</v-icon> Annotate
+      </v-btn>
     </v-col>
   </v-row>
 
@@ -63,7 +63,6 @@ import { mapGetters } from 'vuex';
 
 export default {
   name: "BoundingBoxInfo",
-  model: {prop: "bbox", event: "input"},
 
   props: {
     bbox: undefined,
@@ -75,10 +74,6 @@ export default {
 
   computed: {
     ...mapGetters(['getMediaUrl']),
-    localValue: {
-      get: function(){ return this.bbox },
-      set: function(bbox){ this.$emit('input', bbox) },
-    },
 
     label: function() {
       return this.bbox.label || this.bbox.predicted_label;

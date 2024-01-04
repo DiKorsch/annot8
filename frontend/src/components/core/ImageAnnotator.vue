@@ -16,6 +16,11 @@
       @confirm="updateBBox($event)"
     />
 
+    <dialogs-AnnotationDialog
+      v-model="showAnnotationDialog"
+      @selected="annotate($event)"
+    />
+
     <v-row>
       <v-col cols="auto">
         <core-ImageAnnotatorOptionBar
@@ -58,12 +63,11 @@
           @select="select($event)"
           @remove="boxSelection.toDelete = $event"
 
-          @annotate="annotate($event)"
+          @annotate="showAnnotationDialog = true"
           @predict="classify($event)"
         />
       </v-col>
     </v-row>
-
   </div>
 </template>
 
@@ -111,6 +115,8 @@ export default {
     boxSelection: new BoxSelection(),
 
     showInfo: false,
+    showAnnotationDialog: false,
+
     bboxes: [],
 
     keyActions: {
@@ -204,6 +210,10 @@ export default {
     },
 
     handleKeyPress(event){
+      // ignore key presses if the annotationed dialog is open
+      if (this.showAnnotationDialog)
+        return
+
       for (let key in this.keyActions)
         if (event.key == key)
           this.keyActions[key](this)
@@ -300,7 +310,14 @@ export default {
         });
     },
 
-    annotate({bbox, label}){
+    annotate(label){
+      let bbox = this.boxSelection.selected;
+      if (bbox === undefined){
+        console.warn("[Image Annotator] no bbox was selected for annotation!", label)
+        return
+
+      }
+
       console.log("[Image Annotator] bbox labeling triggered", bbox, label)
       DataService.bboxes.set_label(bbox.id, label)
         .then((ok) => {
