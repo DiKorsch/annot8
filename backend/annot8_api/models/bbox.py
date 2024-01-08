@@ -42,7 +42,7 @@ class BoundingBox(base.DescribableObject):
         "y",
         "width",
         "height",
-        "crops"
+        "thumbs"
     ]
 
     @property
@@ -54,8 +54,8 @@ class BoundingBox(base.DescribableObject):
         return self.x + self.width/2, self.y + self.height/2
 
     @property
-    def crops(self):
-        crops = {}
+    def thumbs(self):
+        thumbs = {}
 
         try:
             folder = self.crop_folder
@@ -63,16 +63,16 @@ class BoundingBox(base.DescribableObject):
             name = self.crop_fname
 
             if (folder / name).exists():
-                crops["original"] = str(url / name)
+                thumbs["original"] = str(url / name)
 
             for th_name, _ in api_models.File.THUMBNAILS:
 
                 crop = folder / th_name / name
                 if crop.exists():
-                    crops[th_name] = str(url / th_name / name)
+                    thumbs[th_name] = str(url / th_name / name)
         except Exception as e:
             logging.error(str(e))
-        return crops
+        return thumbs
 
     @property
     def crop_folder(self):

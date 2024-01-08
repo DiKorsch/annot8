@@ -24,6 +24,24 @@
     <v-row>
       <v-col>
         <div class="cropped-img">
+          <v-tooltip top v-if="hasLabel">
+
+            <template v-slot:activator="{ on, attrs }">
+              <div
+                v-bind="attrs"
+                v-on="on"
+                class="label lighten-1"
+                :class="{
+                  blue: box.label !== null,
+                  green: box.label === null,
+                }"
+                >
+                <v-icon small v-if="box.label !== null">mdi-tag</v-icon>
+                <v-icon small v-else>mdi-brain</v-icon>
+              </div>
+            </template>
+            <span>{{label}}</span>
+          </v-tooltip>
           <img ref="image" :src="src" :style="style">
           <slot></slot>
         </div>
@@ -42,7 +60,7 @@ export default {
   props: {
     file: undefined,
     box: undefined,
-    use_crops: {
+    useThumbs: {
       type: Boolean,
       default: true,
     },
@@ -76,14 +94,30 @@ export default {
   computed: {
     ...mapGetters(['getMediaUrl']),
 
-    hasCrops: function() {
-      let boxThumbs = this.box?.crops;
-      return this.use_crops && boxThumbs !== undefined && boxThumbs[this.thumbSize] !== undefined
+    hasThumbs: function() {
+      let boxThumbs = this.box?.thumbs;
+      return this.useThumbs && boxThumbs !== undefined && boxThumbs[this.thumbSize] !== undefined
+    },
+
+    label: function() {
+      if (this.hasLabel) {
+        if (this.box.label !== null) {
+          return this.box.label.name;
+        } else {
+          return this.box.predicted_label.name;
+        }
+      } else {
+        return "Unknown";
+      }
+    },
+
+    hasLabel: function(){
+      return (this.box.label !== undefined && this.box.label !== null) || (this.box.predicted_label !== undefined && this.box.predicted_label !== null);
     },
 
     thumb: function() {
-      let boxThumbs = this.box?.crops;
-      if (this.use_crops && boxThumbs !== undefined && boxThumbs[this.thumbSize] !== undefined )
+      let boxThumbs = this.box?.thumbs;
+      if (this.useThumbs && boxThumbs !== undefined && boxThumbs[this.thumbSize] !== undefined )
         return boxThumbs[this.thumbSize]
 
 
@@ -103,7 +137,7 @@ export default {
       if (this.box === undefined)
         return {}
 
-      if (!this.hasCrops){
+      if (!this.hasThumbs){
         let coords = this.coordinates();
 
         return {
@@ -156,6 +190,22 @@ export default {
 
 .cropped-img img {
   width: 100%;
+}
+
+
+.cropped-img .label {
+  opacity: 80%;
+  position: absolute;
+  inset: -12px -12px auto auto ;
+  height: 24px;
+  width: 24px;
+  border-radius: 24px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: black !important;
+  display: flex;
+  justify-content: center;
+  text-align: center;
 }
 
 </style>

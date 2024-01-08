@@ -12,7 +12,7 @@
         <core-CroppedImage
           :file="file"
           :box="box"
-          :use_crops="false"
+          :useThumbs="false"
         >
 
           <core-ResizeButtons

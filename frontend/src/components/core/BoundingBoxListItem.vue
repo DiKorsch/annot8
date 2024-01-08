@@ -68,7 +68,7 @@ export default {
     },
     thumb: function() {
 
-      let boxThumbs = this.bbox?.crops;
+      let boxThumbs = this.bbox?.thumbs;
       let url = ""
       if (boxThumbs !== undefined && boxThumbs[this.thumbSize] !== undefined )
         url = boxThumbs[this.thumbSize]

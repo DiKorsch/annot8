@@ -29,6 +29,6 @@ export default class BBox {
       this.prediction_model = null;
     }
 
-    this.crops = data.crops;
+    this.thumbs = data.thumbs;
   }
 }

@@ -9,10 +9,10 @@
         hidden: hidden}"
     @click="$emit('selectedBBox', localValue)"
   >
-    <v-tooltip top>
+    <v-tooltip top v-if="hasLabel">
 
       <template v-slot:activator="{ on, attrs }">
-        <div v-if="hasLabel"
+        <div
           v-bind="attrs"
           v-on="on"
           class="label lighten-1"
@@ -25,7 +25,7 @@
           <v-icon small v-else>mdi-brain</v-icon>
         </div>
       </template>
-      <span>{{labelName}}</span>
+      <span>{{label}}</span>
     </v-tooltip>
   </div>
 </template>
@@ -66,7 +66,7 @@ export default {
       }
     },
 
-    labelName: function() {
+    label: function() {
       if (this.hasLabel) {
         if (this.bbox.label !== null) {
           return this.bbox.label.name;
@@ -79,7 +79,7 @@ export default {
     },
 
     hasLabel: function(){
-      return (typeof this.bbox.label !== 'undefined' && this.bbox.label !== null) || (typeof this.bbox.predicted_label !== 'undefined' && this.bbox.predicted_label !== null);
+      return (this.bbox.label !== undefined && this.bbox.label !== null) || (this.bbox.predicted_label !== undefined && this.bbox.predicted_label !== null);
     }
   },
 

@@ -28,7 +28,7 @@
           <v-tabs v-model="tab">
             <v-tab>Grouped by Location</v-tab>
             <v-tab>Ungrouped</v-tab>
-            <v-tab>...</v-tab>
+            <!-- <v-tab>...</v-tab> -->
           </v-tabs>
 
 
@@ -84,6 +84,7 @@
                     :key="k"
                     class="col-2 d-flex child-flex">
                       <v-badge
+                        left
                         :value="selected.indexOf(boxId)!==-1"
                         icon="mdi-check">
 
@@ -119,25 +120,41 @@
 
         <v-card v-if="tab == 0">
           <v-card-title>
-            Track operations
+            Edit track
           </v-card-title>
 
           <v-card-subtitle v-if="currentTrack !== undefined">
            Track with {{ currentTrack.length }} Crops
           </v-card-subtitle>
-
+          <v-card-text v-if="currentTrackPredictions.length !== 0">
+            Predicted as
+            <v-btn
+              v-for="(pred, i) in currentTrackPredictions" :key="i"
+              @click="annotate(currentTrack, pred[2])"
+              x-small
+              :title="`Annotate the entire tracks as '${pred[2].name}'`">
+              {{pred[0]}} ({{pred[1]}}x)
+            </v-btn>
+          </v-card-text>
+          <v-card-text v-else>
+            No predictions yet
+          </v-card-text>
           <v-card-text>
             <v-row>
               <v-col cols=12>
                 <v-btn @click="remove(currentTrack)"
+                title="Delete entire track"
                 block color="error"><v-icon left>mdi-trash-can-outline</v-icon> Delete</v-btn>
               </v-col>
               <v-col cols=12>
                 <v-btn @click="annotate(currentTrack)"
+
+                title="Label entire track as ..."
                 block><v-icon left>mdi-tag-outline</v-icon> Annotate</v-btn>
               </v-col>
               <v-col cols=12>
                 <v-btn @click="classify(currentTrack)"
+                title="Predict entire track"
                 block><v-icon left>mdi-brain</v-icon> Classify</v-btn>
               </v-col>
             </v-row>
@@ -147,7 +164,7 @@
 
         <v-card v-if="tab == 1">
           <v-card-title>
-            Crop operations
+            Edit selected
           </v-card-title>
           <v-card-subtitle v-if="selected.length !== 0">
             Selected {{selected.length}} crops <v-btn x-small @click="selected = []">reset</v-btn>
@@ -204,6 +221,13 @@ export default {
 
     currentTrack(){
       return this.tracks[this.selectedTrack-1];
+    },
+
+    currentTrackPredictions(){
+      const boxPreds = this.currentTrack.map((i) => this.box(i).predicted_label);
+      const groupedPreds = Map.groupBy(boxPreds, (label) => label?.name);
+
+      return Array.from(groupedPreds, ([key, preds]) => [key, preds.length, preds[0]]).filter((entry) => entry[0] !== undefined)
     },
 
     currentUngrouped(){
@@ -275,7 +299,7 @@ export default {
         this.selectedTrack = Math.min(this.tracks.length, this.selectedTrack+1);
 
       else if(this.tab == 1)
-        this.selectedUngrouped = Math.min(this.ungroupedBoxes.length, this.selectedUngrouped+1);
+        this.selectedUngrouped = Math.min(this.nUngroupedPages, this.selectedUngrouped+1);
 
     },
 
@@ -311,8 +335,10 @@ export default {
       console.log("Remove for", ids, "was clicked");
     },
 
-    annotate(ids){
+    annotate(ids, label){
       console.log("Annotate for", ids, "was clicked");
+      if (label !== undefined)
+        console.log("Annotating as", label)
 
     },
 
