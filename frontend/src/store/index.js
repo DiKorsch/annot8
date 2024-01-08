@@ -57,7 +57,7 @@ export default new Vuex.Store({
             }
           )
 
-          DataService.project.crops(project.id, true).then(
+          DataService.crops.get(project.id, true).then(
             (crops) => {
               this.commit("setProjectCrops", crops)
             }
@@ -95,6 +95,30 @@ export default new Vuex.Store({
       state.projectFiles.push(file)
       this.dispatch("messages/info", {
             msg: `File ${file.name} uploaded`})
+    },
+
+    bboxDeleted(state, boxId){
+
+      const box = state.projectCrops.boxes.get(boxId);
+      if (box !== undefined)
+        state.projectCrops.boxes.delete(boxId)
+
+      let deletedId = undefined;
+      let i = 0;
+      for (let track of state.projectCrops.tracks){
+
+        const idx = track.indexOf(boxId)
+        if (idx !== -1){
+          track.splice(idx, 1)
+          deletedId = i
+          break
+        }
+
+        i += 1;
+      }
+
+      if (deletedId !== undefined && state.projectCrops.tracks[i].length === 0)
+        state.projectCrops.tracks.splice(i, 1)
     }
   },
 

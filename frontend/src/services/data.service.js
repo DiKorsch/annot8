@@ -80,8 +80,10 @@ class DataService {
           return response.data;
         });
     },
+  }
 
-    crops: function(projectId, grouped){
+  crops = {
+    get: function(projectId, grouped){
       let url = `/project/${projectId}/crops/`;
       if (grouped)
         url = `${url}?group_tracks=true`
@@ -284,6 +286,16 @@ class DataService {
           .catch((error) => {
             console.warn("[API] Error while deleting bounding box: ", error)
             return false;
+          })
+      },
+
+      deleteMany: function(idxs){
+        if(!idxs || idxs?.length <=0 )
+          return false;
+        return api.delete('bbox/many/', {data: {idxs}})
+          .then((resp) => {
+            const data = resp?.data;
+            return {msg: data.status, idxs: data.idxs};
           })
       },
 

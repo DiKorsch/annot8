@@ -46,6 +46,7 @@ class AnnotationSerializer(BaseSerializer):
     # but instead by their username.
     # Field is read only - alternatively one could specify a queryset.
     confirmators = UserListingField(many=True, read_only=True)
+    label = LabelSerializer()
     annotator = serializers.StringRelatedField()
 
     class Meta:

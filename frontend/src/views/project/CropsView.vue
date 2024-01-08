@@ -139,6 +139,19 @@
           <v-card-text v-else>
             No predictions yet
           </v-card-text>
+          <v-card-text v-if="currentTrackAnnotations.length !== 0">
+            Annotated as
+            <v-btn
+              v-for="(annot, i) in currentTrackAnnotations" :key="i"
+              @click="annotate(currentTrack, annot[2])"
+              x-small
+              :title="`Annotate the entire tracks as '${annot[2].name}'`">
+              {{annot[0]}} ({{annot[1]}}x)
+            </v-btn>
+          </v-card-text>
+          <v-card-text v-else>
+            No annotations yet
+          </v-card-text>
           <v-card-text>
             <v-row>
               <v-col cols=12>
@@ -194,13 +207,14 @@
 
       </v-col>
     </v-row>
-
   </v-container>
 </template>
 
 
 <script>
 import { mapGetters } from 'vuex'
+import DataService from '@/services/data.service';
+
 
 export default {
   name: "CropsView",
@@ -223,8 +237,17 @@ export default {
       return this.tracks[this.selectedTrack-1];
     },
 
+
+
     currentTrackPredictions(){
       const boxPreds = this.currentTrack.map((i) => this.box(i).predicted_label);
+      const groupedPreds = Map.groupBy(boxPreds, (label) => label?.name);
+
+      return Array.from(groupedPreds, ([key, preds]) => [key, preds.length, preds[0]]).filter((entry) => entry[0] !== undefined)
+    },
+
+    currentTrackAnnotations(){
+      const boxPreds = this.currentTrack.map((i) => this.box(i).label);
       const groupedPreds = Map.groupBy(boxPreds, (label) => label?.name);
 
       return Array.from(groupedPreds, ([key, preds]) => [key, preds.length, preds[0]]).filter((entry) => entry[0] !== undefined)
@@ -251,12 +274,12 @@ export default {
       return this.crops?.tracks || [];
     },
 
+    groupedBoxes (){
+      return this.tracks.reduce((arr, track) => arr.concat(track), []);
+    },
+
     ungroupedBoxes () {
-
-      const boxesInTracks = this.tracks.reduce((arr, track) => arr.concat(track), [])
-      let grouped = Map.groupBy(this.boxes, (entry) => boxesInTracks.indexOf(entry[0]) != -1)
-      return grouped.get(false).map((entry) => entry[0])
-
+      return Array.from(this.boxes).map((el)=>el[0]).filter((idx) => this.groupedBoxes.indexOf(idx) !== -1)
     },
 
     nUngroupedPages(){
@@ -277,6 +300,12 @@ export default {
       return this.ungroupedBoxes.slice(this.ungroupedStart, this.ungroupedEnd);
     },
 
+  },
+
+  watch: {
+    crops: function(val, oldVal){
+      console.log("Crops changed!", oldVal, val)
+    }
   },
 
   methods: {
@@ -319,6 +348,8 @@ export default {
 
     file(boxId){
       let box = this.box(boxId)
+      if (box === undefined)
+        return undefined
       return this.files.get(box.fileId);
     },
 
@@ -332,7 +363,15 @@ export default {
 
 
     remove(ids){
-      console.log("Remove for", ids, "was clicked");
+      DataService.bboxes.deleteMany(ids)
+        .then(({msg, idxs}) => {
+          if (msg !== undefined)
+            this.$store.dispatch("messages/info", {msg: msg})
+
+          this.previous()
+          for (const id of idxs)
+            this.$store.commit("bboxDeleted", id)
+        })
     },
 
     annotate(ids, label){

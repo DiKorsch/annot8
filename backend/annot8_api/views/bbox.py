@@ -16,12 +16,16 @@ class BBoxViewSet(BaseViewSet):
     serializer_class = serializers.BoundingBoxSerializer
     pagination_class = DefaultPagination
 
-    def get_queryset(self):
+    def get_queryset(self, distinct: bool = True):
         user = self.request.user
-        return api_models.BoundingBox.objects.filter(
+        qset = api_models.BoundingBox.objects.filter(
             Q(described_file__project__user=user) |
             Q(described_file__project__collaborators__in=[user])
-        ).distinct()
+        )
+
+        if distinct:
+            return qset.distinct()
+        return qset
 
     def update(self, request, pk=None, *args, **kwargs):
         bbox = self.get_object()
@@ -58,11 +62,16 @@ class BBoxViewSet(BaseViewSet):
         user = self.request.user
         bbox = self.get_object()
 
+        try:
+            annotation = bbox.annotation
+        except api_models.Annotation.DoesNotExist:
+            annotation = api_models.Annotation(described_object=bbox)
+
         # Create a corresponding annotation / update the existing one.
         try:
-            annotation, created = api_models.Annotation.objects.get_or_create(described_object=bbox)
             annotation.label = label
             annotation.annotator = user
+            annotation.save()
             annotation.confirmators.clear()
             annotation.save()
         except Exception as e:
@@ -72,3 +81,24 @@ class BBoxViewSet(BaseViewSet):
 
         else:
             return Response({'status': 'Label added to bounding box'})
+
+
+    @action(detail=False, methods=["delete"], url_path="many")
+    def delete_many(self, request):
+        idxs = request.data.get("idxs")
+        if idxs is None:
+            return Response({"status": "IDs missing"},
+                status=status.HTTP_400_BAD_REQUEST)
+        objects = self.get_queryset(distinct=False).filter(pk__in=idxs)
+        idxs = list(objects.values_list("pk", flat=True))
+        try:
+            objects.delete()
+        except Exception as e:
+            print(e)
+            return Response({"status": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response({
+            'status': f'{len(idxs)} Bounding boxes deleted successfully!',
+            'idxs': idxs
+            })
