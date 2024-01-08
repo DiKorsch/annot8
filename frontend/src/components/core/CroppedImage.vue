@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div @click="$emit('click')">
     <v-row v-if="qualitySelector">
       <v-col>Quality:</v-col>
       <v-col class="text-right">

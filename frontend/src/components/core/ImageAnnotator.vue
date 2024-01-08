@@ -22,14 +22,14 @@
     />
 
     <v-row>
-      <v-col cols="auto">
+      <!-- <v-col cols="auto">
         <core-ImageAnnotatorOptionBar
           ref="optionBar"
           :interaction="interaction"
           @action="setInteraction($event)"
         />
       </v-col>
-
+ -->
       <v-col>
 
         <core-LazyImage
