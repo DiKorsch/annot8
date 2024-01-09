@@ -8,6 +8,7 @@
       </v-container>
     </v-main>
 
+    <app-GBIFExamples/>
     <app-SnackBar/>
   </v-app>
 </template>

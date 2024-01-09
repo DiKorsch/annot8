@@ -229,6 +229,12 @@ export default {
   }),
 
   computed: {
+
+    ...mapGetters({
+      crops: 'getProjectCrops',
+      cropsLoading: 'isLoadingCrops',
+    }),
+
     projectId() {
       return this.$route.params.id;
     },
@@ -236,8 +242,6 @@ export default {
     currentTrack(){
       return this.tracks[this.selectedTrack-1];
     },
-
-
 
     currentTrackPredictions(){
       const boxPreds = this.currentTrack.map((i) => this.box(i).predicted_label);
@@ -257,11 +261,6 @@ export default {
       return this.ungroupedBoxes[this.selectedUngrouped-1];
     },
 
-    ...mapGetters({
-      crops: 'getProjectCrops',
-      cropsLoading: 'isLoadingCrops',
-    }),
-
     boxes() {
       return this.crops?.boxes || {};
     },
@@ -279,7 +278,8 @@ export default {
     },
 
     ungroupedBoxes () {
-      return Array.from(this.boxes).map((el)=>el[0]).filter((idx) => this.groupedBoxes.indexOf(idx) !== -1)
+      return Array.from(this.boxes).map((el)=>el[0])
+        .filter((idx) => this.groupedBoxes.indexOf(idx) === -1)
     },
 
     nUngroupedPages(){

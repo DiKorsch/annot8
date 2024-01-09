@@ -19,7 +19,6 @@
 <script>
 import { mapGetters } from 'vuex'
 import DataService from '@/services/data.service';
-import store from '@/store'
 
 export default {
   name: "ProjectSelector",
@@ -57,7 +56,7 @@ export default {
     selectProject(projectID){
       let project = this.projects.find((proj) => proj.id == projectID);
       console.log("[Project Selector] selected ", project)
-      store.commit('setCurrentProject', project);
+      this.$store.commit('setCurrentProject', project);
 
       this.$emit("selected", project);
 

@@ -9,7 +9,7 @@
   />
   <v-row v-if="predicted_label">
     <v-col class="header" cols=4>Predicted</v-col>
-    <v-col cols=5><a :href="gbif_link(bbox.predicted_label)" target="_new">{{predicted_label}}</a></v-col>
+    <v-col cols=5><a x-small @click="$store.dispatch('gbif/setLabel', bbox.predicted_label)">{{predicted_label}}</a></v-col>
     <v-col cols=3>
       <utils-TooltipButton
         color="green lighten-2"
@@ -35,7 +35,7 @@
 
   <v-row v-if="annotated_label">
     <v-col class="header" cols=4>Annotated</v-col>
-    <v-col cols=5><a :href="gbif_link(bbox.label)" target="_new">{{annotated_label}}</a></v-col>
+    <v-col cols=5><a x-small :href="$store.dispatch('gbif/setLabel', bbox.label)">{{annotated_label}}</a></v-col>
     <v-col cols=3>
       <utils-TooltipButton
         color="green lighten-2"
@@ -110,9 +110,6 @@ export default {
 
   },
   methods: {
-    gbif_link(label){
-      return `https://www.gbif.org/occurrence/gallery?media_type=StillImage&life_stage=Imago&taxon_key=${label.id}`
-    },
 
     confirm(bbox, is_predicted){
       if(is_predicted)

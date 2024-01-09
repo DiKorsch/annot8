@@ -41,7 +41,6 @@
 <script>
 import { mapGetters } from 'vuex'
 import DataService from '@/services/data.service';
-import store from '@/store'
 
 export default {
   name: "TaskList",
@@ -85,7 +84,7 @@ export default {
 
       console.log("[Task List] Checking for new tasks")
       DataService.tasks.get().then((tasks) => {
-        store.commit("setTasks", tasks)
+        this.$store.commit("setTasks", tasks)
       })
     },
 
