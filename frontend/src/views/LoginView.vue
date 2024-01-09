@@ -59,8 +59,7 @@
   export default {
     name: 'LoginView',
 
-    data () {
-      return {
+    data: () => ({
         valid: false,
         user: new User('', ''),
         loading: false,
@@ -69,8 +68,8 @@
         rules: {
           required: [value => !!value || 'Required.'],
         },
-      }
-    },
+    }),
+
 
     computed: {
       loginErrors () {
@@ -81,12 +80,18 @@
       },
       loggedIn() {
         return this.$store.state.auth.loggedIn;
+      },
+
+      next() {
+        return this.$route.query["next"]
       }
+
     },
     created() {
-      if (this.loggedIn){
+      if (this.loggedIn)
         this.$router.push({ name: 'index' })
-      }
+
+      console.log("[Login] redirecting to", this.next)
     },
 
 
