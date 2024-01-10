@@ -9,7 +9,11 @@
           Examples from GBIF for "{{label.name}}"
           <a :href="gbif_link(label)" target="_new">
             <v-icon right>mdi-open-in-new</v-icon>
-          </a></v-card-title>
+          </a>
+          <v-spacer/>
+          <v-btn @click="loadResults">reload</v-btn>
+
+        </v-card-title>
         <v-card-text>
           <v-row v-if="examples.length !== 0">
             <v-col
@@ -135,18 +139,23 @@ export default {
       return `https://www.gbif.org/occurrence/gallery?media_type=StillImage&life_stage=Imago&taxon_key=${label.id}`
     },
 
-  },
+    loadResults() {
 
-  watch: {
-    label(lab){
-      if(lab !== undefined)
+      if(this.label !== undefined)
 
-        gbif.get(`species/${lab.id}/media?limit=10&life_stage=Imago&media_type=StillImage`)
+        gbif.get(`species/${this.label.id}/media?limit=10&life_stage=Imago&media_type=StillImage`)
           .then((response) => {
             this.gbifResults = response?.data?.results
           })
       else
         this.gbifResults = undefined
+    },
+
+  },
+
+  watch: {
+    label(){
+      this.loadResults()
     }
   }
 
