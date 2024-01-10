@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
@@ -63,25 +64,47 @@ class BBoxViewSet(BaseViewSet):
         bbox = self.get_object()
 
         try:
-            annotation = bbox.annotation
-        except api_models.Annotation.DoesNotExist:
-            annotation = api_models.Annotation(described_object=bbox)
-
-        # Create a corresponding annotation / update the existing one.
-        try:
-            annotation.label = label
-            annotation.annotator = user
-            annotation.save()
-            annotation.confirmators.clear()
-            annotation.save()
+            with transaction.atomic():
+                bbox.annotate(label, user)
         except Exception as e:
             print(e)
             return Response({"status": str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         else:
-            return Response({'status': 'Label added to bounding box'})
+            return Response({'status': f'Label {label} set to bounding box'})
 
+    @action(detail=False, methods=["put"], url_path="label")
+    def set_labels(self, request, pk=None):
+        label = request.data.get("label")
+        idxs = request.data.get("idxs")
+        if label is None:
+            return Response({"status": "Label missing"},
+                status=status.HTTP_400_BAD_REQUEST)
+        if idxs is None:
+            return Response({"status": "IDs missing"},
+                status=status.HTTP_400_BAD_REQUEST)
+
+
+        label = get_object_or_404(Label, pk=label["id"])
+
+        user = self.request.user
+        bboxes = self.get_queryset().filter(pk__in=idxs)
+        idxs = list(bboxes.values_list("pk", flat=True))
+
+        try:
+            with transaction.atomic():
+                for bbox in bboxes:
+                    bbox.annotate(label, user)
+        except Exception as e:
+            print(e)
+            return Response({"status": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response({
+                'status': f'Label {label} set to {len(idxs)} bounding boxes',
+                'idxs': idxs
+            })
 
     @action(detail=False, methods=["delete"], url_path="many")
     def delete_many(self, request):

@@ -69,9 +69,9 @@
                 <v-row>
                   <v-col>
                     <div v-if="item.parent !== undefined">
-                      <i>{{item.parent}}</i> > {{ item.name }}
+                      <i>{{item.parent}}</i> > <a @click="$store.dispatch('gbif/setLabel', item)">{{ item.name }}</a>
                     </div>
-                    <div v-else>{{ item.name }}</div>
+                    <div v-else><a @click="$store.dispatch('gbif/setLabel', item)">{{ item.name }}</a></div>
                   </v-col>
                   <v-spacer/>
                   <v-col align="right">

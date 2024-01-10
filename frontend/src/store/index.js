@@ -126,6 +126,17 @@ export default new Vuex.Store({
 
       if (deletedId !== undefined && state.projectCrops.tracks[i].length === 0)
         state.projectCrops.tracks.splice(i, 1)
+    },
+
+    bboxLabelChanged(state, {id, label, pipeline}){
+
+      const box = state.projectCrops.boxes.get(id);
+      if (box === undefined)
+        console.warn("[Store] Cannot change label of", id, "It was not found!")
+      if (pipeline)
+        box.predicted_label = label;
+      else
+        box.label = label;
     }
   },
 

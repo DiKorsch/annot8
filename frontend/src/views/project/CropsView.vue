@@ -6,6 +6,11 @@
       @close="cropsToRemove = []"
     />
 
+    <dialogs-AnnotationDialog
+      v-model="showAnnotationDialog"
+      @selected="annotate({label: $event})"
+    />
+
     <utils-KeypressHandler
       @pressed="handleKeyPress($event)"/>
 
@@ -136,7 +141,7 @@
             Predicted as
             <v-btn
               v-for="(pred, i) in currentTrackPredictions" :key="i"
-              @click="annotate(currentTrack, pred[2])"
+              @click="annotate({ids: currentTrack, label: pred[2]})"
               x-small
               :title="`Annotate the entire tracks as '${pred[2].name}'`">
               {{pred[0]}} ({{pred[1]}}x)
@@ -149,7 +154,7 @@
             Annotated as
             <v-btn
               v-for="(annot, i) in currentTrackAnnotations" :key="i"
-              @click="annotate(currentTrack, annot[2])"
+              @click="annotate({ids: currentTrack, label: annot[2]})"
               x-small
               :title="`Annotate the entire tracks as '${annot[2].name}'`">
               {{annot[0]}} ({{annot[1]}}x)
@@ -166,7 +171,7 @@
                 block color="error"><v-icon left>mdi-trash-can-outline</v-icon> Delete</v-btn>
               </v-col>
               <v-col cols=12>
-                <v-btn @click="annotate(currentTrack)"
+                <v-btn @click="cropsToAnnotate = currentTrack"
 
                 title="Label entire track as ..."
                 block><v-icon left>mdi-tag-outline</v-icon> Annotate</v-btn>
@@ -199,7 +204,7 @@
                 :disabled="selected.length === 0" block color="error"><v-icon left>mdi-trash-can-outline</v-icon> Delete</v-btn>
               </v-col>
               <v-col cols=12>
-                <v-btn @click="annotate(selected)"
+                <v-btn @click="cropsToAnnotate = selected"
                 :disabled="selected.length === 0" block><v-icon left>mdi-tag-outline</v-icon> Annotate</v-btn>
               </v-col>
               <v-col cols=12>
@@ -234,6 +239,7 @@ export default {
     selected: [],
 
     cropsToRemove: [],
+    cropsToAnnotate: [],
   }),
 
   computed: {
@@ -242,6 +248,16 @@ export default {
       crops: 'getProjectCrops',
       cropsLoading: 'isLoadingCrops',
     }),
+
+    showAnnotationDialog: {
+      get(){
+        return this.cropsToAnnotate !== undefined && this.cropsToAnnotate.length !== 0
+      },
+
+      set() {
+        this.cropsToAnnotate = []
+      }
+    },
 
     projectId() {
       return this.$route.params.id;
@@ -402,10 +418,36 @@ export default {
         })
     },
 
-    annotate(ids, label){
-      console.log("Annotate for", ids, "was clicked");
-      if (label !== undefined)
-        console.log("Annotating as", label)
+    annotate({ids, label}){
+      if (ids === undefined)
+        if (this.tab == 0)
+          ids = this.currentTrack
+
+        else if (this.tab == 1)
+          ids = this.selected
+
+
+      if (ids === undefined || label === undefined){
+        console.warn("[Crops] label or ids were not set!", ids, label)
+        return
+      }
+      DataService.bboxes.setLabels(ids, label)
+        .then(({msg, idxs}) => {
+          if (idxs === undefined)
+            this.$store.dispatch("messages/error", {msg: msg})
+
+          else{
+            this.$store.dispatch("messages/info", {msg: msg})
+
+            for (const id of idxs)
+              this.$store.commit("bboxLabelChanged", {id, label, pipeline: false})
+
+          }
+          this.cropsToAnnotate = []
+
+          if(this.tab == 1)
+            this.selected = []
+        });
 
     },
 

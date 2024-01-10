@@ -35,7 +35,7 @@
 
   <v-row v-if="annotated_label">
     <v-col class="header" cols=4>Annotated</v-col>
-    <v-col cols=5><a x-small :href="$store.dispatch('gbif/setLabel', bbox.label)">{{annotated_label}}</a></v-col>
+    <v-col cols=5><a x-small @click="$store.dispatch('gbif/setLabel', bbox.label)">{{annotated_label}}</a></v-col>
     <v-col cols=3>
       <utils-TooltipButton
         color="green lighten-2"
@@ -43,6 +43,13 @@
         @click="confirm(bbox, false)"
       >
         <v-icon color="white">mdi-check</v-icon>
+      </utils-TooltipButton>
+      <utils-TooltipButton
+        color="deafult"
+        tooltip="Annotate"
+        @click="$emit('annotate')"
+      >
+        <v-icon>mdi-tag</v-icon>
       </utils-TooltipButton>
     </v-col>
   </v-row>

@@ -194,7 +194,7 @@ class DataService {
         });
     },
 
-    set_label: function(fileId, label) {
+    setLabel: function(fileId, label) {
       if (fileId === undefined || label === undefined)
         return false;
 
@@ -305,11 +305,26 @@ class DataService {
           })
       },
 
-      set_label: function(bboxId, label) {
-        if (bboxId === undefined || label === undefined)
+      setLabels: function(idxs, label) {
+
+        if (idxs === undefined || label === undefined)
           return false;
 
-        return api.put(`bbox/${bboxId}/label/`, {label})
+        return api.put(`bbox/label/`, {idxs, label})
+          .then((resp) => {
+            const data = resp?.data
+            return {msg: data?.status, idxs: data?.idxs}
+          }).catch((error) => {
+            console.warn("[API] Error while labeling bounding boxes:", error)
+            return {msg: "Error while labeling bounding boxes!"}
+          })
+      },
+
+      setLabel: function(id, label) {
+        if (id === undefined || label === undefined)
+          return false;
+
+        return api.put(`bbox/${id}/label/`, {label})
           .then(() => {
             return true;
           }).catch((error) => {

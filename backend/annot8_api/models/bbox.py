@@ -176,6 +176,22 @@ class BoundingBox(base.DescribableObject):
         # Add to database (logits and prediction).
         self.new_prediction(label, logits, project.classifier)
 
+    def annotate(self, label, annotator):
+
+        try:
+            annotation = self.annotation
+        except api_models.Annotation.DoesNotExist:
+            annotation = api_models.Annotation(described_object=self)
+
+        # Create a corresponding annotation / update the existing one.
+        annotation.label = label
+        annotation.annotator = annotator
+        annotation.save()
+        annotation.confirmators.clear()
+        annotation.save()
+
+        return annotation
+
     @classmethod
     def create(cls, described_file: api_models.File, x: float, y: float, width: float,
             height: float, pipeline_generated: bool = False, user: User = None):
