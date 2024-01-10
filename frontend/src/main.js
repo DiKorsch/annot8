@@ -32,7 +32,7 @@ router.beforeEach((to, from, next) => {
           store.commit('setCurrentProject', project);
         })
     }
-  } else {
+  } else if (store.state.project !== undefined){
     console.log("[main.js] not in a project view; unsetting currentProject")
     store.commit('setCurrentProject', undefined);
   }

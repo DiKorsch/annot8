@@ -54,63 +54,65 @@
 </template>
 
 <script>
-  import User from '@/store/models/user';
+import User from '@/store/models/user';
+import DataService from '@/services/data.service';
+import { mapGetters } from 'vuex'
 
-  export default {
-    name: 'LoginView',
+export default {
+  name: 'LoginView',
 
-    data: () => ({
-        valid: false,
-        user: new User('', ''),
-        loading: false,
-        incorrectAuth: false,
-        showPwd: false,
-        rules: {
-          required: [value => !!value || 'Required.'],
+  data: () => ({
+      valid: false,
+      user: new User('', ''),
+      loading: false,
+      incorrectAuth: false,
+      showPwd: false,
+      rules: {
+        required: [value => !!value || 'Required.'],
+      },
+  }),
+
+
+  computed: {
+    ...mapGetters("auth", ["loggedIn"]),
+
+    loginErrors () {
+      const errors = []
+      if (this.incorrectAuth)
+        errors.push('Username or password are incorrect.')
+      return errors
+    },
+
+    next() {
+      return this.$route.query["next"]
+    }
+
+  },
+  created() {
+    if (this.loggedIn)
+      this.$router.push({ name: 'index' })
+
+    console.log("[Login] redirecting to", this.next)
+  },
+
+
+  methods: {
+    login () {
+      this.loading = true;
+
+      this.$store.dispatch('auth/login', this.user).then(
+        () => {
+          DataService.initData();
+          this.$router.push({ name: 'index' })
         },
-    }),
-
-
-    computed: {
-      loginErrors () {
-        const errors = []
-        if (this.incorrectAuth)
-          errors.push('Username or password are incorrect.')
-        return errors
-      },
-      loggedIn() {
-        return this.$store.state.auth.loggedIn;
-      },
-
-      next() {
-        return this.$route.query["next"]
-      }
-
-    },
-    created() {
-      if (this.loggedIn)
-        this.$router.push({ name: 'index' })
-
-      console.log("[Login] redirecting to", this.next)
-    },
-
-
-    methods: {
-      login () {
-        this.loading = true;
-
-        this.$store.dispatch('auth/login', this.user).then(
-          () => {
-            this.$router.push({ name: 'index' })
-          },
-          err => {
-            console.log(err)
-            this.incorrectAuth = true
-          }
-        )
-      }
+        err => {
+          console.log(err)
+          this.incorrectAuth = true
+        }
+      )
     }
   }
+}
 </script>
 
 

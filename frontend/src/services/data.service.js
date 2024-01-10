@@ -6,6 +6,8 @@ import BBox from "@/store/models/bbox"
 import Project from "@/store/models/project"
 import Task from "@/store/models/task"
 
+import store from "@/store"
+
 // credits to https://stackoverflow.com/a/53829223/1360842
 // returns a promise once it gets ALL pages from API
 function paginated(url) {
@@ -35,7 +37,11 @@ function parse_taxonomy(labels){
 }
 
 class DataService {
-  helper = {
+  initData(){
+    this.labels.get()
+      .then((labels) => {
+        store.commit("setLabels", labels)
+      })
   }
 
   project = {

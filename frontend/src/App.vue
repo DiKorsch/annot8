@@ -32,10 +32,7 @@ export default {
     if (!this.loggedIn)
       return
 
-    DataService.labels.get()
-      .then((labels) => {
-        this.$store.commit("setLabels", labels)
-      })
+    DataService.initData()
   },
 
   beforeDestroy() {
