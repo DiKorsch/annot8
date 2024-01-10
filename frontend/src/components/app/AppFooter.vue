@@ -10,7 +10,7 @@
       tile
       class="primary text-center flex"
     >
-      <v-card-text>
+      <v-card-text v-if="loggedIn">
         <core-TaskList/>
       </v-card-text>
       <v-divider/>
@@ -39,6 +39,7 @@
 <script>
 
 import { v4 as uuidv4 } from 'uuid';
+import { mapGetters } from 'vuex'
 
 class FooterItem {
   constructor(text, to, icon=""){
@@ -57,6 +58,12 @@ export default {
         new FooterItem('About', {name: 'about'}),
       ],
     }
+  },
+  computed: {
+
+    ...mapGetters('auth', [
+      'loggedIn'
+    ]),
   }
 }
 </script>

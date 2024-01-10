@@ -107,12 +107,12 @@
 
 
 <script>
+import { mapGetters } from 'vuex'
 
 export default {
   name: "LabelList",
   props: {
     parent: undefined,
-    labels: undefined,
     ranks: {
       type: Array,
       default: () => ([
@@ -126,6 +126,9 @@ export default {
   },
 
   computed: {
+
+    ...mapGetters({labels: "getLabels"}),
+
     labelList: function(){
       if (this.labels === undefined)
         return [];

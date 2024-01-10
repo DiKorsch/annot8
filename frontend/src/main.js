@@ -23,9 +23,9 @@ router.beforeEach((to, from, next) => {
   if (isProjectView){
 
     let projectID = to.params.id;
-    if (isLoggedIn && store.state.currentProject?.id != projectID){
-      console.log("[main.js] current project changed; changing currentProject from",
-        store.state.currentProject?.id, "to", projectID
+    if (isLoggedIn && store.state.project?.id != projectID){
+      console.log("[main.js] current project changed; changing from",
+        store.state.project?.id, "to", projectID
       )
       DataService.project.get(projectID).then(
         (project) => {

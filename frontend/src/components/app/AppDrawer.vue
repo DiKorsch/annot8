@@ -44,9 +44,26 @@
     <v-divider></v-divider>
 
     <v-list v-if="loggedIn" >
-      <div>
+      <v-list-item
+        v-for="link in nonProjectLinks"
+        :key="link.id"
+        :to="link.url(project)"
+        link
+      >
+        <v-list-item-icon>
+          <v-icon>{{ link.icon }}</v-icon>
+        </v-list-item-icon>
+
+        <v-list-item-content>
+          <v-list-item-title>{{ link.text }}</v-list-item-title>
+        </v-list-item-content>
+
+
+      </v-list-item>
+      <div v-if="project !== undefined && isProjectViewActive">
+        <v-divider></v-divider>
         <v-list-item
-          v-for="link in nonProjectLinks"
+          v-for="link in projectLinks"
           :key="link.id"
           :to="link.url(project)"
           link
@@ -61,25 +78,6 @@
 
 
         </v-list-item>
-        <div v-if="project !== undefined && isProjectViewActive">
-          <v-divider></v-divider>
-          <v-list-item
-            v-for="link in projectLinks"
-            :key="link.id"
-            :to="link.url(project)"
-            link
-          >
-            <v-list-item-icon>
-              <v-icon>{{ link.icon }}</v-icon>
-            </v-list-item-icon>
-
-            <v-list-item-content>
-              <v-list-item-title>{{ link.text }}</v-list-item-title>
-            </v-list-item-content>
-
-
-          </v-list-item>
-        </div>
       </div>
     </v-list>
     <v-spacer/>

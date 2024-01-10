@@ -14,6 +14,8 @@
 </template>
 
 <script>
+import DataService from '@/services/data.service';
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'App',
@@ -26,10 +28,22 @@ export default {
     this.$nextTick(() => {
       window.addEventListener('resize', this.onResize);
     })
+
+    if (!this.loggedIn)
+      return
+
+    DataService.labels.get()
+      .then((labels) => {
+        this.$store.commit("setLabels", labels)
+      })
   },
 
   beforeDestroy() {
     window.removeEventListener('resize', this.onResize);
+  },
+
+  computed: {
+    ...mapGetters("auth", ["loggedIn"])
   },
 
   methods: {

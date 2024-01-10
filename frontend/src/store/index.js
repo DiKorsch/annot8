@@ -20,11 +20,12 @@ class Crops {
 
 export default new Vuex.Store({
   state: {
-    currentProject: undefined,
+    project: undefined,
     projectFiles: [],
     projectCrops: new Crops(),
     loadingCrops: false,
     n_retries: 0,
+    labels: [],
     tasks: [],
   },
 
@@ -44,10 +45,10 @@ export default new Vuex.Store({
     setCurrentProject(state, project) {
 
       if (project !== undefined){
-        if (state.currentProject?.id === project.id)
+        if (state.project?.id === project.id)
           return
         console.log("[Store] setting project:", project)
-        if (state.currentProject?.id !== project.id){
+        if (state.project?.id !== project.id){
           state.projectFiles = [];
           state.projectCrops = new Crops();
           state.loadingCrops = true;
@@ -69,7 +70,12 @@ export default new Vuex.Store({
       } else
         console.log("[Store] unsetting project")
 
-      state.currentProject = project;
+      state.project = project;
+    },
+
+    setLabels(state, labels){
+      console.log("[Store] setting", labels.length, "labels")
+      state.labels = labels;
     },
 
     setTasks(state, tasks) {
@@ -126,11 +132,15 @@ export default new Vuex.Store({
   getters: {
 
     isProjectViewActive: state => {
-      return state.currentProject !== undefined;
+      return state.project !== undefined;
+    },
+
+    getLabels: state => {
+      return state.labels;
     },
 
     getCurrentProject: state => {
-      return state.currentProject;
+      return state.project;
     },
 
     getProjectFiles: state => {
