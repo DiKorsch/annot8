@@ -452,6 +452,18 @@ export default {
     },
 
     classify(ids){
+      if (ids === undefined || ids.length === 0)
+        this.$store.dispatch("messages/error",
+          {msg: "No crops selected!"})
+
+      DataService.bboxes.predictMany(ids)
+        .then((task) => {
+          if (task === undefined){
+            console.error("[Image Annotator] Failed to predict bounding box.");
+            return;
+          }
+          this.$store.commit("addTask", task);
+        });
       console.log("Classify for", ids, "was clicked");
 
     },

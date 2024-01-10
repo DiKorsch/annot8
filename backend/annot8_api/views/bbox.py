@@ -52,6 +52,22 @@ class BBoxViewSet(BaseViewSet):
         task_ser = serializers.TaskSerializer(task)
         return Response(task_ser.data)
 
+    @action(detail=False, methods=["post"], url_path="predict")
+    def predict_many(self, request, pk=None):
+        idxs = request.data.get("idxs")
+        if idxs is None:
+            return Response({"status": "IDs missing"},
+                status=status.HTTP_400_BAD_REQUEST)
+        bboxes = self.get_queryset(distinct=False).filter(pk__in=idxs)
+        idxs = bboxes.values_list("pk", flat=True)
+
+        task = api_models.Task.start_async(
+            api_models.BoundingBox.bbox_predict,
+            user=request.user, items=list(idxs))
+
+        task_ser = serializers.TaskSerializer(task)
+        return Response(task_ser.data)
+
     @action(detail=True, methods=["put"], url_path="label")
     def set_label(self, request, pk=None):
         label = request.data.get("label")

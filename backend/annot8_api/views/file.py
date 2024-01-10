@@ -41,11 +41,11 @@ class FileViewSet(BaseViewSet):
         file = self.get_object()
         bbox_ids = file.bboxes.values_list("pk", flat=True)
 
-        task = api_models.Task.start_async(bbox_predict,
+        task = api_models.Task.start_async(
+            api_models.BoundingBox.bbox_predict,
             user=request.user, items=list(bbox_ids))
         task_ser = serializers.TaskSerializer(task)
         return Response(task_ser.data)
-
 
     @action(detail=True, methods=["post"], url_path="bbox")
     def bbox_add(self, request, pk=None):
@@ -59,9 +59,9 @@ class FileViewSet(BaseViewSet):
         user = self.request.user
 
         try:
-            bbox = BoundingBox.create(file, x, y, width, height, False, user)
+            bbox = api_models.BoundingBox.create(file, x, y, width, height, False, user)
             if label is not None:
-                Annotation.create(described_object=bbox, label=label, annotator=user)
+                api_models.Annotation.create(described_object=bbox, label=label, annotator=user)
 
         except Exception as e:
             print(e)
@@ -83,7 +83,7 @@ class FileViewSet(BaseViewSet):
 
         # Create a corresponding annotation / update the existing one.
         try:
-            annotation, created = Annotation.objects.get_or_create(described_object=file)
+            annotation, created = api_models.Annotation.objects.get_or_create(described_object=file)
             annotation.label = label
             annotation.annotator = user
             annotation.confirmators.clear()
@@ -95,10 +95,3 @@ class FileViewSet(BaseViewSet):
 
         else:
             return Response({'status': 'Label added to file'})
-
-
-
-
-def bbox_predict(box_id):
-    res = api_models.BoundingBox.objects.get(pk=box_id).predict()
-    return box_id, res

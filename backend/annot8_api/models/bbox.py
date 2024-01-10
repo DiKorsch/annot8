@@ -218,6 +218,12 @@ class BoundingBox(base.DescribableObject):
         return bbox
 
 
+    @classmethod
+    def bbox_predict(cls, box_id):
+        res = cls.objects.get(pk=box_id).predict()
+        return box_id, res
+
+
 @receiver(models.signals.post_save, sender=BoundingBox)
 def create_crops(sender, instance, created, raw, update_fields, **kwargs):
     if not raw:

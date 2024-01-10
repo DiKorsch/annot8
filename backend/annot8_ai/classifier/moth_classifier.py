@@ -1,4 +1,4 @@
-from annot8_ai.classifier.base import BaseClassifier
+from annot8_ai.classifier import base
 
 import chainer
 import numpy as np
@@ -11,17 +11,18 @@ from pathlib import Path
 from chainercv import transforms as tr
 from cvmodelz.models import ModelFactory
 
-class MothClassifier(BaseClassifier):
+class MothClassifier(base.BaseClassifier, metaclass=base.Singleton):
     name = "Moth Classifier"
     description = "This is a classifier for moth species."
 
     def __init__(self):
         super().__init__()
 
+        print(f"Creating {self.name}")
         classifier_dir = Path(settings.BASE_DIR, "fixtures/classifier/jena_moths_aug")
 
         with open(classifier_dir / "unq2gbif.yml") as f:
-            id2gbif = yaml.load(f)
+            id2gbif = yaml.safe_load(f)
 
         self.cls = Classifier(
             model_type="cvmodelz.InceptionV3",

@@ -333,6 +333,16 @@ class DataService {
           });
       },
 
+      predictMany: function(idxs) {
+        return api.post("bbox/predict/", {idxs})
+          .then((response) => {
+            return new Task(response.data);
+          }).catch((error) => {
+            console.warn("[API] Error while predicting bounding boxes:", error)
+            return undefined;
+          });
+      },
+
       predict: function(bboxId) {
         return api.post(`bbox/${bboxId}/predict/`)
           .then((response) => {
