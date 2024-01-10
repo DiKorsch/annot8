@@ -1,5 +1,11 @@
 <template>
   <v-container fluid>
+    <dialogs-TrackDelete
+      :ids="cropsToRemove"
+      @confirm="remove($event)"
+      @close="cropsToRemove = []"
+    />
+
     <utils-KeypressHandler
       @pressed="handleKeyPress($event)"/>
 
@@ -50,10 +56,10 @@
                         <v-chip label small
                           :to="{
                             name: 'annotate',
-                            params: {fileId: file(boxId).id},
+                            params: {fileId: (file(boxId) || {}).id},
                             query: {showInfo: boxId}}"
                           >
-                          Go to {{file(boxId).name}}
+                          Go to {{(file(boxId) || {}).name}}
                         </v-chip>
                       </core-CroppedImage>
                   </v-col>
@@ -98,10 +104,10 @@
                           <v-chip label small
                             :to="{
                               name: 'annotate',
-                              params: {fileId: file(boxId).id},
+                              params: {fileId: (file(boxId) || {}).id},
                               query: {showInfo: boxId}}"
                             >
-                            Go to {{file(boxId).name}}
+                            Go to {{(file(boxId) || {}).name}}
                           </v-chip>
                         </core-CroppedImage>
                       </v-badge>
@@ -155,7 +161,7 @@
           <v-card-text>
             <v-row>
               <v-col cols=12>
-                <v-btn @click="remove(currentTrack)"
+                <v-btn @click="cropsToRemove = currentTrack"
                 title="Delete entire track"
                 block color="error"><v-icon left>mdi-trash-can-outline</v-icon> Delete</v-btn>
               </v-col>
@@ -189,7 +195,7 @@
           <v-card-text>
             <v-row>
               <v-col cols=12>
-                <v-btn @click="remove(selected)"
+                <v-btn @click="cropsToRemove = selected"
                 :disabled="selected.length === 0" block color="error"><v-icon left>mdi-trash-can-outline</v-icon> Delete</v-btn>
               </v-col>
               <v-col cols=12>
@@ -226,6 +232,8 @@ export default {
     nUngroupedPerPage: 12,
 
     selected: [],
+
+    cropsToRemove: [],
   }),
 
   computed: {
@@ -312,6 +320,22 @@ export default {
 
     handleKeyPress(event){
       switch (event.key){
+        case "Delete":
+          event.preventDefault();
+
+          if(this.tab == 0)
+            this.cropsToRemove = this.currentTrack;
+
+          else if(this.tab == 1)
+            this.cropsToRemove = this.selected;
+
+          break;
+        case "Enter":
+          event.preventDefault();
+          if (this.cropsToRemove !== undefined && this.cropsToRemove.length !== 0) {
+            this.remove(this.cropsToRemove)
+          }
+          break;
         case "ArrowLeft":
           event.preventDefault();
           this.previous()
@@ -349,7 +373,7 @@ export default {
     file(boxId){
       let box = this.box(boxId)
       if (box === undefined)
-        return undefined
+        return {}
       return this.files.get(box.fileId);
     },
 
@@ -363,11 +387,15 @@ export default {
 
 
     remove(ids){
+
       DataService.bboxes.deleteMany(ids)
         .then(({msg, idxs}) => {
           if (msg !== undefined)
             this.$store.dispatch("messages/info", {msg: msg})
 
+          if(this.tab == 1)
+            this.selected = []
+          this.cropsToRemove = [];
           this.previous()
           for (const id of idxs)
             this.$store.commit("bboxDeleted", id)
