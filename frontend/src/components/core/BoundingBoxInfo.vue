@@ -9,7 +9,7 @@
   />
   <v-row v-if="predicted_label">
     <v-col class="header" cols=4>Predicted</v-col>
-    <v-col cols=5><a x-small @click="$store.dispatch('gbif/setLabel', bbox.predicted_label)">{{predicted_label}}</a></v-col>
+    <v-col cols=5><a x-small @click="$store.dispatch('gbif/setLabel', {label: bbox.predicted_label, reference: thumb})">{{predicted_label}}</a></v-col>
     <v-col cols=3>
       <utils-TooltipButton
         color="green lighten-2"
@@ -35,7 +35,7 @@
 
   <v-row v-if="annotated_label">
     <v-col class="header" cols=4>Annotated</v-col>
-    <v-col cols=5><a x-small @click="$store.dispatch('gbif/setLabel', bbox.label)">{{annotated_label}}</a></v-col>
+    <v-col cols=5><a x-small @click="$store.dispatch('gbif/setLabel', {label: bbox.label, reference: thumb})">{{annotated_label}}</a></v-col>
     <v-col cols=3>
       <utils-TooltipButton
         color="green lighten-2"

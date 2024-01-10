@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid>
+  <v-container fluid id="crops-view">
     <dialogs-TrackDelete
       :ids="cropsToRemove"
       @confirm="remove($event)"
@@ -139,26 +139,41 @@
           </v-card-subtitle>
           <v-card-text v-if="currentTrackPredictions.length !== 0">
             Predicted as
-            <v-btn
-              v-for="(pred, i) in currentTrackPredictions" :key="i"
-              @click="annotate({ids: currentTrack, label: pred[2]})"
-              x-small
-              :title="`Annotate the entire tracks as '${pred[2].name}'`">
-              {{pred[0]}} ({{pred[1]}}x)
-            </v-btn>
+            <v-row v-for="(pred, i) in currentTrackPredictions" :key="i">
+              <v-col>
+                <v-btn-toggle>
+                  <v-btn small
+                    @click="annotate({ids: currentTrack, label: pred[2]})"
+                    :title="`Annotate the entire tracks as '${pred[2].name}'`">
+                    <span class="text-truncate" style="max-width: 130px">{{pred[0]}}</span> ({{pred[1]}}x)
+                  </v-btn>
+                  <v-btn small icon
+                    @click="$store.dispatch('gbif/setLabel', {label: pred[2]})"
+                  ><v-icon>mdi-eye</v-icon></v-btn>
+                </v-btn-toggle>
+              </v-col>
+
+            </v-row>
           </v-card-text>
           <v-card-text v-else>
             No predictions yet
           </v-card-text>
           <v-card-text v-if="currentTrackAnnotations.length !== 0">
             Annotated as
-            <v-btn
-              v-for="(annot, i) in currentTrackAnnotations" :key="i"
-              @click="annotate({ids: currentTrack, label: annot[2]})"
-              x-small
-              :title="`Annotate the entire tracks as '${annot[2].name}'`">
-              {{annot[0]}} ({{annot[1]}}x)
-            </v-btn>
+            <v-row v-for="(annot, i) in currentTrackAnnotations" :key="i">
+              <v-col>
+                <v-btn-toggle>
+                  <v-btn small
+                    @click="annotate({ids: currentTrack, label: annot[2]})"
+                    :title="`Annotate the entire tracks as '${annot[2].name}'`">
+                    <span class="text-truncate" style="max-width: 130px">{{annot[0]}}</span> ({{annot[1]}}x)
+                  </v-btn>
+                  <v-btn small icon
+                    @click="$store.dispatch('gbif/setLabel', {label: annot[2]})"
+                  ><v-icon>mdi-eye</v-icon></v-btn>
+                </v-btn-toggle>
+              </v-col>
+            </v-row>
           </v-card-text>
           <v-card-text v-else>
             No annotations yet
@@ -471,3 +486,10 @@ export default {
 
 }
 </script>
+
+
+<style scoped>
+  #crops-view .v-btn--active:hover::before, #crops-view .v-btn--active::before {
+    opacity: 0.0;
+  }
+</style>

@@ -1,27 +1,30 @@
-import api from '../services/api';
-
 export const gbif = {
 
   namespaced: true,
   state: {
     label: undefined,
+    reference: undefined,
   },
 
   getters: {
     getLabel: state => {
       return state.label;
     },
-    getExamples(state) {
-      api.get(state.label)
-    },
+
+    getReference: state => {
+      return state.reference;
+    }
   },
 
   actions : {
-    setLabel({commit}, label) {
+    setLabel({commit}, {label, reference}) {
       commit("setLabel", label);
+      commit("setReference", reference);
     },
+
     unsetLabel({commit}) {
       commit("setLabel", undefined);
+      commit("setReference", undefined);
     },
   },
 
@@ -29,6 +32,10 @@ export const gbif = {
 
     setLabel(state, label) {
       state.label = label;
+    },
+
+    setReference(state, reference) {
+      state.reference = reference;
     },
   },
 }

@@ -62,6 +62,17 @@
             There were no example images
           </v-alert>
         </v-card-text>
+        <div v-if="reference !== undefined">
+          <v-card-title>Your reference:</v-card-title>
+          <v-card-text>
+            <v-img
+              contain
+              :src="reference"
+              aspect-ratio="1.778"
+              max-height="240">
+            </v-img>
+          </v-card-text>
+        </div>
         <v-card-actions>
           <v-spacer/>
           <v-btn
@@ -104,6 +115,7 @@ export default {
 
     ...mapGetters("gbif",{
       label: 'getLabel',
+      reference: 'getReference',
     }),
 
     hasLabel: {
