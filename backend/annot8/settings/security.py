@@ -32,6 +32,7 @@ ALLOWED_HOSTS = [
     CURRENT_IP,
     'hemera4.inf-cv.uni-jena.de',
     'api.inf-cv.uni-jena.de',
+    'annot8.dikorsch.de',
 ]
 
 FRONTEND_PORT = os.environ.get("FRONTEND_PORT", 8080)
@@ -45,6 +46,7 @@ CORS_ORIGIN_WHITELIST = (
 
 CSRF_TRUSTED_ORIGINS = (
     'https://api.inf-cv.uni-jena.de',
+    'https://annot8.dikorsch.de',
 )
 
 CORS_ALLOW_HEADERS = list(default_headers) + [

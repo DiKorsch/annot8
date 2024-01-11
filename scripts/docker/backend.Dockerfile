@@ -19,15 +19,15 @@ RUN apt update && \
 WORKDIR /code
 
 # install dependencies
-COPY ./backend/requirements.txt /code/requirements.txt
+COPY ./backend/requirements.txt /code/
 RUN python -m pip install --upgrade pip
-RUN pip install numpy
+RUN pip install numpy uwsgi
 RUN pip install -r /code/requirements.txt
 RUN rm /code/requirements.txt
 
-#
-RUN python -c "from django.core.management.utils import get_random_secret_key as new_key; print(new_key())" > /code/secret.txt
-RUN chown -R ${UID}:${GID} /code/
-RUN chmod 600 /code/secret.txt
+# #
+# RUN python -c "from django.core.management.utils import get_random_secret_key as new_key; print(new_key())" > /code/secret.txt
+# RUN chown -R ${UID}:${GID} /code/
+# RUN chmod 600 /code/secret.txt
 
 USER      ${UID}:${GID}

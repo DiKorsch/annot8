@@ -46,6 +46,31 @@ services:
   backend:
     env_file: [".env"]
     user: ${UID:-0}:${GID:-0}
+    image: annot8_nginx:latest
+    build:
+      context: .
+      dockerfile: ./scripts/docker/backend.nginx.Dockerfile
+      args:
+        GID: ${GID:-0}
+        UID: ${UID:-0}
+
+    container_name: annot8_backend
+
+    ports:
+      - ${BACKEND_PORT:-8000}:80
+
+    volumes:
+      - annot8_uwsgi_data:/tmp/uwsgi/
+      - annot8_web_static:/code/static/
+      - annot8_web_static:/var/www/annot8/assets/
+      - ./backend/media:/var/www/annot8/media/
+    depends_on:
+      uwsgi:
+        condition: service_started
+
+  uwsgi:
+    env_file: [".env"]
+    user: ${UID:-0}:${GID:-0}
     image: annot8_backend:latest
     build:
       context: .
@@ -54,10 +79,7 @@ services:
         GID: ${GID:-0}
         UID: ${UID:-0}
 
-    container_name: annot8_backend
-
-    ports:
-      - ${BACKEND_PORT:-8000}:8000
+    container_name: annot8_uwsgi
 
     environment:
       - FRONTEND_PORT=${FRONTEND_PORT:-8080}
@@ -67,13 +89,17 @@ services:
       - -c
       - |
         python manage.py wait_for_db
-        python manage.py runserver 0.0.0.0:8000
+        python manage.py collectstatic --noinput
+        uwsgi --ini uwsgi.ini
 
 
     volumes:
       - /tmp/annot8/mysqld:/run/mysqld
       - ./backend/:/code/
       - /dev/null:/code/mysql.cnf
+      - annot8_uwsgi_data:/tmp/uwsgi/
+      - annot8_web_static:/code/static/
+      - annot8_web_static:/var/www/annot8/assets/
 
     depends_on:
       migration:
@@ -136,3 +162,9 @@ services:
       - MARIADB_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MARIADB_HOST=${MYSQL_HOST}
 
+
+
+
+volumes:
+  annot8_uwsgi_data:
+  annot8_web_static:
