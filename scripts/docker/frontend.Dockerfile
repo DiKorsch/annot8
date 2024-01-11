@@ -6,7 +6,7 @@ ARG GID=root
 # build webui                          #
 ########################################
 
-FROM node:16 as builder
+FROM node:20 as builder
 
 # copy files
 COPY  ./frontend /code

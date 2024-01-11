@@ -9,6 +9,7 @@ from annot8.settings.base import BASE_DIR
 
 config_file = BASE_DIR / "mysql.cnf"
 if config_file.is_file():
+    logging.info(f"Using configs from '{config_file}'")
     config = configparser.ConfigParser()
     config.read(config_file)
 

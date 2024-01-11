@@ -11,6 +11,7 @@ RUN apt update && \
 	apt install -y \
 		python3-dev \
 		libc-dev \
+		pkg-config \
 		gcc \
 		g++ \
 		libmariadb-dev
@@ -18,7 +19,7 @@ RUN apt update && \
 WORKDIR /code
 
 # install dependencies
-COPY ./backend /code
+COPY ./backend/requirements.txt /code/requirements.txt
 RUN python -m pip install --upgrade pip
 RUN pip install numpy
 RUN pip install -r /code/requirements.txt
