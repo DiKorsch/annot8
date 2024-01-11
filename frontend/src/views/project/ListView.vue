@@ -1,7 +1,7 @@
 <template>
   <v-container fluid>
     <app-ViewHeader
-      title="Settings"
+      title="Your Projects"
       icon="mdi-plus"
       dest="create_project"
       text="New Project"

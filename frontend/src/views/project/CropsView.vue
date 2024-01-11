@@ -148,7 +148,7 @@
                     <span class="text-truncate" style="max-width: 130px">{{pred[0]}}</span> ({{pred[1]}}x)
                   </v-btn>
                   <v-btn small icon
-                    @click="$store.dispatch('gbif/setLabel', {label: pred[2]})"
+                    @click="$store.dispatch('gbif/setLabel', {label: pred[2], reference: gbifRefs(currentTrack)})"
                   ><v-icon>mdi-eye</v-icon></v-btn>
                 </v-btn-toggle>
               </v-col>
@@ -169,7 +169,7 @@
                     <span class="text-truncate" style="max-width: 130px">{{annot[0]}}</span> ({{annot[1]}}x)
                   </v-btn>
                   <v-btn small icon
-                    @click="$store.dispatch('gbif/setLabel', {label: annot[2]})"
+                    @click="$store.dispatch('gbif/setLabel', {label: annot[2], reference: gbifRefs(currentTrack)})"
                   ><v-icon>mdi-eye</v-icon></v-btn>
                 </v-btn-toggle>
               </v-col>
@@ -262,6 +262,7 @@ export default {
     ...mapGetters({
       crops: 'getProjectCrops',
       cropsLoading: 'isLoadingCrops',
+      mediaURL: 'getMediaUrl',
     }),
 
     showAnnotationDialog: {
@@ -395,6 +396,20 @@ export default {
         this.selectedUngrouped = Math.max(1, this.selectedUngrouped-1);
 
 
+    },
+
+    gbifRefs(ids) {
+      console.log(ids);
+      console.log(this.boxes)
+      let res = [];
+      for (let id of ids){
+        if (res.length >= 4)
+          break
+        let box = this.boxes.get(id)
+        let url = box.thumbs?.original
+        res.push(url === undefined ? undefined : `${this.mediaURL}${url}`)
+      }
+      return res
     },
 
     box(boxId){

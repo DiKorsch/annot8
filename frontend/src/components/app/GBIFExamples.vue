@@ -64,7 +64,7 @@
         </v-card-text>
         <div v-if="reference !== undefined">
           <v-card-title>Your reference:</v-card-title>
-          <v-card-text>
+          <v-card-text v-if="typeof reference === 'string'">
             <v-img
               contain
               :src="reference"
@@ -72,6 +72,19 @@
               max-height="240">
             </v-img>
           </v-card-text>
+          <v-card-text v-else>
+            <v-row>
+              <v-col cols=3 v-for="(ref, k) in reference" :key="k">
+                <v-img
+                  contain
+                  :src="ref"
+                  aspect-ratio="1.778"
+                  max-height="240">
+                </v-img>
+              </v-col>
+            </v-row>
+          </v-card-text>
+
         </div>
         <v-card-actions>
           <v-spacer/>

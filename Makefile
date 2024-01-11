@@ -7,6 +7,9 @@ export GID
 
 DOCKER_OPTS :=
 
+start_screen:
+	screen -dmS annot8 -c scripts/screen/rc
+
 docker.run.dev:
 	docker compose --env-file .env.local --profile dev up $(DOCKER_OPTS)
 
@@ -39,7 +42,4 @@ backend_coverage:
 
 backend_pylint:
 	@echo "BACKEND PYLINT MISSING!"
-
-start_screen:
-	screen -dmS annot8 -c scripts/screen/rc
 
