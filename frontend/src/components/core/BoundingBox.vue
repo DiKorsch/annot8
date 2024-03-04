@@ -1,4 +1,6 @@
 <template>
+  <div>
+    
   <div
     class="bounding-box"
     :style="style"
@@ -7,7 +9,8 @@
         selected: selected,
         highlight: highlight,
         hidden: hidden}"
-    @click="$emit('selectedBBox', localValue)"
+    @click.stop="$emit('selectedBBox', localValue)"
+    @contextmenu.stop="handleRightClick"
   >
     <v-tooltip top v-if="hasLabel">
 
@@ -28,6 +31,39 @@
       <span>{{label}}</span>
     </v-tooltip>
   </div>
+
+  <v-menu
+      v-model="showCtxMenu"
+      :position-x="ctxMenuX"
+      :position-y="ctxMenuY"
+      absolute
+      offset-y
+    >
+      <v-list flat dense subheader>
+        <v-subheader>Box actions</v-subheader>
+        
+        <v-list-item-group
+          color="primary"
+        >
+        <div v-for="(item, i) in items" :key="i">
+          <v-divider v-if="item.separator"></v-divider>
+
+          <v-list-item v-else
+            @click="$emit(item.action, localValue)"
+          >
+            <v-list-item-icon>
+              <v-icon v-text="item.icon"></v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title v-text="item.text"></v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </div>
+        </v-list-item-group>
+      </v-list>
+    </v-menu>
+    
+  </div>
 </template>
 
 <script>
@@ -42,11 +78,24 @@ export default {
       type: Boolean,
       default: false
     },
+    editable: {
+      type: Boolean,
+      default: false
+    },
   },
 
   data: () => ({
     highlight: false,
     hidden: false,
+    ctxMenuX: 0,
+    ctxMenuY: 0,
+    showCtxMenu: false,
+    items: [
+      { text: 'Edit', icon: 'mdi-pencil', action: "edit"},
+      { text: 'Delete', icon: 'mdi-trash-can', action: "delete"},
+      { text: 'Predict', icon: 'mdi-brain', action: "predict"},
+      { text: 'Annotate', icon: 'mdi-tag', action: "annotate"},
+    ],
   }),
 
   computed: {
@@ -68,14 +117,13 @@ export default {
 
     label: function() {
       if (this.hasLabel) {
-        if (this.bbox.label !== null) {
-          return this.bbox.label.name;
-        } else {
-          return this.bbox.predicted_label.name;
-        }
-      } else {
+        let label = this.bbox?.label || this.bbox?.predicted_label
+        if (label !== null)
+          return label.name;
+         else
+          return "Unknown";
+      } else
         return "Unknown";
-      }
     },
 
     hasLabel: function(){
@@ -84,11 +132,21 @@ export default {
   },
 
   methods: {
-    handleLeftClick: function(e) {
-      console.log("left click box:", e)
-    },
+    
     handleRightClick: function(e) {
-      console.log("right click box:", e)
+      e.preventDefault()
+      if(!this.selected)
+        this.$emit('selectedBBox', this.localValue)
+
+      if (!this.editable)
+        return
+    
+      this.showCtxMenu = false
+      this.ctxMenuX = e.clientX
+      this.ctxMenuY = e.clientY
+      this.$nextTick(() => {
+        this.showCtxMenu = this.selected
+      })
     },
 
   },

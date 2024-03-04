@@ -101,18 +101,19 @@ export default {
 
     label: function() {
       if (this.hasLabel) {
-        if (this.box.label !== null) {
-          return this.box.label.name;
-        } else {
-          return this.box.predicted_label.name;
-        }
-      } else {
+        let label = this.box?.label || this.box?.predicted_label
+        if (label !== null)
+          return label.name;
+         else
+          return "Unknown";
+      } else
         return "Unknown";
-      }
+      
     },
 
     hasLabel: function(){
-      return (this.box.label !== undefined && this.box.label !== null) || (this.box.predicted_label !== undefined && this.box.predicted_label !== null);
+      let label = this.box?.label || this.box?.predicted_label;
+      return label !== undefined && label !== null;
     },
 
     thumb: function() {

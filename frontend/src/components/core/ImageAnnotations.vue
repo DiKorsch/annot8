@@ -2,10 +2,12 @@
   <div class="overlay"
     ref="overlay"
     :key="toggleBBoxUpdate"
-    @click="mouseClicked"
+    @click.prevent="mouseClicked"
     @mouseenter="mouseEnter"
     @mousemove="mouseMove"
     @mouseleave="mouseLeave"
+
+    @contextmenu="rightClick"
   >
     <v-chip v-if="fileLabel" small label>
       {{ this.getDisplayLabel(this.fileLabel) }}
@@ -16,7 +18,10 @@
       :key="box.id"
       :ref="`box-${box.id}`"
       :selected="isSelected(box.id)"
+      :editable="true"
       @selectedBBox="$emit('selectedBBox', $event)"
+      @delete="$emit('delete', $event)"
+      @edit="$emit('edit', $event)"
     />
 
     <core-BoundingBox
@@ -28,11 +33,59 @@
       v-if="newBox !== undefined"
       v-model="newBox"
     />
+    
+  <v-menu
+      v-model="showCtxMenu"
+      :position-x="ctxMenuPos.x"
+      :position-y="ctxMenuPos.y"
+      absolute
+      offset-y
+    >
+      <v-list flat dense subheader>
+        <v-subheader>Image actions</v-subheader>
+        
+        <v-list-item-group
+          color="primary"
+        >
+        <div v-for="(item, i) in ctxMenuItems" :key="i">
+          <v-divider v-if="item.separator"></v-divider>
+          <v-list-item v-else
+              @click="ctxMenuClicked(item.action)"
+            >
+              <v-list-item-icon>
+                <v-icon v-text="item.icon"></v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title v-text="item.text"></v-list-item-title>
+              </v-list-item-content>
+
+          </v-list-item>
+          
+        </div>
+        </v-list-item-group>
+      </v-list>
+    </v-menu>
   </div>
 </template>
 
 
 <script>
+
+class Coords{
+  constructor(x, y){
+    this.x = x;
+    this.y = y;
+  }
+
+  reset() {
+    this.x = undefined;
+    this.y = undefined;
+  }
+
+  isSet(){
+    return this.x !== undefined && this.y !== undefined;
+  }
+}
 
 export default {
   name: "ImageAnnotations",
@@ -55,16 +108,34 @@ export default {
   },
 
   data: () => ({
-    minSize: 32,
-    x: null,
-    y: null,
+    minSize: 0,
+    initPos: new Coords(),
     currentBBox: undefined,
     toggleBBoxUpdate: false,
     newBox: undefined,
+    action: undefined,
+    
+    ctxMenuPos: new Coords(0, 0),
+    ctxMenuRelPos: new Coords(0, 0),
+    showCtxMenu: false,
+    ctxMenuItems: [
+      { text: 'Add box', icon: 'mdi-plus', action: 'add_box' },
+      { text: 'Estimate box', icon: 'mdi-circle-box-outline', action: "estimate_bbox"},
+      { separator: true },
+      { text: 'Classify image', icon: 'mdi-label-multiple-outline', action: "predict"},
+      { text: 'Detect boxes', icon: 'mdi-view-grid-plus-outline', action: "detect"},
+      { text: 'Annotate', icon: 'mdi-tag', action: "annotate"},
+    ]
   }),
 
 
   methods: {
+    ctxMenuClicked(action){
+      if (action === "add_box")
+        this.initPos = this.ctxMenuRelPos;
+      
+      console.log(action)
+    },
 
     isSelected(boxId){
       return this.selectedBBox !== undefined && this.selectedBBox.id === boxId;
@@ -72,9 +143,7 @@ export default {
 
     getCoordinates(event) {
       var bounds = event.currentTarget.getBoundingClientRect();
-      var x = event.clientX - bounds.left;
-      var y = event.clientY - bounds.top;
-      return {x, y}
+      return new Coords(Math.max(event.clientX - bounds.left, 0), Math.max(event.clientY - bounds.top, 0))
     },
 
     toggleVisibility(boxId){
@@ -98,26 +167,36 @@ export default {
     },
 
 
-    mouseEnter() {
+    mouseEnter(e) {
       console.debug('mouseenter');
-      // this.$el.addEventListener('mousemove', this.mouseMove, false);
+      this.mouseMove(e)
     },
-    mouseLeave() {
+    mouseLeave(e) {
       console.debug('mouseleave');
-      // this.$el.removeEventListener('mousemove', this.mouseMove());
+      this.mouseMove(e)
     },
     mouseMove(event) {
-      var coords = this.getCoordinates(event);
-      if (this.x !== null && this.y !== null && this.interaction === "add") {
-          this.currentBBox = this.calculateBBox(this.x, this.y, coords.x, coords.y);
-      }
-
+      if (this.initPos.isSet()) // && this.interaction === "add") {
+          this.currentBBox = this.calculateBBox(event);
     },
-    mouseClicked(event) {
-      var coords = this.getCoordinates(event);
+    mouseClicked() {
+      if (this.initPos.isSet()){
+        // second click
+        this.$emit("addBBox", this.currentBBox)
+        this.resetDrawBBox();
+      } 
+        // this.drawBBox(event);
+    },
 
-      if (this.interaction === "add")
-        this.drawBBox(coords.x, coords.y);
+    rightClick(e) {
+      this.resetDrawBBox()
+      e.preventDefault()
+      this.showCtxMenu = false
+      this.ctxMenuPos = new Coords(e.clientX, e.clientY)
+      this.ctxMenuRelPos = this.getCoordinates(e)
+      this.$nextTick(() => {
+        this.showCtxMenu = true
+      })
     },
 
     getDisplayLabel(label) {
@@ -128,30 +207,18 @@ export default {
       }
     },
 
-    drawBBox(x, y) {
-
-      if (this.x !== null && this.y !== null) {
-        // second click
-        this.$emit("addBBox", this.currentBBox)
-        this.resetDrawBBox();
-      } else {
-        // first click
-        this.x = x;
-        this.y = y;
-      }
-    },
-
     resetDrawBBox() {
-      this.x = null;
-      this.y = null;
+      this.initPos.reset();
       this.currentBBox = undefined;
       console.debug("Reset draw_box")
     },
 
-    calculateBBox(x1, y1, x2, y2) {
-      if (x1 === null || y1 === null || x2 === null || y2 === null) {
+    calculateBBox(event) {
+      let p1 = this.initPos, p2 = this.getCoordinates(event);
+      if (!p1.isSet() || !p2.isSet()) {
         return undefined;
       }
+      let x1 = p1.x, y1 = p1.y, x2 = p2.x, y2 = p2.y;
       // Scale bounding box coordinates to [0,1].
       var W = this.$refs.overlay.clientWidth
       var H = this.$refs.overlay.clientHeight
@@ -161,11 +228,15 @@ export default {
       y2 = (y2 + 1) / H;
 
       // Switch x1 / x2 and y1 / y2 if necessary.
+      let x = Math.min(x1, x2), y = Math.min(y1, y2);
+      let dx = 1/W, dy = 1/H;
+      x += x==x1 ? -dx : dx;
+      y += y==y1 ? -dy : dy;
       return {
         width: Math.max(Math.abs(x2 - x1), this.minSize / W),
         height: Math.max(Math.abs(y2 - y1), this.minSize / H),
-        x: Math.min(x1, x2),
-        y: Math.min(y1, y2),
+        x: x,
+        y: y,
       }
     },
 

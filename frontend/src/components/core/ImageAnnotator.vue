@@ -22,14 +22,6 @@
     />
 
     <v-row>
-      <!-- <v-col cols="auto">
-        <core-ImageAnnotatorOptionBar
-          ref="optionBar"
-          :interaction="interaction"
-          @action="setInteraction($event)"
-        />
-      </v-col>
- -->
       <v-col>
 
         <core-LazyImage
@@ -40,12 +32,13 @@
 
           <core-ImageAnnotations
             ref="imageAnnotations"
-            :interaction="interaction"
             :fileLabel="file.label"
             :bboxes="bboxes"
             @addBBox="addBBox($event)"
             :selectedBBox="boxSelection.selected"
             @selectedBBox="bboxClicked($event)"
+            @delete="boxSelection.toDelete = $event"
+            @edit="boxSelection.toEdit = $event"
           />
         </core-LazyImage>
       </v-col>
@@ -111,7 +104,7 @@ export default {
   },
 
   data: () => ({
-    interaction: 'select',
+    // interaction: undefined, // default interaction
     boxSelection: new BoxSelection(),
 
     showAnnotationDialog: false,
@@ -134,29 +127,16 @@ export default {
       },
 
       Escape(that){
-        if (that.state === "dialog")
+        if (that.isDialogOpen)
           that.closeDialog()
-        else
-          that.interaction = "select"
+        that.$refs.imageAnnotations.resetDrawBBox()
       },
 
       Enter(that) {
-        if (that.state === "dialog")
+        if (that.isDialogOpen)
           that.confirmDialog()
       },
 
-      v(that){
-        that.toggle(that.boxSelection.selected);
-      },
-
-      e(that){
-        that.closeDialog()
-        that.boxSelection.edit();
-        that.interaction = "edit"
-      },
-      a(that){
-        that.interaction = "add"
-      },
     },
   }),
 
@@ -174,13 +154,6 @@ export default {
   computed: {
     fileId: function() {
       return this.file.id;
-    },
-
-    state: function() {
-      if (this.isDialogOpen)
-        return "dialog";
-      else
-        return this.interaction;
     },
 
     isDialogOpen: function () {
@@ -211,45 +184,6 @@ export default {
       for (let key in this.keyActions)
         if (event.key == key)
           this.keyActions[key](this)
-    },
-
-    setInteraction(interaction) {
-
-      if (interaction === "add"){
-        // unselect the bbox if it is set
-        this.select(this.selectedBBox);
-      }
-
-      else if (interaction === "delete"){
-        this.boxSelection.delete()
-        // because we do not want to change the interaction mode
-        interaction = this.interaction;
-      }
-
-      else if (interaction === "detect") {
-        this.detect();
-      }
-
-      else if (interaction === "classify") {
-        interaction = "pipeline";
-        this.classify(this.boxSelection.selected)
-      }
-
-      else if (interaction === "classify-all") {
-        interaction = "pipeline";
-        this.classify()
-      }
-
-      if (interaction === this.interaction)
-        return
-
-      console.log("[Image Annotator] setting new interaction:", this.interaction)
-      this.interaction = interaction;
-    },
-    resetInteraction() {
-      if (this.interaction === "draw-box") {
-        this.$refs.imageAnnotations.resetDrawBBox();
-      }
     },
 
     addBBox(bbox, label) {
@@ -396,25 +330,12 @@ export default {
     },
 
     bboxClicked(bbox) {
-      console.log("Clicked on", bbox?.id, "current mode:", this.interaction)
+      console.log("Clicked on", bbox?.id)
 
       // // Manage corresponding interactions.
-      if (bbox === undefined || this.interaction === "add")
+      if (bbox === undefined)
         return;
       this.select(bbox);
-
-      if (this.interaction === "edit")
-        return this.boxSelection.edit()
-
-      // } else if (this.interaction === "select" || this.interaction === "edit") {
-      // } else if (this.interaction === "remove-box") {
-      //   this.removeBBox(bbox);
-      // } else if (this.interaction === "label-box") {
-      //   this.labelBBox(this.selectedBBox, "Dummy label 2");
-      // } else if (this.interaction === "predict-box") {
-      //   this.predictBBox(this.selectedBBox);
-      // } else if (this.interaction === "confirm-box") {
-      //   this.confirmBBox(this.selectedBBox);
 
     }
   }
