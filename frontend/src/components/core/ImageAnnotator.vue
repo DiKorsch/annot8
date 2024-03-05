@@ -67,6 +67,7 @@
 <script>
 
 import DataService from '@/services/data.service';
+import { mapGetters } from 'vuex'
 
 class BoxSelection{
   selected = undefined;
@@ -137,6 +138,20 @@ export default {
           that.confirmDialog()
       },
 
+      c(that, event){
+        if(!event.ctrlKey)
+          return
+        if(that.boxSelection.selected === undefined)
+          return
+        that.sendToPastebin(that.boxSelection.selected);
+      },
+
+      v(that, event){
+        if(!event.ctrlKey)
+          return
+        that.getFromPastebin();
+      },
+
     },
   }),
 
@@ -158,11 +173,47 @@ export default {
 
     isDialogOpen: function () {
       return this.boxSelection.toDelete !== undefined || this.boxSelection.toEdit !== undefined;
-    }
+    },
+
+    ...mapGetters('pastebin', {
+      storedBbox: 'get',
+      hasBboxStored: 'isSet'
+    }),
   },
 
 
   methods: {
+    getFromPastebin() {
+      if(!this.hasBboxStored){
+        this.$store.dispatch("messages/alert", {msg: "No box stored in pastebin.", timeout: 1500})
+        return
+      }
+      let bbox = this.storedBbox;
+      console.log("Got box from pastebin: ", bbox)
+      this.pasteBox(bbox)
+    },
+
+    pasteBox(bbox) {
+      if(this.hasOverlap(bbox, 0.5))
+        return this.$store.dispatch("messages/alert", {msg: "Pasted box has to much overlap with another box!", timeout: 1500})
+
+      this.addBBox(bbox, bbox.label)
+      this.$store.dispatch("messages/info", {msg: "Pasted box from pastebin.", timeout: 1500})
+    },
+
+    hasOverlap(bbox, thresh){
+      return this.bboxes.some( box => box.iou(bbox) > thresh);
+    },
+
+    sendToPastebin(bbox){
+      if (bbox === undefined){
+        console.error("[ImageAnnotator] No box selected for pastebin.")
+        return
+      }
+      this.$store.dispatch("messages/info", {msg: "Copied selected box", timeout: 1500})
+      this.$store.dispatch("pastebin/store", bbox)
+      console.log("Copied selected bbox!", bbox)
+    },
 
     closeDialog(){
       this.boxSelection.toDelete = undefined;
@@ -183,7 +234,7 @@ export default {
 
       for (let key in this.keyActions)
         if (event.key == key)
-          this.keyActions[key](this)
+          this.keyActions[key](this, event)
     },
 
     addBBox(bbox, label) {

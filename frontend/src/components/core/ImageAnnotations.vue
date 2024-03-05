@@ -33,7 +33,7 @@
       v-if="newBox !== undefined"
       v-model="newBox"
     />
-    
+
   <v-menu
       v-model="showCtxMenu"
       :position-x="ctxMenuPos.x"
@@ -43,7 +43,7 @@
     >
       <v-list flat dense subheader>
         <v-subheader>Image actions</v-subheader>
-        
+
         <v-list-item-group
           color="primary"
         >
@@ -60,7 +60,7 @@
               </v-list-item-content>
 
           </v-list-item>
-          
+
         </div>
         </v-list-item-group>
       </v-list>
@@ -114,7 +114,7 @@ export default {
     toggleBBoxUpdate: false,
     newBox: undefined,
     action: undefined,
-    
+
     ctxMenuPos: new Coords(0, 0),
     ctxMenuRelPos: new Coords(0, 0),
     showCtxMenu: false,
@@ -133,7 +133,7 @@ export default {
     ctxMenuClicked(action){
       if (action === "add_box")
         this.initPos = this.ctxMenuRelPos;
-      
+
       console.log(action)
     },
 
@@ -184,7 +184,7 @@ export default {
         // second click
         this.$emit("addBBox", this.currentBBox)
         this.resetDrawBBox();
-      } 
+      }
         // this.drawBBox(event);
     },
 

@@ -1,4 +1,5 @@
 from django.db.models import Q
+from django.shortcuts import get_object_or_404
 
 from rest_framework import status
 from rest_framework.decorators import action
@@ -7,6 +8,8 @@ from rest_framework.response import Response
 from annot8_api import models as api_models
 from annot8_api import serializers
 from annot8_api.views.base import BaseViewSet
+
+from labeltree.models import Label
 
 class FileViewSet(BaseViewSet):
 
@@ -61,6 +64,7 @@ class FileViewSet(BaseViewSet):
         try:
             bbox = api_models.BoundingBox.create(file, x, y, width, height, False, user)
             if label is not None:
+                label = get_object_or_404(Label, pk=label["id"])
                 api_models.Annotation.create(described_object=bbox, label=label, annotator=user)
 
         except Exception as e:
@@ -78,6 +82,7 @@ class FileViewSet(BaseViewSet):
             return Response({"status": "Label missing"},
                 status=status.HTTP_400_BAD_REQUEST)
 
+        label = get_object_or_404(Label, pk=label["id"])
         user = self.request.user
         file = self.get_object()
 

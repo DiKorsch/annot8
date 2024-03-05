@@ -5,6 +5,7 @@ import { auth } from './auth.module';
 import { data } from './data.module';
 import { gbif } from './gbif.module';
 import { messages } from './messages.module';
+import { pastebin } from './pastebin.module';
 
 import DataService from '@/services/data.service';
 
@@ -193,5 +194,6 @@ export default new Vuex.Store({
     data,
     gbif,
     messages,
+    pastebin,
   }
 });
