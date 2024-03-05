@@ -1,6 +1,6 @@
 <template>
   <div>
-    
+
   <div
     class="bounding-box"
     :style="style"
@@ -41,7 +41,7 @@
     >
       <v-list flat dense subheader>
         <v-subheader>Box actions</v-subheader>
-        
+
         <v-list-item-group
           color="primary"
         >
@@ -62,7 +62,7 @@
         </v-list-item-group>
       </v-list>
     </v-menu>
-    
+
   </div>
 </template>
 
@@ -91,8 +91,10 @@ export default {
     ctxMenuY: 0,
     showCtxMenu: false,
     items: [
+      { text: 'Copy', icon: 'mdi-content-copy', action: "copy"},
       { text: 'Edit', icon: 'mdi-pencil', action: "edit"},
       { text: 'Delete', icon: 'mdi-trash-can', action: "delete"},
+      { separator: true },
       { text: 'Predict', icon: 'mdi-brain', action: "predict"},
       { text: 'Annotate', icon: 'mdi-tag', action: "annotate"},
     ],
@@ -132,7 +134,7 @@ export default {
   },
 
   methods: {
-    
+
     handleRightClick: function(e) {
       e.preventDefault()
       if(!this.selected)
@@ -140,7 +142,7 @@ export default {
 
       if (!this.editable)
         return
-    
+
       this.showCtxMenu = false
       this.ctxMenuX = e.clientX
       this.ctxMenuY = e.clientY

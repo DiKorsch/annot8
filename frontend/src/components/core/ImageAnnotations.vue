@@ -22,6 +22,7 @@
       @selectedBBox="$emit('selectedBBox', $event)"
       @delete="$emit('delete', $event)"
       @edit="$emit('edit', $event)"
+      @copy="$emit('copy', $event)"
     />
 
     <core-BoundingBox
@@ -34,7 +35,7 @@
       v-model="newBox"
     />
 
-  <v-menu
+    <v-menu
       v-model="showCtxMenu"
       :position-x="ctxMenuPos.x"
       :position-y="ctxMenuPos.y"
@@ -51,6 +52,7 @@
           <v-divider v-if="item.separator"></v-divider>
           <v-list-item v-else
               @click="ctxMenuClicked(item.action)"
+              :disabled="item.disabled"
             >
               <v-list-item-icon>
                 <v-icon v-text="item.icon"></v-icon>
@@ -70,7 +72,7 @@
 
 
 <script>
-
+import { mapGetters } from 'vuex'
 class Coords{
   constructor(x, y){
     this.x = x;
@@ -118,23 +120,33 @@ export default {
     ctxMenuPos: new Coords(0, 0),
     ctxMenuRelPos: new Coords(0, 0),
     showCtxMenu: false,
-    ctxMenuItems: [
-      { text: 'Add box', icon: 'mdi-plus', action: 'add_box' },
-      { text: 'Estimate box', icon: 'mdi-circle-box-outline', action: "estimate_bbox"},
-      { separator: true },
-      { text: 'Classify image', icon: 'mdi-label-multiple-outline', action: "predict"},
-      { text: 'Detect boxes', icon: 'mdi-view-grid-plus-outline', action: "detect"},
-      { text: 'Annotate', icon: 'mdi-tag', action: "annotate"},
-    ]
   }),
 
+
+  computed: {
+    ctxMenuItems() {
+      return [
+        { text: 'Paste box', icon: 'mdi-content-paste', action: 'paste', disabled: !this.hasBboxStored},
+        { text: 'Add box', icon: 'mdi-plus', action: 'add_box' },
+        { text: 'Estimate box', icon: 'mdi-circle-box-outline', action: "estimate_bbox"},
+        { separator: true },
+        { text: 'Classify image', icon: 'mdi-label-multiple-outline', action: "predict"},
+        { text: 'Detect boxes', icon: 'mdi-view-grid-plus-outline', action: "detect"},
+        { text: 'Annotate', icon: 'mdi-tag', action: "annotate"},
+      ]
+    },
+
+    ...mapGetters('pastebin', {
+      hasBboxStored: 'isSet'
+    }),
+  },
 
   methods: {
     ctxMenuClicked(action){
       if (action === "add_box")
         this.initPos = this.ctxMenuRelPos;
-
-      console.log(action)
+      else
+        this.$emit(action)
     },
 
     isSelected(boxId){

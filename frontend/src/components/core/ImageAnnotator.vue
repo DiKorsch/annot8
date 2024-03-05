@@ -39,6 +39,8 @@
             @selectedBBox="bboxClicked($event)"
             @delete="boxSelection.toDelete = $event"
             @edit="boxSelection.toEdit = $event"
+            @copy="sendToPastebin($event)"
+            @paste="getFromPastebin"
           />
         </core-LazyImage>
       </v-col>
