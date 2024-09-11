@@ -12,6 +12,7 @@ import Data from './views/project/DataView'
 import Annotations from './views/project/AnnotationsView'
 import Crops from './views/project/CropsView'
 import Labels from './views/LabelsView'
+import PasswordChange from './views/PasswordChangeView'
 import Login from './views/LoginView'
 import Logout from './views/LogoutView'
 
@@ -75,6 +76,11 @@ export default new VueRouter({
           path: '/labels',
           name: 'labels',
           component: Labels
+        },
+        {
+          path: '/change-password',
+          name: 'change_password',
+          component: PasswordChange
         },
         {
             path: '/project/:id',

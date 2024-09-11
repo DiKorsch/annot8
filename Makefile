@@ -10,12 +10,6 @@ DOCKER_OPTS :=
 start_screen:
 	screen -dmS annot8 -c scripts/screen/rc
 
-docker.run.dev:
-	docker compose --env-file .env.local --profile dev up $(DOCKER_OPTS)
-
-docker.build.dev:
-	docker compose --env-file .env.local --profile dev build $(DOCKER_OPTS)
-
 docker.run:
 	docker compose --env-file .env --profile production up $(DOCKER_OPTS)
 
@@ -42,4 +36,3 @@ backend_coverage:
 
 backend_pylint:
 	@echo "BACKEND PYLINT MISSING!"
-

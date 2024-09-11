@@ -16,6 +16,17 @@ class AuthService {
     TokenService.removeTokens();
   }
 
+  changePassword({oldPassword, newPassword}) {
+    return api.post("/user/change-password/", {
+        old_password: oldPassword,
+        new_password: newPassword,
+      })
+      .then((response) => {
+        return response.data;
+      });
+
+  }
+
   refreshAccessToken () {
 
     return api.

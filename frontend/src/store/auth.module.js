@@ -33,6 +33,19 @@ export const auth = {
         }
       );
     },
+    changePassword({ commit }, passwords) {
+      return AuthService.changePassword(passwords).then(
+        response => {
+          commit('changePasswordSuccess', response);
+          return Promise.resolve(response);
+        },
+        error => {
+          console.log(error)
+          commit('changePasswordFailure', error.response.data.status);
+          return Promise.reject(error);
+        }
+      );
+    },
     logout({ commit }) {
       AuthService.logout();
       commit('logout');
@@ -54,6 +67,18 @@ export const auth = {
       state.tokens = null;
       this.dispatch("messages/alert", {msg: "Logged failed!"})
     },
+
+    changePasswordSuccess(state, response) {
+      console.log("[Store Auth] password change success:", response)
+      // AuthService.logout();
+      this.dispatch("messages/info", {msg: "Password changed!"})
+    },
+
+    changePasswordFailure(state, error) {
+      console.log("[Store Auth] password change failure:", error)
+      this.dispatch("messages/alert", {msg: `Password change failed: ${error}!`})
+    },
+
     logout(state) {
       console.log("[Store Auth] logged out!")
       state.loggedIn = false;
