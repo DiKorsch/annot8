@@ -21,7 +21,7 @@ WORKDIR /code
 # install dependencies
 COPY ./backend/requirements.txt /code/
 RUN python -m pip install --upgrade pip
-RUN pip install numpy uwsgi
+RUN pip install numpy~=1.23.5 uwsgi
 RUN pip install -r /code/requirements.txt
 RUN rm /code/requirements.txt
 

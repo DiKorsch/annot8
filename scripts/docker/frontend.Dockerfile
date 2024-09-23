@@ -6,7 +6,7 @@ ARG GID=root
 # build webui                          #
 ########################################
 
-FROM node:20 as builder
+FROM node:20 AS builder
 
 # copy files
 COPY  ./frontend /code
@@ -25,7 +25,7 @@ RUN npm run build
 # actuall webserver                    #
 ########################################
 
-FROM nginx as annot8_frontend
+FROM nginx AS annot8_frontend
 
 COPY --from=builder /code/dist /usr/share/nginx/html
 USER      ${UID}:${GID}

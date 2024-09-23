@@ -36,6 +36,7 @@ ALLOWED_HOSTS = [
 ]
 
 FRONTEND_PORT = os.environ.get("FRONTEND_PORT", 8080)
+print(f"Used frontend port: {FRONTEND_PORT}")
 
 CORS_ORIGIN_WHITELIST = (
     f'http://localhost:{FRONTEND_PORT}',
@@ -47,6 +48,7 @@ CORS_ORIGIN_WHITELIST = (
 CSRF_TRUSTED_ORIGINS = (
     'https://api.inf-cv.uni-jena.de',
     'https://annot8.dikorsch.de',
+    'http://localhost:8082',
 )
 
 CORS_ALLOW_HEADERS = list(default_headers) + [
