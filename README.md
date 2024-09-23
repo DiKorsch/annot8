@@ -13,6 +13,7 @@ conda create -n annot8 python~=3.9.0
 conda activate annot8
 pip install "cython<3.0.0" # for cvmodelz
 pip install "pyyaml==5.4.1" --no-build-isolation
+pip install "numpy<2.0.0"  # resolve: AttributeError: `np.sctypes` was removed in the NumPy 2.0 release. Access dtypes explicitly instead.
 pip install -r requirements.txt
 ```
 
