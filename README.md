@@ -10,6 +10,7 @@ sudo apt install -y redis
 cd backend
 conda create -n annot8 python~=3.9.0
 conda activate annot8
+pip install numpy~=1.23.5 uwsgi
 pip install -r requirements.txt
 ```
 
@@ -96,4 +97,3 @@ npm run lint
 
 #### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
-
