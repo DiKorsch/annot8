@@ -22,6 +22,8 @@ class Extensions(enum.Enum):
     JPG = ".jpg"
     JPEG = ".jpeg"
     PNG = ".png"
+    TIFF = ".tiff"
+    TIF = ".tif"
 
 
 def project_directory(instance: "File", filename: str):
@@ -38,6 +40,8 @@ class File(base.DescribableObject):
         (Extensions.JPG, "JPG Image"),
         (Extensions.JPEG, "JPEG Image"),
         (Extensions.PNG, "PNG Image"),
+        (Extensions.TIF, "TIF Image"),
+        (Extensions.TIFF, "TIFF Image"),
     ]
 
     THUMBNAILS = [
@@ -124,9 +128,21 @@ class File(base.DescribableObject):
         with self.load_image() as im:
             return np.asarray(im)
 
+    def save(self, *args, **kwargs):
+        path = Path(self.path.path)
+        if path.suffix.lower() in (".tiff", ".tif"):
+            im = Image.open(self.path.file)
+            im = im.convert("RGB")
+            path = path.with_suffix(".jpg")
+            im.save(path, 'JPEG', quality=100)
+            self.path.name = path.name  # Update path in the instance
+
+        super().save(*args, **kwargs)
+
     def create_thumbnails(self):
         path = Path(self.path.path)
         folder = path.parent / "thumbs"
+        # name = path.stem + ".png" if path.suffix.lower() in (".tiff", ".tif") else path.name
         name = path.name
         with self.load_image() as im:
             for th_name, size in self.THUMBNAILS:
