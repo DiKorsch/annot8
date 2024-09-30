@@ -6,6 +6,7 @@
 
 1. Install requirements
 ```bash
+sudo apt install python3-dev default-libmysqlclient-dev build-essential
 sudo apt install -y redis
 cd backend
 conda create -n annot8 python~=3.9.0
