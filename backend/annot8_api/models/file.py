@@ -16,7 +16,7 @@ from pathlib import Path
 
 from annot8_api import models as api_models
 from annot8_api.models import base
-from annot8_ai.detector.tracks import creation_date
+from annot8_ai.detector.tracks import creation_date, CreationDateError
 
 class Extensions(enum.Enum):
     JPG = ".jpg"
@@ -81,7 +81,10 @@ class File(base.DescribableObject):
     def meta(self):
         n_boxes = self.bboxes.count()
 
-        record_date = creation_date(self)
+        try:
+            record_date = creation_date(self)
+        except CreationDateError:
+            record_date = self.created
 
         return [
             ("Bounding boxes", n_boxes),
