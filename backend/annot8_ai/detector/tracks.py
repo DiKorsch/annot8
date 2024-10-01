@@ -20,25 +20,12 @@ class CostWeights:
     feature: float = .1
     iou: float = .1
 
-class CreationDateError(Exception):
-    pass
 
 def to_int(string) -> int:
     try:
         return int(string)
     except ValueError:
         return 0
-
-def extract_from_file_name(fname: str, regex) -> dt.datetime:
-    m = regex.search(fname)
-    if m:
-        year, month, day, hour, minute, sequence = map(to_int, m.groups())
-    else:
-        logging.error(f"Could not match {fname}, ignoring this file!")
-        raise CreationDateError
-
-    # we just interpret the sequence number as microseconds
-    return dt.datetime(year, month, day, hour, minute, microsecond=sequence)
 
 def creation_date(file: "api_models.File",
                   FMT = "%Y:%m:%d %H:%M:%S",
@@ -52,13 +39,20 @@ def creation_date(file: "api_models.File",
                 return dt.datetime.strptime(exif_data['DateTimeOriginal'], FMT)
 
         except AttributeError:
+            logging.error(f"Could not extract creation date from EXIF data of {file.path}")
             fname = str(Path(file.path.path).name)
-            try:
-                return extract_from_file_name(fname, regex)
-            except CreationDateError:
+            match = regex.search(fname)
+            if match:
+                year, month, day, hour, minute, sequence = map(to_int, match.groups())
+                # we just interpret the sequence number as microseconds
+                return dt.datetime(year, month, day, hour, minute, microsecond=sequence)
+            else:
+                logging.error(f"Could not match {fname}. Using the creation date of the file!")
                 return file.created
 
-
+        except Exception as e:
+            logging.error(f"Could not extract creation date from {file.path}: {e}")
+            return file.created
 
 def concat_tracks(connections):
 
