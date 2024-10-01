@@ -23,44 +23,41 @@ class CostWeights:
 class CreationDateError(Exception):
     pass
 
-def creation_date(file,
+def to_int(string) -> int:
+    try:
+        return int(string)
+    except ValueError:
+        return 0
+
+def extract_from_file_name(fname: str, regex) -> dt.datetime:
+    m = regex.search(fname)
+    if m:
+        year, month, day, hour, minute, sequence = map(to_int, m.groups())
+    else:
+        logging.error(f"Could not match {fname}, ignoring this file!")
+        raise CreationDateError
+
+    # we just interpret the sequence number as microseconds
+    return dt.datetime(year, month, day, hour, minute, microsecond=sequence)
+
+def creation_date(file: "api_models.File",
                   FMT = "%Y:%m:%d %H:%M:%S",
                   regex = re.compile(r"(\d{4})[_-]?(\d{2})[_-]?(\d{2})[a-zA-Z-_]*(\d{2})(\d{2})(\d*)\..*")
-                  ):
-    def to_int(string) -> int:
-        try:
-            return int(string)
-        except ValueError:
-            return 0
-
-    def extract_from_file_name(fname: str) -> dt.datetime:
-        m = regex.search(fname)
-        if m:
-            year, month, day, hour, minute, sequence = map(to_int, m.groups())
-        else:
-            logging.error(f"Could not match {fname}, ignoring this file!")
-            raise CreationDateError
-
-        # we just interpret the sequence number as microseconds
-        return dt.datetime(int(year), int(month), int(day), int(hour), int(minute), microsecond=int(sequence))
-
+                  ) -> dt.datetime:
     with Image.open(file.path.path) as img:
         try:
             exif = img._getexif()
-        except AttributeError:
-            exif = None
+            exif_data = {PIL.ExifTags.TAGS[k]: v for k, v in exif.items() if k in PIL.ExifTags.TAGS}
+            if 'DateTimeOriginal' in exif_data:
+                return dt.datetime.strptime(exif_data['DateTimeOriginal'], FMT)
 
-    if exif is None:
-        fname = str(Path(file.path.path).name)
-        ts = extract_from_file_name(fname)
-    else:
-        exif_data = {PIL.ExifTags.TAGS[k]: v for k, v in exif.items() if k in PIL.ExifTags.TAGS}
-        if 'DateTimeOriginal' in exif_data:
-            ts = dt.datetime.strptime(exif_data['DateTimeOriginal'], FMT)
-        else:
+        except AttributeError:
             fname = str(Path(file.path.path).name)
-            ts = extract_from_file_name(fname)
-    return ts
+            try:
+                return extract_from_file_name(fname, regex)
+            except CreationDateError:
+                return file.created
+
 
 
 def concat_tracks(connections):
